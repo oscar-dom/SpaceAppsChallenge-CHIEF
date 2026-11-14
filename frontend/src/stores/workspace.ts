@@ -95,15 +95,6 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     set(removePane(clone(layout.value), paneId) ?? mkPane(['crew']));
   }
 
-  function splitRight(paneId: string) {
-    const p = findPane(layout.value, paneId);
-    const active = p?.tabs.find((t) => t.id === p.active);
-    if (!active) return;
-    const t = mkTab(active.sec, active.period);
-    const np: Pane = { type: 'pane', id: `${paneId}-r${Date.now()}`, tabs: [t], active: t.id };
-    set(splitPane(clone(layout.value), paneId, 'right', np), np.id);
-  }
-
   /** Drops what is being dragged on a pane: into it (center) or as a new split beside it. */
   function drop(paneId: string, zone: Zone, index?: number) {
     const d = drag.value;
@@ -158,13 +149,18 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     dropTab.value = null;
   }
 
-  /** Resizes the two children of a split around a divider; `delta` is a fraction of it. */
-  function resize(path: number[], i: number, sizes0: number[], delta: number) {
+  /**
+   * Resizes the two children of a split around a divider; `delta` is a fraction of it.
+   * `minFrac` is the minimum pane size as a fraction of the split, so neither side shrinks
+   * below it (when the two cannot both fit, the space is shared equally).
+   */
+  function resize(path: number[], i: number, sizes0: number[], delta: number, minFrac = 0.15) {
     const tree = clone(layout.value);
     const n = nodeAt(tree, path);
     if (n.type !== 'split') return;
     const total = (sizes0[i] ?? 0) + (sizes0[i + 1] ?? 0);
-    const a = Math.max(0.15 * total, Math.min(0.85 * total, (sizes0[i] ?? 0) + delta));
+    const min = Math.min(minFrac, total / 2);
+    const a = Math.max(min, Math.min(total - min, (sizes0[i] ?? 0) + delta));
     n.sizes[i] = a;
     n.sizes[i + 1] = total - a;
     layout.value = tree;
@@ -198,7 +194,6 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     setPeriod,
     closeTab,
     closePane,
-    splitRight,
     drop,
     startDrag,
     endDrag,

@@ -162,6 +162,41 @@ export function flatten(tree: LayoutNode): { panes: PlacedPane[]; dividers: Divi
   return { panes, dividers };
 }
 
+/** Smallest pane, in pixels, that still fits a section header and readable charts. */
+export const MIN_PANE_W = 380;
+export const MIN_PANE_H = 280;
+/** More panes than this on one screen makes every section too small to read. */
+export const MAX_PANES = 4;
+
+/**
+ * Smallest workspace, in pixels, that keeps every placed pane at the minimum size, whatever
+ * share of the workspace each pane has after its dividers were dragged.
+ */
+export function minSize(panes: PlacedPane[]): { w: number; h: number } {
+  return {
+    w: Math.max(MIN_PANE_W, ...panes.map((p) => MIN_PANE_W / p.w)),
+    h: Math.max(MIN_PANE_H, ...panes.map((p) => MIN_PANE_H / p.h)),
+  };
+}
+
+/**
+ * Drop zones a pane of `w` × `h` pixels accepts: a split is offered only when both halves
+ * would still be at least the minimum pane size and the pane limit is not reached.
+ */
+export function allowedZones(w: number, h: number, paneCount: number): Set<Zone> {
+  const zones = new Set<Zone>(['center']);
+  if (paneCount >= MAX_PANES) return zones;
+  if (w / 2 >= MIN_PANE_W) {
+    zones.add('left');
+    zones.add('right');
+  }
+  if (h / 2 >= MIN_PANE_H) {
+    zones.add('top');
+    zones.add('bottom');
+  }
+  return zones;
+}
+
 /** Which drop zone the pointer is in: the outer quarter of each edge, else the centre. */
 export function zoneAt(fx: number, fy: number): Zone {
   const m = Math.min(fx, 1 - fx, fy, 1 - fy);

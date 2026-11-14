@@ -41,7 +41,10 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
   context is never in doubt.
 - **Workspace:** a tree of splits and panes (`src/lib/layout.ts`, pure and tested). Click a
   section to open it in the focused pane; drag a section or a tab onto a pane edge to split
-  it, onto its centre or tab bar to move it there. Dividers resize the panes.
+  it, onto its centre or tab bar to move it there. Dividers resize the panes. A pane never
+  gets smaller than 380 × 280 px: a split is only offered when both halves keep that size,
+  there are at most 4 panes, dividers stop at the minimum, and when the window is too small
+  for the layout the workspace scrolls instead of squeezing the panes.
 - **Notifications:** alerts (anomalies) and tasks (scheduled measurements). The panel
   collapses to a rail, but a new alert from the backend always opens it again.
 - **CHIEF chat:** text and push-to-talk. The recording goes to `/api/chief/stt`; if the
