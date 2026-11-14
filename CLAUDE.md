@@ -154,6 +154,11 @@ One view for every crew member: what an astronaut sees on board.
   aware of, sorted by severity. **Clicking an alert asks CHIEF for recommended actions.**
 - **CHIEF chat:** text and voice (push-to-talk). If the voice service is down, the
   browser's Web Speech API is the fallback.
+- **CHIEF's mascot: "Capsule"**, a medicine capsule dressed as an astronaut, with four
+  animated states (`idle`, `listening`, `thinking`, `alert`). It appears on the Talk to
+  CHIEF button and in the chat. SVG, colors and the suggested Vue component:
+  [`docs/design/chief-mascot/`](docs/design/chief-mascot/README.md). Its accent is sky
+  blue (amber in `alert`), never green or red, which mean health statuses.
 
 The UI should feel like a spacecraft system: clear, dark-friendly, with subtle animation
 for live data and alert changes.
