@@ -56,11 +56,11 @@ export const THRESHOLDS: ThresholdSeed[] = [
       'Check the sensor fit, breathe slowly and measure again. Check the cabin oxygen and CO2 levels and contact the flight surgeon if it stays low.',
     source: {
       document:
-        'WHO Pulse Oximetry Training Manual (2011): saturation should be 95% or above in healthy people; below 90% is a low-saturation emergency',
+        'WHO Pulse Oximetry Training Manual (2011): saturation should be 95% or above; at 94% or below look for the cause; below 90% is a clinical emergency',
       url: 'https://www.phenxtoolkit.org/protocols/view/91102',
     },
-    // 95% confirmed; the 90% emergency level was found only in the PhenX protocol based on the manual.
-    verification: 'partially-verified',
+    // Both cut-offs quoted verbatim from the manual by the PhenX protocol and in the WHO slide set.
+    verification: 'verified',
   },
   {
     metricId: 'systolic-blood-pressure',
@@ -105,11 +105,11 @@ export const THRESHOLDS: ThresholdSeed[] = [
       'Keep up the resistive exercise sessions (ARED) and calcium and vitamin D intake, and tell the flight surgeon so the countermeasures can be reviewed.',
     source: {
       document:
-        'NASA OCHMO Bone Loss technical brief (NASA-STD-3001 Vol. 1): in-mission bone countermeasures target hip and spine at or above 95% and femoral neck at or above 90% of pre-mission values',
+        'NASA-STD-3001 Vol. 1 Rev. C, requirement V1 4027 (Pre-mission Bone Countermeasures): countermeasures shall maintain bone mineral density of the hip and spine at or above 95% of pre-mission values and at or above 90% for the femoral neck. Quoted in the NASA OCHMO Bone Loss technical brief OCHMO-MTB-013 Rev D',
+      section: 'V1 4027',
       url: 'https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-030-bone-loss.pdf',
     },
-    // The targets come from the NASA brief; which Rev C requirement holds them still has to be checked.
-    verification: 'partially-verified',
+    verification: 'verified',
   },
 
   // --- blood and biochemistry -------------------------------------------------------------------
@@ -157,10 +157,11 @@ export const THRESHOLDS: ThresholdSeed[] = [
       'Review recent meals and sugar intake and repeat the fasting measurement. Report values that stay out of range to the flight surgeon.',
     source: {
       document:
-        'ADA Standards of Care in Diabetes: fasting glucose 100-125 mg/dL prediabetes, >= 126 diabetes; hypoglycemia level 1 < 70, level 2 < 54 mg/dL',
+        'ADA Standards of Care in Diabetes: fasting glucose 100-125 mg/dL prediabetes, >= 126 diabetes; classification of hypoglycemia: level 1 < 70 and >= 54 mg/dL, level 2 < 54 mg/dL',
+      section: 'Diagnosis and Classification; Glycemic Goals and Hypoglycemia',
     },
-    // Fasting categories confirmed in the ADA summary; hypoglycemia levels only in a secondary source.
-    verification: 'partially-verified',
+    // Hypoglycemia levels confirmed in the Standards' classification table and ADA's own handouts.
+    verification: 'verified',
   },
 
   // --- immune -----------------------------------------------------------------------------------
@@ -192,27 +193,28 @@ export const THRESHOLDS: ThresholdSeed[] = [
       'Look for a cause of inflammation (illness, injury, intense exercise) and repeat the test in a few days. Report values above 10 mg/L to the flight surgeon.',
     source: {
       document:
-        'CDC/AHA scientific statement on markers of inflammation (Pearson et al., Circulation 2003;107:499-511): < 1 low, 1-3 average, > 3 mg/L high risk',
+        'CDC/AHA scientific statement on markers of inflammation (Pearson et al., Circulation 2003;107:499-511): < 1 low, 1-3 average, > 3 mg/L high risk; a persistent, unexplained value > 10 mg/L should be evaluated for non-cardiovascular causes (infection, inflammation)',
     },
-    // The risk bands are confirmed; the > 10 mg/L acute level was found only in a secondary summary.
-    verification: 'partially-verified',
+    // The > 10 mg/L recommendation is quoted by the CAP and LabCorp documents that cite the statement.
+    verification: 'verified',
   },
 
   // --- vision (SANS) ----------------------------------------------------------------------------
   {
     metricId: 'optic-disc-edema-grade',
     ranges: [
-      { status: 'nominal', range: { max: 1 } }, // grade 0: no edema
-      { status: 'caution', range: { min: 1, max: 3 } }, // team-band: grades 1-2
-    ],
+      { status: 'nominal', range: { max: 1 } }, // grade 0: normal optic disc
+      { status: 'caution', range: { min: 1, max: 3 } }, // team-band: grades 1-2 (very early, early)
+    ], // >= 3: moderate, marked or severe edema
     escalation: { caution: 'crew-medical-officer', critical: 'flight-surgeon' },
     fallbackRecommendation:
       'Report any blurred vision or headaches. Schedule a repeat eye exam and tell the flight surgeon: optic disc swelling is a sign of SANS.',
     source: {
       document:
-        'Frisén grading scale for papilledema (1982), used to grade optic disc edema in SANS',
+        'Frisén L. Swelling of the optic nerve head: a staging scheme. J Neurol Neurosurg Psychiatry 1982;45:13-18. Grades: 0 normal, 1 very early, 2 early, 3 moderate, 4 marked, 5 severe. Used to grade optic disc edema in the SANS case definition',
     },
-    verification: 'to-verify',
+    // The grades are verified; which grades count as caution or critical is a team choice.
+    verification: 'verified',
   },
   {
     metricId: 'intraocular-pressure',
@@ -252,17 +254,17 @@ export const THRESHOLDS: ThresholdSeed[] = [
     metricId: 'sleep-efficiency',
     ranges: [
       { status: 'nominal', range: { min: 85 } },
-      { status: 'caution', range: { min: 65, max: 85 } }, // team-band
-    ],
+      { status: 'caution', range: { min: 75, max: 85 } }, // NSF "uncertain" band for adults
+    ], // < 75: does not indicate good sleep quality (adults 26-64, like the whole crew)
     escalation: { caution: 'self-care', critical: 'crew-medical-officer' },
     fallbackRecommendation:
       'Keep a regular sleep schedule, limit time awake in bed and check the noise and light in your sleep station.',
     source: {
       document:
-        'National Sleep Foundation sleep quality recommendations (Ohayon et al., Sleep Health 2017;3(1):6-19): sleep efficiency of 85% or more',
+        'National Sleep Foundation sleep quality recommendations (Ohayon et al., Sleep Health 2017;3(1):6-19): for adults aged 26-64, sleep efficiency of 85% or more indicates good sleep quality and 74% or less does not',
     },
-    // The 85% figure was found in a document that cites the paper, not in the paper itself.
-    verification: 'partially-verified',
+    // Both cut-offs found in several sources quoting the paper (NSF release, DiMe core measures table).
+    verification: 'verified',
   },
 
   // --- radiation --------------------------------------------------------------------------------

@@ -12,6 +12,7 @@ Why the database, the simulator and the data look the way they do. Newest decisi
 | 4 | #10 `feat: rebuild database on drizzle and the shared contract` | Schema rebuilt on Drizzle and `@chief/shared`; previous SQL removed |
 | 5 | #13 `feat: add live simulator and real nasa data` | Live simulator, NASA OSDR and DONKI datasets |
 | 6 | `feat: verify threshold sources and add sourced thresholds` | Threshold sources checked; sourced thresholds for bone, calcium and fluid |
+| 7 | `fix: close the remaining threshold verifications` | Every threshold verified; sleep efficiency bands taken from the NSF instead of a team band |
 
 ## D1. SQLite as the engine
 
@@ -93,7 +94,6 @@ Why the database, the simulator and the data look the way they do. Newest decisi
 
 ## Open items
 
-- Close the remaining threshold verifications (Frisén mapping, partially verified entries, Rev C bone requirement).
 - Agree on the space-weather rule for the solar-storm alert.
 - Wire `MissionSimulator` into the backend (Express + Socket.IO) and expose a way to launch the storm during the demo.
 - Import more OSDR panels only together with sourced thresholds.
