@@ -33,6 +33,7 @@ class FakeModels:
 
     async def generate_content(self, *, model: str, contents: Any, config: Any) -> Any:
         self.calls.append(model)
+        self.config = config
         result = self.behaviour[model]
         if isinstance(result, BaseException):
             raise result
@@ -51,7 +52,7 @@ class Clock:
 
 
 def make_chain(
-    behaviour: dict[str, Any], timeout: float = 30.0, clock: Any = None
+    behaviour: dict[str, Any], timeout: float = 30.0, clock: Any = None, attempt: float = 30.0
 ) -> tuple[GeminiChain, FakeModels]:
     models = FakeModels(behaviour)
     client = SimpleNamespace(aio=SimpleNamespace(models=models))
@@ -60,6 +61,7 @@ def make_chain(
         gemini_api_key="k",
         gemini_models=",".join(behaviour),
         llm_timeout_seconds=timeout,
+        llm_attempt_seconds=attempt,
     )
     chain = GeminiChain(settings, client=client, clock=clock or Clock())
     return chain, models
@@ -143,3 +145,25 @@ def test_does_not_start_a_model_without_enough_time() -> None:
     with pytest.raises(LlmError, match="out of time"):
         run(chain)
     assert models.calls == []
+
+
+def test_slow_model_leaves_time_for_the_next_one(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("chief.llm.MIN_ATTEMPT_SECONDS", 0.1)
+    chain, models = make_chain(
+        {"a": 5.0, "b": GOOD}, timeout=1.0, attempt=0.3, clock=time.monotonic
+    )
+    assert run(chain).model == "b"
+    assert models.calls == ["a", "b"]
+
+
+@pytest.mark.parametrize(("level", "expected"), [("low", "LOW"), ("", None)])
+def test_thinking_level_is_sent_when_set(level: str, expected: str | None) -> None:
+    models = FakeModels({"a": GOOD})
+    client = SimpleNamespace(aio=SimpleNamespace(models=models))
+    settings = Settings(
+        _env_file=None, gemini_api_key="k", gemini_models="a", gemini_thinking_level=level
+    )
+    run(GeminiChain(settings, client=client))
+    thinking = models.config.thinking_config
+    level_sent = thinking.thinking_level.name if thinking else None
+    assert level_sent == expected

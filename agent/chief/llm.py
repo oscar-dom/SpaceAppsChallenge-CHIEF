@@ -61,7 +61,8 @@ class GeminiChain:
     """Tries each configured model in order until one gives a valid answer.
 
     A model that fails is skipped for a while (see the COOLDOWN_* values), so a model
-    without quota does not slow down every answer. The whole chain shares one deadline.
+    without quota does not slow down every answer. The whole chain shares one deadline,
+    and each model gets at most `llm_attempt_seconds` of it.
     """
 
     def __init__(
@@ -101,6 +102,7 @@ class GeminiChain:
             temperature=self._settings.gemini_temperature,
             response_mime_type="application/json",
             response_schema=schema,
+            thinking_config=_thinking(self._settings.gemini_thinking_level),
         )
         deadline = self._clock() + self._settings.llm_timeout_seconds
         failures: list[str] = []
@@ -115,7 +117,7 @@ class GeminiChain:
                     self._client.aio.models.generate_content(
                         model=model, contents=contents, config=config
                     ),
-                    timeout=remaining,
+                    timeout=min(remaining, self._settings.llm_attempt_seconds),
                 )
                 return LlmResult(output=_parse(response, schema), model=model)
             except _InvalidAnswerError as exc:
@@ -131,6 +133,11 @@ class GeminiChain:
         if not failures:
             failures.append("every model is cooling down after recent failures")
         raise LlmError("; ".join(failures))
+
+
+def _thinking(level: str) -> types.ThinkingConfig | None:
+    level = level.strip().lower()
+    return types.ThinkingConfig(thinking_level=level) if level else None  # type: ignore[arg-type]
 
 
 class _InvalidAnswerError(Exception):
