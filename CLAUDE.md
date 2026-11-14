@@ -53,7 +53,7 @@ Full details in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vue 3 + Vite + TypeScript, **Vuetify 3**, Pinia, Vue Router, **vue-echarts** (charts), Socket.IO client |
+| Frontend | Vue 3 + Vite + TypeScript, Pinia, Socket.IO client. Own design system (tokens in `frontend/src/styles/base.css`) and SVG charts, no component library |
 | Backend | Node.js + **Express** + TypeScript, Socket.IO, **SQLite** with **Drizzle ORM** (better-sqlite3 driver) |
 | Agent (CHIEF) | **Python + FastAPI**, a chain of Gemini Flash models via the `google-genai` SDK, **faster-whisper** (speech-to-text), **Piper** (text-to-speech) |
 | Shared contracts | `shared/` — TypeScript types used by frontend and backend |
@@ -70,6 +70,10 @@ Why these choices:
   In the story, CHIEF is the ship's assistant.
 - **Python agent:** faster-whisper and Piper are Python tools; keeping CHIEF, STT and TTS
   in one service gives the AI work a single home.
+- **No Vuetify or vue-echarts:** the interface follows a custom flight-software design
+  (status colours only for health, mono tabular numbers, threshold bands on every chart).
+  Plain CSS tokens and small SVG charts match it exactly; a Material component library
+  and a chart library would have to be fought at every step.
 
 ---
 
@@ -142,17 +146,22 @@ backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
 
 One view for every crew member: what an astronaut sees on board.
 
-- **Top bar:** **crew switcher**, a quick dropdown like Instagram's account switcher, to
-  change the active crew member. Also mission day and mission clock.
-- **Left menu (always visible):** the body-system sections from the list above. The first
-  entry is **Overview**. At the bottom, a **Talk to CHIEF** button.
+- **Top bar:** mission day, mission clock and crew dose rate. Under it, the **crew tabs**:
+  a **Crew** tab (whole-crew overview: every body, score and key vitals) and one tab per
+  crew member with their health score.
+- **Left menu (always visible, can shrink to icons):** the body-system sections from the
+  list above. The first entry is **Overview**. At the bottom, **Talk to CHIEF** as a speech
+  bubble with the mascot.
+- **Workspace:** sections open as tabs. Dragging a section or a tab onto a pane's edge
+  splits it, so several sections can be seen at once (like editor groups in VS Code).
 - **Overview:** a human body figure (SVG) whose regions are coloured by their system's
   status, plus the global **health score**. Clicking a region opens its section.
 - **System sections:** a dashboard full of statistics for that system: every metric from
   measurements and sensors, with period selectors (day / week / month / whole mission),
   thresholds drawn on the charts and trend indicators.
-- **Right panel (always available, vertical, collapsible):** the alerts to act on or be
-  aware of, sorted by severity. **Clicking an alert asks CHIEF for recommended actions.**
+- **Right panel (collapsible to a rail):** alerts sorted by severity and a Tasks tab with
+  the scheduled measurements. **A new alert always opens the panel.** **Clicking an alert
+  asks CHIEF for recommended actions.**
 - **CHIEF chat:** text and voice (push-to-talk). If the voice service is down, the
   browser's Web Speech API is the fallback.
 - **CHIEF's mascot: "Capsule"**, a medicine capsule dressed as an astronaut, with four
