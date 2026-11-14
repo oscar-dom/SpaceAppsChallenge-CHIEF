@@ -52,43 +52,39 @@ Socket.IO (same port): the server emits `mission:clock` to everyone, and
 that sent `crew:select` with that crew member. A resolved alert is sent once more with
 `acknowledged: true` and then disappears from `GET .../alerts`.
 
-## How it works
+## Where things are
+
+Each folder has its own README with its files, formats and connections. Start there
+before changing a part (and point your AI assistant to it).
+
+| Folder | What it is | Owner |
+| --- | --- | --- |
+| `src/server.ts` | entry point: database, HTTP, Socket.IO, live loop | Carlos |
+| `src/app.ts` | Express app without listening (the tests use it directly) | Carlos |
+| [`src/config/`](src/config/README.md) | environment variables, rules engine constants, logger | Carlos |
+| [`src/routes/`](src/routes/README.md) | REST routes and request formats | Carlos |
+| [`src/controllers/`](src/controllers/README.md) | thin handlers: validate, call a service, answer | Carlos |
+| [`src/middlewares/`](src/middlewares/README.md) | input validation and the `ApiError` handler | Carlos |
+| [`src/errors/`](src/errors/README.md) | error classes and the codes the client sees | Carlos |
+| [`src/services/`](src/services/README.md) | business logic: health, alerts, CHIEF, mission clock, live loop | Carlos |
+| [`src/services/rules/`](src/services/rules/README.md) | **rules engine**: statuses, scores, alerts | Carlos |
+| [`src/services/agent/`](src/services/agent/README.md) | HTTP client of the Python agent | Carlos |
+| [`src/services/simulator/`](src/services/simulator/README.md) | mission simulator (full docs: [`docs/simulator.md`](../docs/simulator.md)) | Héctor |
+| [`src/db/`](src/db/README.md) | Drizzle schema, migrations, queries (`engine-queries.ts`: the API's chart and alert queries) | Héctor |
+| [`data/`](data/README.md) | metrics, thresholds with sources, formulary, scenarios, NASA datasets | Héctor |
+| `scripts/` | `fetch-nasa-data.ts` (`npm run data:fetch`) | Héctor |
 
 ```
-src/
-  server.ts          entry point: database, HTTP, Socket.IO, live loop
-  app.ts             Express app (the tests use it without listening)
-  config/            env (validated with zod), constants (system weights...), logger
-  routes/            REST routes → thin controllers/
-  middlewares/       input validation and the ApiError handler
-  services/
-    rules/engine.ts  rules engine: pure functions, no I/O, no AI
-    health, alerts, crew, chief   services used by the controllers
-    agent/client.ts  HTTP client of the Python agent
-    mission-clock    read-only view of the stored mission time; every "now" comes from here
-    simulator/       Héctor's simulator (docs/simulator.md): moves the clock, writes readings
-    live.service     the tick loop: simulator tick → rules engine → Socket.IO
-  db/                database (see its README); engine-queries.ts holds the chart
-                     series and the alert updates used by the API
+request ─▶ routes ─▶ controllers ─▶ services ─▶ rules engine (pure)
+                                       │   └──▶ db ─▶ SQLite
+                                       └──────▶ agent client ─▶ Python agent
+tick ─▶ simulator ─▶ SQLite ─▶ services (re-evaluate) ─▶ Socket.IO ─▶ frontend
 ```
 
-- **Rules engine.** A reading is classified by the first range of its threshold that
-  contains it (min inclusive, max exclusive), otherwise `critical`. A system takes the
-  worst status of its metrics and the mean of their scores (nominal 100, caution 60,
-  critical 20). The health score is the weighted mean of the systems with scored metrics
-  (`config/constants.ts`), and its status is the worst system status: a high score can
-  still be `critical` when one system is.
-- **No threshold, no status.** Metrics without a sourced threshold (`data/thresholds.ts`)
-  are listed and charted but do not count for any score.
-- **Alerts.** One alert per metric out of range: it is updated if its severity changes
-  and deleted when the metric is back to nominal (the table has no resolved state).
-  Infrequent measurements done by the crew (weekly labs, eye exams) get a `scheduled`
-  reminder 6 h before they are due, resolved when the new reading arrives.
-- **Mission clock.** The live simulator (`MissionSimulator`) is the only one that moves it:
-  every tick (`TICK_INTERVAL_MS`, 1 s) it advances `timeScale` times faster than real time
-  (600 by default: 10 minutes per second) and stores it, so a restart resumes the mission.
-  The rest of the backend only reads it. With `SIMULATOR_ENABLED=false` the clock stands
-  still.
+Key rules, explained in each README: the rules engine decides every status (CHIEF only
+explains it); metrics without a sourced threshold are charted but not scored; the
+simulator is the only one that moves the mission clock; CHIEF chat never fails, it
+answers in fallback mode when the agent is down.
 
 ## Known limitations
 
