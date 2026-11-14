@@ -21,7 +21,21 @@ export function createApp({ services, logger, corsOrigin }: AppOptions): Express
   app.use(helmet());
   app.use(cors({ origin: corsOrigin }));
   app.use(express.json({ limit: '100kb' }));
-  app.use(pinoHttp({ logger }));
+  // One short line per request ("GET /api/crew 200 3ms"): full headers would bury the
+  // simulator and agent logs. Client errors are warnings, server errors are errors.
+  app.use(
+    pinoHttp({
+      logger,
+      quietReqLogger: true,
+      serializers: { req: () => undefined, res: () => undefined },
+      customLogLevel: (_req, res, err) =>
+        err || res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : 'info',
+      customSuccessMessage: (req, res, responseTime) =>
+        `${req.method} ${req.url} ${res.statusCode} ${Math.round(responseTime)}ms`,
+      customErrorMessage: (req, res, err) =>
+        `${req.method} ${req.url} ${res.statusCode}: ${err.message}`,
+    }),
+  );
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });

@@ -51,7 +51,8 @@ watch(
     <template v-if="mission.loadError">
       <span class="boot-title">Cannot reach the ship's health system</span>
       <span class="muted"
-        >{{ mission.loadError }}. Start the backend with <code>npm run dev</code>.</span
+        >{{ mission.loadError }}. Start the backend with <code>npm run dev</code>; retrying every
+        few seconds.</span
       >
       <button class="btn" @click="mission.init({ onNewAlert: ui.alertArrived })">Retry</button>
     </template>
