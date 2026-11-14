@@ -79,7 +79,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     title: 'Rising kidney-stone risk',
     description: 'Urine calcium keeps rising, a risk factor for kidney stones.',
     crewId: 'C001',
-    effects: [{ metricId: 'urine-calcium', kind: 'ramp', amount: 110, fromDay: 25 }],
+    effects: [{ metricId: 'urine-calcium', kind: 'ramp', amount: 85, fromDay: 25 }],
   },
   {
     code: 'early-sans',

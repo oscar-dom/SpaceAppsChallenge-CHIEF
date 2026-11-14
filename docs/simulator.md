@@ -113,7 +113,7 @@ Effect kinds (days since the mission start):
 | Scenario | Crew | Effects | Value at day 60 | Status |
 | --- | --- | --- | --- | --- |
 | `accelerated-bone-loss` | C001 Ana Ruiz | bone density −3.5 %, muscle strength −8 % (ramps from day 20) | bone density about −5.4 % | caution |
-| `kidney-stone-risk` | C001 Ana Ruiz | urine calcium +110 mg/day (ramp from day 25) | about 270 mg/day | caution |
+| `kidney-stone-risk` | C001 Ana Ruiz | urine calcium +85 mg/day (ramp from day 25) | about 275 mg/day | caution |
 | `early-sans` | C002 Leo Martín | optic disc edema +2.2 grades, eye pressure +8 mmHg (ramps from day 30) | grade 2, about 22 mmHg | caution |
 | `vitamin-d-deficiency` | C003 Sara Okafor | vitamin D −22 ng/mL (ramp from day 1) | about 16 ng/mL | critical |
 | `sleep-deprivation` | C004 Iker Vidal | sleep −2 h, efficiency −22 %, reaction time +75 ms, mood −1.2, stress +1.5 (ramps from day 44) | sleep about 5.6 h, efficiency about 67 %, reaction about 370 ms | critical (sleep and efficiency) |
