@@ -242,9 +242,11 @@ npm test                    # tests in every workspace (Vitest, rules engine)
 
 Each workspace provides its own `dev`, `build`, `typecheck` and `test` scripts; the root
 scripts run them with `--if-present`. `npm run dev` starts the agent through
-`scripts/dev-agent.mjs`, which skips it until `agent/main.py` exists. Planned backend
-scripts: `db:migrate` (Drizzle migrations) and `db:seed` (mission history and demo
-scenarios).
+`scripts/dev-agent.mjs`, which skips it until `agent/main.py` exists. Backend database
+scripts (run with `-w backend`, see [`docs/database-schema.md`](docs/database-schema.md)):
+`db:generate` (new Drizzle migration after editing `schema.ts`), `db:migrate`, `db:seed`
+(reference data and mission history) and `db:reset` (rebuild; `-- --restore` returns to the
+clean copy). The SQLite file is `backend/var/chief.db` (git-ignored).
 
 CI runs two jobs on every PR: `Commit messages` (required) and
 `Lint, typecheck and test`.
