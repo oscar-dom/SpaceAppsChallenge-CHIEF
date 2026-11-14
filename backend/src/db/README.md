@@ -10,7 +10,6 @@ Drizzle ORM schema, migrations and access functions for the SQLite database. Onl
 | `migrations.ts` | `runMigrations(db)` |
 | `populate.ts` | `populateDatabase(db, { seed })`: reference data + simulated mission history |
 | `queries.ts` | Access functions that return `@chief/shared` types |
-| `types.ts` | Types not yet in `@chief/shared` (`Medication`, `Alert.recommendation`); delete once the agent branch is merged |
 | `migrate.ts`, `seed.ts`, `reset.ts` | CLIs behind `npm run db:*` |
 | `db.test.ts` | Vitest tests (seed, scenarios, queries, constraints) |
 

@@ -1,15 +1,16 @@
-import { and, asc, eq, gte, lte, max } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, gte, lt, lte, max, sum } from 'drizzle-orm';
 import {
   ALERT_SEVERITIES,
+  type Alert,
   type BodySystemId,
   type CrewMember,
   type Measurement,
+  type Medication,
   type Metric,
   type MissionClock,
   type Threshold,
 } from '@chief/shared';
 import type { Db } from './client.js';
-import type { AlertWithRecommendation, Medication } from './types.js';
 import {
   alerts,
   crewMembers,
@@ -178,6 +179,51 @@ export function getLatestMeasurements(db: Db, crewId: string): Measurement[] {
     .map(({ row }) => toMeasurement(row));
 }
 
+/** The latest reading of a metric strictly before `before` (`YYYY-MM-DDTHH:mm:ssZ`), or null. */
+export function getLatestMeasurementBefore(
+  db: Db,
+  crewId: string,
+  metricId: string,
+  before: string,
+): Measurement | null {
+  const row = db
+    .select()
+    .from(measurements)
+    .where(
+      and(
+        eq(measurements.crewId, crewId),
+        eq(measurements.metricId, metricId),
+        lt(measurements.takenAt, before),
+      ),
+    )
+    .orderBy(desc(measurements.takenAt))
+    .limit(1)
+    .get();
+  return row ? toMeasurement(row) : null;
+}
+
+/** Sum of the readings of a metric in `(after, until]`; `after` null means from the beginning. */
+export function sumMeasurementValues(
+  db: Db,
+  crewId: string,
+  metricId: string,
+  after: string | null,
+  until: string,
+): number {
+  const conditions = [
+    eq(measurements.crewId, crewId),
+    eq(measurements.metricId, metricId),
+    lte(measurements.takenAt, until),
+  ];
+  if (after) conditions.push(gt(measurements.takenAt, after));
+  const [row] = db
+    .select({ total: sum(measurements.value) })
+    .from(measurements)
+    .where(and(...conditions))
+    .all();
+  return Number(row?.total ?? 0);
+}
+
 export type NewMeasurement = Omit<Measurement, 'id'>;
 
 /**
@@ -209,7 +255,7 @@ export function insertMeasurement(
 
 type AlertRow = typeof alerts.$inferSelect;
 
-function toAlert(row: AlertRow): AlertWithRecommendation {
+function toAlert(row: AlertRow): Alert {
   return {
     id: String(row.id),
     crewMemberId: row.crewId,
@@ -228,7 +274,7 @@ function toAlert(row: AlertRow): AlertWithRecommendation {
 }
 
 /** Alerts of a crew member, most urgent first, then newest first. */
-export function getAlerts(db: Db, crewId: string): AlertWithRecommendation[] {
+export function getAlerts(db: Db, crewId: string): Alert[] {
   return db
     .select()
     .from(alerts)
@@ -242,7 +288,7 @@ export function getAlerts(db: Db, crewId: string): AlertWithRecommendation[] {
     );
 }
 
-export function getAlert(db: Db, id: string): AlertWithRecommendation | null {
+export function getAlert(db: Db, id: string): Alert | null {
   const row = db
     .select()
     .from(alerts)
@@ -251,9 +297,9 @@ export function getAlert(db: Db, id: string): AlertWithRecommendation | null {
   return row ? toAlert(row) : null;
 }
 
-export type NewAlert = Omit<AlertWithRecommendation, 'id' | 'acknowledged'>;
+export type NewAlert = Omit<Alert, 'id' | 'acknowledged'>;
 
-export function insertAlert(db: Db, alert: NewAlert): AlertWithRecommendation {
+export function insertAlert(db: Db, alert: NewAlert): Alert {
   const row = db
     .insert(alerts)
     .values({
@@ -275,7 +321,7 @@ export function insertAlert(db: Db, alert: NewAlert): AlertWithRecommendation {
 }
 
 /** Marks an alert as acknowledged. Returns the updated alert, or null if it does not exist. */
-export function acknowledgeAlert(db: Db, id: string): AlertWithRecommendation | null {
+export function acknowledgeAlert(db: Db, id: string): Alert | null {
   const row = db
     .update(alerts)
     .set({ acknowledged: true })

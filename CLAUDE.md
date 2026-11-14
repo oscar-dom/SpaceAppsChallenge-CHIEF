@@ -252,8 +252,9 @@ scripts run them with `--if-present`. `npm run dev` starts the agent through
 `scripts/dev-agent.mjs`, which skips it until `agent/main.py` exists. Backend database
 scripts (run with `-w backend`, see [`docs/database-schema.md`](docs/database-schema.md)):
 `db:generate` (new Drizzle migration after editing `schema.ts`), `db:migrate`, `db:seed`
-(reference data and mission history) and `db:reset` (rebuild; `-- --restore` returns to the
-clean copy). The SQLite file is `backend/var/chief.db` (git-ignored).
+(reference data and mission history), `db:reset` (rebuild; `-- --restore` returns to the
+clean copy), `simulate` (live simulator on its own) and `data:fetch` (refresh the NASA
+datasets). The SQLite file is `backend/var/chief.db` (git-ignored).
 
 CI runs three jobs on every PR: `Commit messages` (required), `Lint, typecheck and test`
 (TypeScript) and `Agent tests and lint` (pytest + Ruff).

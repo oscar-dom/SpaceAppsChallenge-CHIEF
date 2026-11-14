@@ -104,11 +104,12 @@ export const THRESHOLDS: ThresholdSeed[] = [
     ranges: [
       { status: 'nominal', range: { min: 70, max: 100 } },
       { status: 'caution', range: { min: 100, max: 126 } },
+      { status: 'caution', range: { min: 54, max: 70 } }, // ADA level 1 hypoglycemia
     ],
     escalation: { caution: 'self-care', critical: 'flight-surgeon' },
     fallbackRecommendation:
-      'Review recent meals and sugar intake and repeat the fasting measurement. Report values that stay high to the flight surgeon.',
-    source: { document: 'ADA Standards of Care in Diabetes: fasting glucose categories' },
+      'Review recent meals and sugar intake and repeat the fasting measurement. Report values that stay out of range to the flight surgeon.',
+    source: { document: 'ADA Standards of Care in Diabetes: fasting glucose categories and hypoglycemia levels (<70, <54 mg/dL)' },
     verification: 'to-verify',
   },
   {
