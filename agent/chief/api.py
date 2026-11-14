@@ -6,7 +6,7 @@ from fastapi import APIRouter, FastAPI, File, HTTPException, Request, Response, 
 from starlette.concurrency import run_in_threadpool
 
 from .config import Settings, get_settings
-from .llm import GeminiClient, LlmClient
+from .llm import GeminiChain, LlmClient
 from .schemas import (
     AlertActionsRequest,
     AlertActionsResponse,
@@ -35,10 +35,13 @@ def _voice(request: Request) -> Voice:
 @router.get("/health", response_model=HealthCheckResponse)
 def health(request: Request) -> HealthCheckResponse:
     settings: Settings = request.app.state.settings
+    llm = request.app.state.llm
+    available = llm.available_models() if isinstance(llm, GeminiChain) else []
     return HealthCheckResponse(
         status="ok",
-        llm_configured=request.app.state.llm is not None,
-        model=settings.gemini_model,
+        llm_configured=llm is not None,
+        models=settings.model_chain,
+        available_models=available,
         tts_voice_available=_voice(request).tts_available,
     )
 
@@ -80,7 +83,7 @@ def create_app(settings: Settings | None = None, llm: LlmClient | None = None) -
     """Build the app. Tests pass their own settings and a fake LLM."""
     settings = settings or get_settings()
     if llm is None and settings.llm_configured:
-        llm = GeminiClient(settings)
+        llm = GeminiChain(settings)
 
     app = FastAPI(title="CHIEF agent", version="0.1.0")
     app.state.settings = settings

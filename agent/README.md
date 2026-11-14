@@ -2,8 +2,8 @@
 
 Python service with CHIEF, the AI assistant of the crew health system:
 
-- **Chat** and **alert recommendations** with Gemini (`google-genai`, default
-  `gemini-3.5-flash`), structured JSON output and safety guardrails.
+- **Chat** and **alert recommendations** with a chain of Gemini models (`google-genai`),
+  structured JSON output and safety guardrails.
 - **Speech-to-text** with faster-whisper and **text-to-speech** with Piper, both on CPU.
 
 Only the backend calls this service. The frontend never talks to it directly.
@@ -28,10 +28,9 @@ faster-whisper and Piper, and `requirements-dev.txt` adds pytest and Ruff.
 Then:
 
 1. Copy `.env.example` to `.env` and set `GEMINI_API_KEY` (Google AI Studio).
-2. `GEMINI_MODEL` defaults to `gemini-3.5-flash`, tested on 2026-11-14: about 6-8 s
-   per answer. Pro models (`gemini-2.5-pro`, `gemini-3.1-pro-preview`) return 404 for
-   new free-tier keys, and `gemini-3.8-flash` was overloaded (minutes per answer). To
-   list the models your key can use (PowerShell, from `agent/`):
+2. `GEMINI_MODELS` is the model chain (see [Model chain](#model-chain)); the default
+   works with a free-tier key. To list the models your key can use (PowerShell, from
+   `agent/`):
    ```powershell
    $env:GEMINI_API_KEY="your_key"; .venv\Scripts\python -c "from google import genai; [print(m.name) for m in genai.Client().models.list() if 'gemini' in m.name]"
    ```
@@ -56,7 +55,7 @@ JSON uses camelCase and mirrors the TypeScript types in `shared/src/chief.ts`
 
 | Method | Path | Body | Response |
 |---|---|---|---|
-| GET | `/health` | | `{ status, llmConfigured, model, ttsVoiceAvailable }` |
+| GET | `/health` | | `{ status, llmConfigured, models, availableModels, ttsVoiceAvailable }` |
 | POST | `/chat` | `AgentChatRequest` | `AgentChatResponse` |
 | POST | `/alerts/actions` | `AgentAlertActionsRequest` | `AlertActionsResponse` |
 | POST | `/stt` | multipart, field `audio` (webm, ogg, wav...) | `{ text, language }` |
@@ -77,12 +76,37 @@ Every context request (`/chat`, `/alerts/actions`) carries:
 `/chat` adds `message` and `history` (`ChiefMessage[]`, oldest first). `/alerts/actions`
 adds `alert`. A full example lives in `tests/conftest.py`.
 
-Each Gemini call is capped at `LLM_TIMEOUT_SECONDS` (30 s) and `LLM_ATTEMPTS` (2);
-past that, the answer is a fallback.
+`/chat` and `/alerts/actions` responses include `model`: the Gemini model that answered,
+or `null` in fallback mode.
 
 Errors: `422` invalid body, `400`/`413` empty or too large audio, `503` voice packages or
 voice model missing. Gemini failures never return an error: they return a fallback
 answer.
+
+## Model chain
+
+`GEMINI_MODELS` lists the models to try, in order. Free-tier quota is counted per model,
+so when one runs out the next one still answers. Default, tested on 2026-11-14:
+
+| Model | Latency | Note |
+|---|---|---|
+| `gemini-3.5-flash` | ~6-8 s | Best answers so far, first choice |
+| `gemini-3.6-flash` | ~5 s | |
+| `gemini-3.5-flash-lite` | ~2 s | Shorter answers |
+| `gemini-3.1-flash-lite` | ~2 s | |
+
+Not usable with a new free-tier key: `gemini-2.5-pro`, `gemini-3.1-pro-preview`,
+`gemini-2.5-flash(-lite)` (404) and `gemini-3.7/3.8-flash` (503 or minutes per answer).
+
+How it behaves (`chief/llm.py`):
+
+- On a quota error (429), an unavailable model (400/403/404), an overload (5xx), a
+  timeout or an invalid answer, it moves on to the next model.
+- A failing model is skipped for a while so it does not slow down later answers:
+  5 min after a 429, 1 h after a 400/403/404, 1 min after a 5xx or a timeout. Invalid
+  answers do not skip the model. `/health` lists the models available right now.
+- The whole chain shares one deadline, `LLM_TIMEOUT_SECONDS` (30 s). If no model
+  answers in time, CHIEF answers in fallback mode.
 
 ## Guardrails (`chief/safety.py`)
 
@@ -104,7 +128,7 @@ chief/
   config.py          settings from .env
   schemas.py         request/response models and the model's output schema
   prompts.py         system prompt and context rendering
-  llm.py             Gemini client (LlmClient protocol, fake in tests)
+  llm.py             Gemini model chain (LlmClient protocol, fake in tests)
   service.py         chat, alert actions and fallback
   safety.py          guardrails
   voice.py           faster-whisper and Piper

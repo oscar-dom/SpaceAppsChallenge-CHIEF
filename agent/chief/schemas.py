@@ -168,6 +168,8 @@ class ChatResponse(CamelModel):
     reply: str
     actions: list[RecommendedAction]
     fallback: bool
+    # Gemini model that answered; None in fallback mode.
+    model: str | None = None
 
 
 class AlertActionsRequest(ChiefContext):
@@ -181,6 +183,7 @@ class AlertActionsResponse(CamelModel):
     summary: str
     actions: list[RecommendedAction]
     fallback: bool
+    model: str | None = None
 
 
 class SttResponse(CamelModel):
@@ -201,7 +204,9 @@ class HealthCheckResponse(CamelModel):
 
     status: str
     llm_configured: bool
-    model: str
+    # Configured chain, in order, and the models not cooling down after a failure.
+    models: list[str]
+    available_models: list[str]
     tts_voice_available: bool
 
 

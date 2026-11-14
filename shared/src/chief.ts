@@ -50,6 +50,8 @@ export interface ChiefChatResponse {
   actions: RecommendedAction[];
   /** True when Gemini failed and the reply comes from the rules engine fallback. */
   fallback: boolean;
+  /** Gemini model that answered; null in fallback mode. */
+  model?: string | null;
 }
 
 /** POST /api/alerts/:alertId/actions */
@@ -58,6 +60,8 @@ export interface AlertActionsResponse {
   summary: string;
   actions: RecommendedAction[];
   fallback: boolean;
+  /** Gemini model that answered; null in fallback mode. */
+  model?: string | null;
 }
 
 /** An item of the onboard formulary: the only medication CHIEF may suggest. */
@@ -95,6 +99,8 @@ export interface AgentChatResponse {
   reply: string;
   actions: RecommendedAction[];
   fallback: boolean;
+  /** Gemini model that answered; null in fallback mode. */
+  model: string | null;
 }
 
 /** POST {AGENT_URL}/alerts/actions, answered with AlertActionsResponse. */
