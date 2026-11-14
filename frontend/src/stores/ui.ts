@@ -45,21 +45,18 @@ export const useUiStore = defineStore('ui', () => {
   }
 
   /**
-   * A new alert always opens the notifications panel, even if the user collapsed it. An
-   * anomaly brings the Alerts tab to the front; a scheduled reminder only switches to Tasks
-   * when the panel was closed, so it never pulls the list away from under the cursor.
+   * A new anomaly always opens the notifications panel, even if the user collapsed it, and
+   * brings the Alerts tab to the front. A new task is planned days ahead, so it only raises
+   * the badge: it never opens the panel or pulls the list away from under the cursor.
    */
   function alertArrived(alert: Alert) {
-    const wasOpen = notifOpen.value;
-    notifOpen.value = true;
     if (alert.kind === 'anomaly') {
+      // The notice explains why a collapsed panel opened; it would only shift an open one.
+      if (!notifOpen.value) autoNotice.value = true;
+      notifOpen.value = true;
       notifTab.value = 'alerts';
       alertFilter.value = 'all';
-    } else if (!wasOpen) {
-      notifTab.value = 'tasks';
     }
-    // The notice explains why a collapsed panel opened; it would only shift an open one.
-    if (!wasOpen) autoNotice.value = alert.kind === 'anomaly';
     unread.value++;
     highlight.value = alert.id;
     clearTimeout(highlightTimer);

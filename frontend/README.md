@@ -79,10 +79,12 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
   cargo ships, forecast, adjustments), the water balance for water, and the **Adjust
   count** form (remove or add, note, who; it previews the result and refuses going below
   zero). Stock changes arrive live (`inventory:updated`).
-- **Notifications:** alerts (anomalies) and tasks (scheduled measurements), on the same navy
-  layer as the navigation (`.chrome-surface` in `base.css` remaps the tokens, so the alert
-  cards, chips and buttons inside follow). The panel collapses to a rail, but a new alert
-  from the backend always opens it again.
+- **Notifications:** alerts (anomalies) and tasks (the crew's scheduled measurements of the
+  next five mission days; click one to mark it done, it leaves the list when its readings
+  arrive), on the same navy layer as the navigation (`.chrome-surface` in `base.css`
+  remaps the tokens, so the alert cards, chips and buttons inside follow). The panel
+  collapses to a rail, but a new anomaly always opens it again; a new task only raises the
+  badge.
 - **CHIEF's mascot:** the same sky-blue Capsule on the Talk to CHIEF button and in the chat
   (`chief.mascot`): listening, thinking, idle, or grey when CHIEF is offline. Pending alerts
   are told by the button's text, not by an amber mascot, so amber keeps meaning a status.

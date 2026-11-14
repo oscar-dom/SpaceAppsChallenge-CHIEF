@@ -8,8 +8,12 @@ import { toDbTime, type MissionClock } from './mission-clock.js';
 import { diffAlerts, findAnomalies, type OpenAnomaly } from './rules/engine.js';
 
 const MINUTE_MS = 60_000;
-/** A scheduled measurement shows up on the alerts panel this long before it is due. */
-const SCHEDULED_NOTICE_MS = 6 * 60 * MINUTE_MS;
+/**
+ * How far ahead the Tasks tab plans: a scheduled measurement is listed this long before it is
+ * due. Five mission days covers the gap between the crew's staggered weekly check-ups (at most
+ * four days), so the crew always sees what comes next, like the daily plan on the ISS.
+ */
+const SCHEDULED_NOTICE_MS = 5 * 24 * 60 * MINUTE_MS;
 /** Only infrequent measurements done by the crew get a reminder (weekly labs, eye exams...). */
 const SCHEDULED_MIN_CADENCE_MINUTES = 7 * 24 * 60;
 
