@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Rebuilds the database from scratch (or restores it to its initial state).
  *
@@ -17,17 +15,22 @@
  * IMPORTANT: stop the backend before running it; on Windows an open .db file cannot be deleted.
  */
 
-const fs = require('node:fs');
-const path = require('node:path');
-const Database = require('better-sqlite3');
-const { DB_PATH, SCHEMA_PATH, SEED_PATH, schemaVersion, toDbDate } = require('./index.js');
-const { seedSimulated } = require('./seed-simulated.js');
+import fs from 'node:fs';
+import path from 'node:path';
+import Database from 'better-sqlite3';
+import { DB_PATH, SCHEMA_PATH, SEED_PATH, schemaVersion, toDbDate } from './index.js';
+import { seedSimulated } from './seed-simulated.js';
 
 const DB_SIDE_FILES = ['', '-wal', '-shm'];
 const BASE_PATH = path.join(path.dirname(DB_PATH), 'chief.base.db');
 
 function parseArgs(argv) {
-  const opts = { restore: false, simulated: true, now: process.env.CHIEF_NOW, seed: process.env.CHIEF_SEED };
+  const opts = {
+    restore: false,
+    simulated: true,
+    now: process.env.CHIEF_NOW,
+    seed: process.env.CHIEF_SEED,
+  };
   for (const arg of argv) {
     if (arg === '--restore') opts.restore = true;
     else if (arg === '--no-simulated') opts.simulated = false;
@@ -48,7 +51,9 @@ function removeDbFiles(file) {
       fs.rmSync(file + suffix, { force: true });
     } catch (err) {
       if (err.code === 'EBUSY' || err.code === 'EPERM') {
-        throw new Error(`Cannot delete ${file + suffix}: it is in use. Stop the backend and try again.`);
+        throw new Error(
+          `Cannot delete ${file + suffix}: it is in use. Stop the backend and try again.`,
+        );
       }
       throw err;
     }
@@ -72,7 +77,9 @@ function build({ now, seed, simulated }) {
 
     const violations = db.pragma('foreign_key_check');
     if (violations.length > 0) {
-      throw new Error(`Foreign key violations after seeding: ${JSON.stringify(violations.slice(0, 5))}`);
+      throw new Error(
+        `Foreign key violations after seeding: ${JSON.stringify(violations.slice(0, 5))}`,
+      );
     }
 
     // Clean copy of the initial state for --restore.
@@ -86,7 +93,9 @@ function build({ now, seed, simulated }) {
 
 function restore() {
   if (!fs.existsSync(BASE_PATH)) {
-    throw new Error(`No initial copy found (${BASE_PATH}). Create the database with: node src/db/reset.js (npm run db:reset)`);
+    throw new Error(
+      `No initial copy found (${BASE_PATH}). Create the database with: node src/db/reset.js (npm run db:reset)`,
+    );
   }
   removeDbFiles(DB_PATH);
   fs.copyFileSync(BASE_PATH, DB_PATH);
@@ -104,7 +113,8 @@ function main() {
   console.log(`Initial copy: ${BASE_PATH}`);
   if (summary) {
     console.log(`Simulated data: now=${summary.now} seed=${summary.seed}`);
-    for (const [table, n] of Object.entries(summary.counts)) console.log(`  ${table.padEnd(22)} ${n}`);
+    for (const [table, n] of Object.entries(summary.counts))
+      console.log(`  ${table.padEnd(22)} ${n}`);
   }
 }
 

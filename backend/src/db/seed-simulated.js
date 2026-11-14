@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Generates simulated demo data (vitals, sleep, cognitive tests, wellbeing, exercise, nutrition,
  * cabin environment, ISS position, symptoms, health score, digital twin and today's tasks).
@@ -12,7 +10,7 @@
  * Run from reset.js after schema.sql and seed.sql.
  */
 
-const { toDbDate } = require('./index.js');
+import { toDbDate } from './index.js';
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
@@ -64,8 +62,11 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
   const vitalStart = end - VITAL_DAYS * DAY;
   const iso = (ms) => toDbDate(ms);
 
-  const crew = db.prepare('SELECT id, weight_kg, mission_start FROM crew_members ORDER BY id').all();
-  if (crew.length === 0) throw new Error('seed-simulated: crew_members is empty; load seed.sql first');
+  const crew = db
+    .prepare('SELECT id, weight_kg, mission_start FROM crew_members ORDER BY id')
+    .all();
+  if (crew.length === 0)
+    throw new Error('seed-simulated: crew_members is empty; load seed.sql first');
   const leoId = crew.find((c) => c.id === 'C002') ? 'C002' : crew[Math.min(1, crew.length - 1)].id;
 
   // --- Baseline physiology of each crew member (deterministic) -------------------------------------
@@ -82,7 +83,7 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
         dia: 75 + i,
         sleepOffsetMin: uniform(-30, 30),
       },
-    ])
+    ]),
   );
 
   // --- Cabin environment: CO2 with spikes (the demo correlates CO2 with C002's headaches) ----------
@@ -110,7 +111,10 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
   const issAt = (t) => {
     const u = (2 * Math.PI * (t - start)) / PERIOD;
     const lat = (Math.asin(Math.sin(INC) * Math.sin(u)) * 180) / Math.PI;
-    let lon = (Math.atan2(Math.cos(INC) * Math.sin(u), Math.cos(u)) * 180) / Math.PI + lon0 - (360 * (t - start)) / SIDEREAL_DAY;
+    let lon =
+      (Math.atan2(Math.cos(INC) * Math.sin(u), Math.cos(u)) * 180) / Math.PI +
+      lon0 -
+      (360 * (t - start)) / SIDEREAL_DAY;
     lon = ((((lon + 180) % 360) + 360) % 360) - 180;
     // SAA approximated as a rectangle (good enough for the demo).
     const inSaa = lat >= -50 && lat <= 0 && lon >= -90 && lon <= 40 ? 1 : 0;
@@ -118,35 +122,41 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
   };
 
   const stmt = {
-    env: db.prepare('INSERT INTO env_readings (metric, value, unit, recorded_at, source) VALUES (?, ?, ?, ?, ?)'),
-    iss: db.prepare('INSERT INTO iss_positions (recorded_at, lat, lon, alt_km, in_saa, source) VALUES (?, ?, ?, ?, ?, ?)'),
+    env: db.prepare(
+      'INSERT INTO env_readings (metric, value, unit, recorded_at, source) VALUES (?, ?, ?, ?, ?)',
+    ),
+    iss: db.prepare(
+      'INSERT INTO iss_positions (recorded_at, lat, lon, alt_km, in_saa, source) VALUES (?, ?, ?, ?, ?, ?)',
+    ),
     vital: db.prepare(
-      "INSERT INTO vital_samples (crew_id, metric, value, unit, recorded_at, source) VALUES (?, ?, ?, ?, ?, 'simulated')"
+      "INSERT INTO vital_samples (crew_id, metric, value, unit, recorded_at, source) VALUES (?, ?, ?, ?, ?, 'simulated')",
     ),
     sleep: db.prepare(
-      'INSERT INTO sleep_sessions (crew_id, night_date, onset_at, wake_at, deep_min, rem_min, light_min, awake_min, efficiency_pct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO sleep_sessions (crew_id, night_date, onset_at, wake_at, deep_min, rem_min, light_min, awake_min, efficiency_pct) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     ),
     cog: db.prepare(
-      'INSERT INTO cognitive_tests (crew_id, taken_at, reaction_ms_mean, lapses, score) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO cognitive_tests (crew_id, taken_at, reaction_ms_mean, lapses, score) VALUES (?, ?, ?, ?, ?)',
     ),
     well: db.prepare(
-      'INSERT INTO wellbeing_entries (crew_id, logged_at, mood, isolation, crew_relations, stress) VALUES (?, ?, ?, ?, ?, ?)'
+      'INSERT INTO wellbeing_entries (crew_id, logged_at, mood, isolation, crew_relations, stress) VALUES (?, ?, ?, ?, ?, ?)',
     ),
     ex: db.prepare(
-      'INSERT INTO exercise_sessions (crew_id, started_at, type, duration_min, load_pct, avg_hr_bpm) VALUES (?, ?, ?, ?, ?, ?)'
+      'INSERT INTO exercise_sessions (crew_id, started_at, type, duration_min, load_pct, avg_hr_bpm) VALUES (?, ?, ?, ?, ?, ?)',
     ),
     nut: db.prepare(
-      'INSERT INTO nutrition_entries (crew_id, logged_at, meal, kcal, protein_g, water_ml, sodium_mg, calcium_mg, vitamin_d_iu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO nutrition_entries (crew_id, logged_at, meal, kcal, protein_g, water_ml, sodium_mg, calcium_mg, vitamin_d_iu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
     ),
-    sym: db.prepare('INSERT INTO symptom_reports (crew_id, symptom, severity, recorded_at, note) VALUES (?, ?, ?, ?, ?)'),
+    sym: db.prepare(
+      'INSERT INTO symptom_reports (crew_id, symptom, severity, recorded_at, note) VALUES (?, ?, ?, ?, ?)',
+    ),
     score: db.prepare(
-      'INSERT INTO health_scores (crew_id, recorded_at, score, level, vitals, sleep, cognitive, nutrition, wellbeing, bone, radiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO health_scores (crew_id, recorded_at, score, level, vitals, sleep, cognitive, nutrition, wellbeing, bone, radiation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     ),
     twin: db.prepare(
-      'INSERT INTO twin_snapshots (crew_id, recorded_at, horizon_days, bone_density_loss_pct, muscle_mass_loss_pct, exercise_min_per_day, resistance_load_pct, model_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO twin_snapshots (crew_id, recorded_at, horizon_days, bone_density_loss_pct, muscle_mass_loss_pct, exercise_min_per_day, resistance_load_pct, model_version) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     ),
     task: db.prepare(
-      'INSERT INTO tasks (crew_id, title, type, priority, origin, expects, due_at, status, result, created_at, done_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      'INSERT INTO tasks (crew_id, title, type, priority, origin, expects, due_at, status, result, created_at, done_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     ),
   };
 
@@ -182,7 +192,7 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
       for (let t = vitalStart; t <= end; t += STEP) {
         const at = iso(t);
         const h = hourOfDay(t);
-        const asleep = (h >= 23 || h < 7) ? 1 : 0;
+        const asleep = h >= 23 || h < 7 ? 1 : 0;
         const circ = Math.sin(((h - 9) / 24) * 2 * Math.PI);
         const hr = p.hr + 4 * circ - 7 * asleep + gauss(0, 2);
         const spo2 = clamp(p.spo2 - 0.5 * asleep + gauss(0, 0.3), 92, 100);
@@ -190,7 +200,13 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
         stmt.vital.run(c.id, 'hrv', round(p.hrv + 6 * asleep + gauss(0, 4), 1), 'ms', at);
         stmt.vital.run(c.id, 'spo2', round(spo2, 1), '%', at);
         stmt.vital.run(c.id, 'respRate', round(p.rr - 1.5 * asleep + gauss(0, 0.5), 1), 'rpm', at);
-        stmt.vital.run(c.id, 'skinTemp', round(p.skin - 0.4 * asleep + gauss(0, 0.1), 2), 'degC', at);
+        stmt.vital.run(
+          c.id,
+          'skinTemp',
+          round(p.skin - 0.4 * asleep + gauss(0, 0.1), 2),
+          'degC',
+          at,
+        );
         bump('vital_samples', 5);
         const d = slot(c.id, dayKey(t));
         d.hr.push(hr);
@@ -251,7 +267,14 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
           const type = d % 2 === 0 ? 'resistance' : 'cardio';
           const minutes = Math.round(clamp(gauss(55, 8), 30, 90));
           const load = type === 'resistance' ? round(clamp(gauss(85, 10), 50, 120), 1) : null;
-          stmt.ex.run(c.id, iso(exAt), type, minutes, load, round(p.hr + (type === 'cardio' ? 70 : 45) + gauss(0, 4), 1));
+          stmt.ex.run(
+            c.id,
+            iso(exAt),
+            type,
+            minutes,
+            load,
+            round(p.hr + (type === 'cardio' ? 70 : 45) + gauss(0, 4), 1),
+          );
           const s = exerciseStats[c.id];
           s.min += minutes;
           s.days += 1;
@@ -261,12 +284,27 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
 
         // Nutrition: three meals and a snack.
         let kcalDay = 0;
-        for (const [meal, hour, share] of [['breakfast', 7.5, 0.25], ['lunch', 12.5, 0.35], ['dinner', 19, 0.3], ['snack', 15.5, 0.1]]) {
+        for (const [meal, hour, share] of [
+          ['breakfast', 7.5, 0.25],
+          ['lunch', 12.5, 0.35],
+          ['dinner', 19, 0.3],
+          ['snack', 15.5, 0.1],
+        ]) {
           const at = dayStart + hour * HOUR;
           if (at > nowMs) continue;
           const kcal = Math.round(2600 * share * clamp(gauss(1, 0.1), 0.6, 1.3));
           kcalDay += kcal;
-          stmt.nut.run(c.id, iso(at), meal, kcal, round(kcal * 0.045, 1), Math.round(kcal * 0.45), Math.round(kcal * 1.1), Math.round(kcal * 0.35), Math.round(kcal * 0.18));
+          stmt.nut.run(
+            c.id,
+            iso(at),
+            meal,
+            kcal,
+            round(kcal * 0.045, 1),
+            Math.round(kcal * 0.45),
+            Math.round(kcal * 1.1),
+            Math.round(kcal * 0.35),
+            Math.round(kcal * 0.18),
+          );
           bump('nutrition_entries');
         }
         rec.kcal = kcalDay;
@@ -288,7 +326,13 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
       if (s.peak < 5.5) continue;
       const at = s.start + uniform(1.5, 2.5) * HOUR;
       if (at <= nowMs) {
-        stmt.sym.run(leoId, 'headache', Math.round(uniform(3, 4.4)), iso(at), 'After a CO2 rise in the cabin');
+        stmt.sym.run(
+          leoId,
+          'headache',
+          Math.round(uniform(3, 4.4)),
+          iso(at),
+          'After a CO2 rise in the cabin',
+        );
         bump('symptom_reports');
       }
     }
@@ -296,14 +340,22 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
     for (let i = 0; i < 3; i++) {
       const who = crew[Math.floor(rand() * crew.length)].id;
       const at = start + uniform(0.1, 0.95) * (end - start);
-      stmt.sym.run(who, rand() < 0.5 ? 'fatigue' : 'back_pain', Math.round(uniform(1, 2.4)), iso(at), null);
+      stmt.sym.run(
+        who,
+        rand() < 0.5 ? 'fatigue' : 'back_pain',
+        Math.round(uniform(1, 2.4)),
+        iso(at),
+        null,
+      );
       bump('symptom_reports');
     }
 
     // ===== Daily health score (last 7 days) and digital twin =====
     for (const c of crew) {
       const stats = exerciseStats[c.id];
-      const avgLoad = stats.load.length ? stats.load.reduce((a, b) => a + b, 0) / stats.load.length : 0;
+      const avgLoad = stats.load.length
+        ? stats.load.reduce((a, b) => a + b, 0) / stats.load.length
+        : 0;
       const exMinPerDay = stats.days ? stats.min / stats.days : 0;
       const effort = clamp(0.5 * (exMinPerDay / 60) + 0.5 * (avgLoad / 100), 0, 1);
       const missionDay = Math.max(0, Math.floor((end - Date.parse(c.mission_start)) / DAY));
@@ -316,10 +368,17 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
         const prev = daily[c.id][dayKey(dayStart - DAY)];
         const hrMean = rec.hr.reduce((a, b) => a + b, 0) / rec.hr.length;
         const spo2Mean = rec.spo2.reduce((a, b) => a + b, 0) / rec.spo2.length;
-        const vitals = clamp(100 - Math.abs(hrMean - profile[c.id].hr) * 1.5 - Math.max(0, 97 - spo2Mean) * 8, 0, 100);
-        const sleep = (prev?.sleepEff ?? rec.sleepEff) ?? null;
+        const vitals = clamp(
+          100 - Math.abs(hrMean - profile[c.id].hr) * 1.5 - Math.max(0, 97 - spo2Mean) * 8,
+          0,
+          100,
+        );
+        const sleep = prev?.sleepEff ?? rec.sleepEff ?? null;
         const cognitive = rec.cog ?? prev?.cog ?? null;
-        const nutrition = d === 0 ? clamp(((prev?.kcal ?? 2500) / 2600) * 100, 0, 100) : clamp((rec.kcal / 2600) * 100, 0, 100);
+        const nutrition =
+          d === 0
+            ? clamp(((prev?.kcal ?? 2500) / 2600) * 100, 0, 100)
+            : clamp((rec.kcal / 2600) * 100, 0, 100);
         const wellbeing = rec.wellbeing ?? prev?.wellbeing ?? null;
         const bone = clamp(100 - 0.15 * missionDay * (1 - 0.5 * effort), 0, 100);
         const doses = doseByDay[key] ?? [];
@@ -330,7 +389,19 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
         const present = parts.filter((x) => x !== null);
         const score = round(present.reduce((a, b) => a + b, 0) / present.length, 1);
         const r = (x) => (x === null ? null : round(x, 1));
-        stmt.score.run(c.id, iso(at), score, levelFor(score), r(vitals), r(sleep), r(cognitive), r(nutrition), r(wellbeing), r(bone), r(radiation));
+        stmt.score.run(
+          c.id,
+          iso(at),
+          score,
+          levelFor(score),
+          r(vitals),
+          r(sleep),
+          r(cognitive),
+          r(nutrition),
+          r(wellbeing),
+          r(bone),
+          r(radiation),
+        );
         bump('health_scores');
       }
 
@@ -339,7 +410,16 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
         const months = (missionDay + horizon) / 30;
         const bone = round(1.2 * months * (1 - 0.55 * effort), 2);
         const muscle = round(1.5 * months * (1 - 0.6 * effort), 2);
-        stmt.twin.run(c.id, iso(end), missionDay + horizon, bone, muscle, round(exMinPerDay, 1), round(avgLoad, 1), 'seed-v1');
+        stmt.twin.run(
+          c.id,
+          iso(end),
+          missionDay + horizon,
+          bone,
+          muscle,
+          round(exMinPerDay, 1),
+          round(avgLoad, 1),
+          'seed-v1',
+        );
         bump('twin_snapshots');
       }
 
@@ -349,12 +429,49 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
       const created = todayStart;
       const mDone = morning <= nowMs;
       stmt.task.run(
-        c.id, 'Measure blood pressure', 'measurement', 'normal', 'routine', JSON.stringify({ metric: 'systolicBp' }),
-        iso(morning), mDone ? 'done' : 'pending', mDone ? JSON.stringify({ systolicBp: Math.round(profile[c.id].sys), diastolicBp: Math.round(profile[c.id].dia) }) : null,
-        iso(created), mDone ? iso(morning + 5 * MIN) : null
+        c.id,
+        'Measure blood pressure',
+        'measurement',
+        'normal',
+        'routine',
+        JSON.stringify({ metric: 'systolicBp' }),
+        iso(morning),
+        mDone ? 'done' : 'pending',
+        mDone
+          ? JSON.stringify({
+              systolicBp: Math.round(profile[c.id].sys),
+              diastolicBp: Math.round(profile[c.id].dia),
+            })
+          : null,
+        iso(created),
+        mDone ? iso(morning + 5 * MIN) : null,
       );
-      stmt.task.run(c.id, 'Exercise session', 'exercise', 'normal', 'routine', null, iso(todayStart + 17 * HOUR), todayStart + 17 * HOUR <= nowMs ? 'done' : 'pending', null, iso(created), todayStart + 17 * HOUR <= nowMs ? iso(todayStart + 18 * HOUR) : null);
-      stmt.task.run(c.id, 'Wellbeing survey', 'survey', 'low', 'routine', null, iso(todayStart + 21 * HOUR), todayStart + 21 * HOUR <= nowMs ? 'done' : 'pending', null, iso(created), todayStart + 21 * HOUR <= nowMs ? iso(todayStart + 21 * HOUR + 3 * MIN) : null);
+      stmt.task.run(
+        c.id,
+        'Exercise session',
+        'exercise',
+        'normal',
+        'routine',
+        null,
+        iso(todayStart + 17 * HOUR),
+        todayStart + 17 * HOUR <= nowMs ? 'done' : 'pending',
+        null,
+        iso(created),
+        todayStart + 17 * HOUR <= nowMs ? iso(todayStart + 18 * HOUR) : null,
+      );
+      stmt.task.run(
+        c.id,
+        'Wellbeing survey',
+        'survey',
+        'low',
+        'routine',
+        null,
+        iso(todayStart + 21 * HOUR),
+        todayStart + 21 * HOUR <= nowMs ? 'done' : 'pending',
+        null,
+        iso(created),
+        todayStart + 21 * HOUR <= nowMs ? iso(todayStart + 21 * HOUR + 3 * MIN) : null,
+      );
       bump('tasks', 3);
     }
   });
@@ -364,4 +481,4 @@ function seedSimulated(db, { now = new Date(), seed = 42 } = {}) {
   return { seed, now: iso(nowMs), counts };
 }
 
-module.exports = { seedSimulated };
+export { seedSimulated };

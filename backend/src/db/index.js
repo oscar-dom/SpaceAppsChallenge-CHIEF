@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * SQLite database access (better-sqlite3).
  *
@@ -8,9 +6,12 @@
  * of this folder and use openDb().
  */
 
-const fs = require('node:fs');
-const path = require('node:path');
-const Database = require('better-sqlite3');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import Database from 'better-sqlite3';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 const SEED_PATH = path.join(__dirname, 'seed.sql');
@@ -35,7 +36,9 @@ function schemaVersion() {
  */
 function openDb({ file = DB_PATH, readonly = false } = {}) {
   if (!fs.existsSync(file)) {
-    throw new Error(`Database not found (${file}). Create it with: node src/db/reset.js (npm run db:reset)`);
+    throw new Error(
+      `Database not found (${file}). Create it with: node src/db/reset.js (npm run db:reset)`,
+    );
   }
   const db = new Database(file, { readonly, fileMustExist: true });
   db.pragma('foreign_keys = ON');
@@ -48,7 +51,7 @@ function openDb({ file = DB_PATH, readonly = false } = {}) {
     db.close();
     throw new Error(
       `Outdated schema: the database is version ${actual} and the code expects ${expected}. ` +
-        'Regenerate it with: node src/db/reset.js (npm run db:reset)'
+        'Regenerate it with: node src/db/reset.js (npm run db:reset)',
     );
   }
   return db;
@@ -84,7 +87,7 @@ function runIdempotentInsert(stmt, params) {
     : { inserted: true, id: Number(info.lastInsertRowid) };
 }
 
-module.exports = {
+export {
   DB_PATH,
   DATA_DIR,
   SCHEMA_PATH,

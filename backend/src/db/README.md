@@ -37,10 +37,11 @@ npm run db:restore    # between demos: back to the initial state (stop the backe
 `reset.js` options: `--now=2026-11-14T10:00:00Z` (freezes "now"), `--seed=7`, `--no-simulated`
 (reference data only). Variables: `CHIEF_NOW`, `CHIEF_SEED`, `CHIEF_DB_PATH`.
 
-> The `.js` files are CommonJS (`require`). If the backend uses TypeScript or `"type": "module"`, convert
-> `index.js`, `reset.js` and `seed-simulated.js` to `import`/`export` (a mechanical change). `CLAUDE.md`
-> plans Drizzle ORM for the schema; if the team adopts it, `schema.sql` stays as the reference for the
-> constraints (date format, JSON, ranges) that the Drizzle schema must reproduce.
+> The `.js` files are ES modules (the repo root sets `"type": "module"`), so they are linted and
+> formatted by the root `npm run lint` and `npm run format:check`. `backend/` has no `package.json`
+> yet: create it (with `better-sqlite3` and the scripts above) when the backend is scaffolded.
+> `CLAUDE.md` plans Drizzle ORM for the schema; if the team adopts it, `schema.sql` stays as the
+> reference for the constraints (date format, JSON, ranges) that the Drizzle schema must reproduce.
 
 ## Rules for writing access functions
 
