@@ -21,8 +21,9 @@ The engine does not read the database: `HealthService` and `AlertsService`
 | `deviation(value, threshold)` | → `'low' \| 'high' \| undefined` relative to the nominal range |
 | `worstStatus(statuses)` | → the most severe (`critical` > `caution` > `nominal`) |
 | `computeTrend(values)` | → `rising \| falling \| stable`: mean of the last third vs. the first third of the series, ±3 % (`TREND_MIN_CHANGE`) |
-| `evaluateSystem(system, metrics, isScored)` | → `SystemStatus`: status = worst scored metric, score = mean of `STATUS_SCORE` (nominal 100, caution 60, critical 20). No scored metric → nominal, 100 |
-| `computeHealthScore(crewId, systems, weights, computedAt, isScored)` | → `HealthScore`: weighted mean of the systems with scored metrics (`SYSTEM_WEIGHTS`, normalized). Status = worst system status |
+| `evaluateSystem(system, metrics, isScored)` | → `SystemStatus`: status = worst scored metric, score = mean of `STATUS_SCORE` (nominal 100, caution 60, critical 20), scaled into the status band. No scored metric → nominal, 100 |
+| `computeHealthScore(crewId, systems, weights, computedAt, isScored)` | → `HealthScore`: weighted mean of the systems with scored metrics (`SYSTEM_WEIGHTS`, normalized), scaled into the status band. Status = worst system status |
+| `scoreInBand(score, status)` | → the 0-100 average scaled linearly into `SCORE_BANDS` (nominal 90-100, caution 70-89, critical 0-69) and rounded. Scaling keeps the order between crew members with the same status |
 | `findAnomalies(inputs)` | → one `AnomalyFinding` per non-nominal metric, with title and message for the alerts panel |
 | `diffAlerts(findings, open)` | → `{ create, update, resolve }` against the alerts already open |
 
@@ -44,10 +45,11 @@ Thresholds (`backend/data/thresholds.ts`, `Threshold` in `shared/src/metrics.ts`
 - 25 ng/mL → `caution` (20 inclusive, 30 exclusive).
 - 14.5 ng/mL is in no range → `critical`, escalated to `flight-surgeon`; `findAnomalies` gives the title `Low vitamin D (25-OH)` and the
   message `Vitamin D (25-OH) is 14.5 ng/mL (nominal 30 ng/mL or more).`
-- blood-biochemistry with metrics critical (20) + nominal (100) → score 60, status
-  `critical`.
-- A health score can be high (e.g. 93) and still `critical`: the status is the worst
-  system, the score is an average. The UI should show both.
+- blood-biochemistry with metrics critical (20) + nominal (100) → mean 60, status
+  `critical` → score 0.6 × 69 = 41.
+- The score always falls in the band of its status (`SCORE_BANDS`). Without the bands
+  an average would hide one critical metric among healthy ones (e.g. 97 and `critical`);
+  with them that crew member scores 65. The UI can colour a score with the same bands.
 
 ## Alert diff
 

@@ -132,7 +132,7 @@ These values are **not** from a source; they are plausible choices, always store
 | Assumption | Value | Basis |
 | --- | --- | --- |
 | Mission | 180 days from 2026-09-01; the seed stops at mission day 60, 12:00 UTC | `CLAUDE.md`: a 6-month ISS mission |
-| Baselines and noise of each metric | e.g. resting heart rate 62 bpm ± 2.5 | Plausible healthy adult values; blood values use the OSDR baselines above |
+| Baselines and noise of each metric | e.g. resting heart rate 70 bpm ± 2.5 | Plausible healthy adult values; blood values use the OSDR baselines above |
 | Bone loss trend | −0.035 %/day (about −1 %/month) | Within the 0.5–1.5 %/month spaceflight loss rate reported in NASA material |
 | Prior career radiation dose | C001 120, C002 280, C003 45, C004 90 mSv | Fictional; C002 is set close to the 300 mSv caution band for the demo |
 | Dose rate on board | 18 µSv/h ± 2.5 (about 0.43 mSv/day) | Plausible ISS order of magnitude |

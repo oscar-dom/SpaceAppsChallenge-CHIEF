@@ -72,7 +72,7 @@ All values are simulated, not sourced (see [data sources](data-sources.md#simula
 
 | Metric | Base | Per crew | Noise (sd) | Trend / day | Other |
 | --- | --- | --- | --- | --- | --- |
-| Resting heart rate (bpm) | 62 | 0, +3, −2, +5 | 2.5 | — | daily cycle ±3, peak 15:00; min 40 |
+| Resting heart rate (bpm) | 70 | 0, +3, −2, +5 | 2.5 | — | daily cycle ±3, peak 15:00; min 40 |
 | Heart rate variability (ms) | 62 | 0, −6, +5, −3 | 6 | — | min 10 |
 | Blood oxygen saturation (%) | 97.5 | — | 0.5 | — | 85–100 |
 | Systolic BP (mmHg) | 114 | 0, +6, −4, +3 | 4 | — | |

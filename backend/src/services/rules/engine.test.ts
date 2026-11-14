@@ -10,6 +10,7 @@ import {
   evaluateSystem,
   evaluateValue,
   findAnomalies,
+  scoreInBand,
   worstStatus,
 } from './engine.js';
 
@@ -110,7 +111,24 @@ describe('evaluateSystem', () => {
       metricStatus('caution'),
     ]);
     expect(system.status).toBe('caution');
-    expect(system.score).toBe(80);
+    // Mean 80, scaled into the caution band: 70 + 0.8 * 19.
+    expect(system.score).toBe(85);
+  });
+
+  it('keeps the system score inside the band of its status', () => {
+    const metrics = [
+      metricStatus('critical'),
+      metricStatus('nominal'),
+      metricStatus('nominal'),
+      metricStatus('nominal'),
+    ];
+    // Mean 80, but one critical metric puts it in the critical band: 0.8 * 69.
+    expect(evaluateSystem('cardiovascular', metrics)).toMatchObject({
+      status: 'critical',
+      score: 55,
+    });
+    // An all-caution system (mean 60) stays in the caution band.
+    expect(evaluateSystem('cardiovascular', [metricStatus('caution')]).score).toBe(81);
   });
 
   it('ignores metrics without data', () => {
@@ -143,8 +161,40 @@ describe('computeHealthScore', () => {
       weights,
       '2026-11-14T10:00:00Z',
     );
-    expect(health.score).toBe(90);
+    // Weighted mean 90, scaled into the caution band (70-89): 70 + 0.9 * 19.
+    expect(health.score).toBe(87);
     expect(health.status).toBe('caution');
+  });
+
+  it('never shows a healthy-looking score next to a critical status', () => {
+    const health = computeHealthScore(
+      'C003',
+      [
+        system('cardiovascular', 'nominal', 100),
+        system('sleep-cognition', 'nominal', 100),
+        system('blood-biochemistry', 'critical', 60),
+      ],
+      SYSTEM_WEIGHTS,
+      '2026-11-14T10:00:00Z',
+    );
+    // Weighted mean about 91, but the status is critical: 0.91 * 69.
+    expect(health.status).toBe('critical');
+    expect(health.score).toBe(63);
+  });
+});
+
+describe('scoreInBand', () => {
+  it('scales a score into the band of its status', () => {
+    expect(scoreInBand(97, 'critical')).toBe(67);
+    expect(scoreInBand(97, 'caution')).toBe(88);
+    expect(scoreInBand(60, 'caution')).toBe(81);
+    expect(scoreInBand(0, 'caution')).toBe(70);
+    expect(scoreInBand(100, 'critical')).toBe(69);
+    expect(scoreInBand(100, 'nominal')).toBe(100);
+  });
+
+  it('keeps the order of two scores with the same status', () => {
+    expect(scoreInBand(93, 'critical')).toBeLessThan(scoreInBand(97, 'critical'));
   });
 });
 

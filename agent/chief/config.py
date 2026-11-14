@@ -20,8 +20,9 @@ class Settings(BaseSettings):
         "gemini-3.5-flash,gemini-3.6-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite"
     )
     gemini_temperature: float = 0.4
-    # Time limit for one answer across the whole chain. Past it, CHIEF falls back.
-    llm_timeout_seconds: float = 30.0
+    # Time limit for one answer across the whole chain. Past it, CHIEF falls back. Keep it
+    # below the backend's AGENT_TIMEOUT_MS (20 s), or the backend gives up first.
+    llm_timeout_seconds: float = 15.0
 
     # Speech-to-text (faster-whisper). Model size: tiny, base, small, medium...
     whisper_model: str = "base.en"
@@ -29,6 +30,10 @@ class Settings(BaseSettings):
 
     # Text-to-speech (Piper). Path to the .onnx voice, relative to agent/ or absolute.
     piper_voice_path: Path = Path("models/piper/en_US-ryan-medium.onnx")
+
+    # Load the voice models in the background at startup, so the first push-to-talk does
+    # not wait for them (or for the first Whisper download).
+    voice_preload: bool = True
 
     # Upper bound on the actions CHIEF returns in one answer.
     max_actions: int = 5

@@ -67,6 +67,11 @@ export class HealthService {
     return this.thresholds.get(metricId);
   }
 
+  /** Every sourced threshold, ordered by metric id: the dashboards draw their ranges. */
+  listThresholds(): Threshold[] {
+    return [...this.thresholds.values()];
+  }
+
   evaluate(crewId: string): CrewEvaluation {
     const now = this.clock.now();
     const latest = new Map(getLatestMeasurements(this.db, crewId).map((m) => [m.metricId, m]));

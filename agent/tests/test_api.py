@@ -118,3 +118,28 @@ def test_tts_reports_missing_voice(tmp_path: Any) -> None:
     client = TestClient(create_app(settings=settings))
     response = client.post("/tts", json={"text": "Hello"})
     assert response.status_code == 503
+
+
+def test_voice_warm_up_reports_problems_without_raising(tmp_path: Any) -> None:
+    from chief.config import Settings
+    from chief.voice import Voice
+
+    settings = Settings(
+        _env_file=None,
+        whisper_model=str(tmp_path / "no-such-whisper-model"),
+        piper_voice_path=tmp_path / "missing.onnx",
+    )
+    problems = Voice(settings).warm_up()
+    assert [p.split(":")[0] for p in problems] == ["speech-to-text", "text-to-speech"]
+
+
+def test_startup_does_not_wait_for_the_voice_models(tmp_path: Any) -> None:
+    from fastapi.testclient import TestClient
+
+    from chief.api import create_app
+    from chief.config import Settings
+
+    settings = Settings(_env_file=None, gemini_api_key="", piper_voice_path=tmp_path / "x.onnx")
+    settings.whisper_model = str(tmp_path / "no-such-whisper-model")
+    with TestClient(create_app(settings=settings)) as client:
+        assert client.get("/health").status_code == 200

@@ -12,6 +12,7 @@ a route is added there first, agreed with the team, then here.
 | GET | `/crew` | `crew.list` | `CrewMember[]` |
 | GET | `/mission/clock` | `crew.missionClock` | `MissionClock` |
 | GET | `/metrics` | `crew.metrics` | `Metric[]` |
+| GET | `/thresholds` | `crew.thresholds` | `Threshold[]`, only metrics with a sourced threshold |
 | GET | `/crew/:crewId/health` | `crew.healthScore` | `HealthScore` |
 | GET | `/crew/:crewId/systems/:systemId` | `crew.system` | `SystemStatus` |
 | GET | `/crew/:crewId/measurements?metricId=&period=` | `crew.measurements` | `Measurement[]` (≤ 300, oldest first) |

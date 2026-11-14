@@ -17,6 +17,7 @@ export function apiRouter(services: Services): Router {
   router.get('/crew', crew.list);
   router.get('/mission/clock', crew.missionClock);
   router.get('/metrics', crew.metrics);
+  router.get('/thresholds', crew.thresholds);
   router.get('/crew/:crewId/health', crew.healthScore);
   router.get('/crew/:crewId/systems/:systemId', crew.system);
   router.get('/crew/:crewId/measurements', crew.measurements);

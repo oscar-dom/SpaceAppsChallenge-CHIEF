@@ -10,7 +10,22 @@ import type {
   Threshold,
   Trend,
 } from '@chief/shared';
-import { STATUS_RANK, STATUS_SCORE, TREND_MIN_CHANGE } from '../../config/constants.js';
+import {
+  SCORE_BANDS,
+  STATUS_RANK,
+  STATUS_SCORE,
+  TREND_MIN_CHANGE,
+} from '../../config/constants.js';
+
+/**
+ * A 0-100 average scaled linearly into the band of its status (SCORE_BANDS) and rounded.
+ * Scaling, not clamping, keeps the order: two critical crew members still differ.
+ */
+export function scoreInBand(score: number, status: Status): number {
+  const { min, max } = SCORE_BANDS[status];
+  const ratio = Math.min(100, Math.max(0, score)) / 100;
+  return Math.round(min + ratio * (max - min));
+}
 
 /** Status of a value: the first range that contains it, or critical if none does. */
 export function evaluateValue(value: number, threshold: Threshold): Status {
@@ -68,8 +83,8 @@ const hasData: IsScored = (m) => m.latest !== null;
 /**
  * Status and score of one body system. Metrics that are not scored (no data, or no sourced
  * threshold) are listed but do not count. The status is the worst metric status (one
- * critical metric makes the system critical); the score is the mean of the metric scores.
- * Without any scored metric the system is nominal.
+ * critical metric makes the system critical); the score is the mean of the metric scores,
+ * scaled into the band of that status. Without any scored metric the system is nominal.
  */
 export function evaluateSystem(
   system: BodySystemId,
@@ -81,17 +96,14 @@ export function evaluateSystem(
     measured.length === 0
       ? 100
       : measured.reduce((sum, m) => sum + STATUS_SCORE[m.status], 0) / measured.length;
-  return {
-    system,
-    status: worstStatus(measured.map((m) => m.status)),
-    score: Math.round(score),
-    metrics,
-  };
+  const status = worstStatus(measured.map((m) => m.status));
+  return { system, status, score: scoreInBand(score, status), metrics };
 }
 
 /**
  * Global health score: weighted mean of the scores of the systems with scored metrics, with
- * the weights normalized over those systems. The status is the worst system status.
+ * the weights normalized over those systems, scaled into the band of the status. The status
+ * is the worst system status.
  */
 export function computeHealthScore(
   crewMemberId: string,
@@ -106,13 +118,8 @@ export function computeHealthScore(
     totalWeight === 0
       ? 100
       : withData.reduce((sum, s) => sum + s.score * weights[s.system], 0) / totalWeight;
-  return {
-    crewMemberId,
-    score: Math.round(score),
-    status: worstStatus(withData.map((s) => s.status)),
-    systems,
-    computedAt,
-  };
+  const status = worstStatus(withData.map((s) => s.status));
+  return { crewMemberId, score: scoreInBand(score, status), status, systems, computedAt };
 }
 
 /** An anomaly the engine wants on the alerts panel: one per metric out of range. */
