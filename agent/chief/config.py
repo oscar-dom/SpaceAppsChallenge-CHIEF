@@ -13,9 +13,13 @@ class Settings(BaseSettings):
 
     # Gemini. Without an API key the agent still runs and answers in fallback mode.
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-pro"
+    # Pro models are not available to new free-tier keys; Flash answers in about 6-8 s.
+    gemini_model: str = "gemini-3.5-flash"
     gemini_temperature: float = 0.4
-    llm_timeout_seconds: float = 45.0
+    # Hard limit per answer, retries included. Past it, CHIEF answers in fallback mode.
+    llm_timeout_seconds: float = 30.0
+    # Attempts per request (1 = no retry). The SDK default retries for minutes.
+    llm_attempts: int = 2
 
     # Speech-to-text (faster-whisper). Model size: tiny, base, small, medium...
     whisper_model: str = "base.en"

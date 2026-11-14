@@ -55,7 +55,7 @@ Full details in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
 |---|---|
 | Frontend | Vue 3 + Vite + TypeScript, **Vuetify 3**, Pinia, Vue Router, **vue-echarts** (charts), Socket.IO client |
 | Backend | Node.js + **Express** + TypeScript, Socket.IO, **SQLite** with **Drizzle ORM** (better-sqlite3 driver) |
-| Agent (CHIEF) | **Python + FastAPI**, Gemini Pro via the `google-genai` SDK, **faster-whisper** (speech-to-text), **Piper** (text-to-speech) |
+| Agent (CHIEF) | **Python + FastAPI**, Gemini (`gemini-3.5-flash`) via the `google-genai` SDK, **faster-whisper** (speech-to-text), **Piper** (text-to-speech) |
 | Shared contracts | `shared/` — TypeScript types used by frontend and backend |
 | Quality | ESLint + Prettier (TS), Vitest (rules engine tests), Ruff (Python, optional) |
 | Deployment | **Local only.** The demo runs on one laptop, no GPU required |
@@ -63,8 +63,10 @@ Full details in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
 Why these choices:
 
 - **SQLite:** a single file, no server, fits an onboard system that works offline.
-- **Gemini Pro instead of a local LLM:** none of our machines can run a local model well;
-  we have student access to Gemini Pro. In the story, CHIEF is the ship's assistant.
+- **Gemini instead of a local LLM:** none of our machines can run a local model well.
+  Pro models are not available to new free-tier API keys (the student Gemini Pro plan
+  covers the Gemini app, not the API), so CHIEF uses `gemini-3.5-flash`, which answers
+  in about 6-8 s. In the story, CHIEF is the ship's assistant.
 - **Python agent:** faster-whisper and Piper are Python tools; keeping CHIEF, STT and TTS
   in one service gives the AI work a single home.
 

@@ -2,8 +2,8 @@
 
 Python service with CHIEF, the AI assistant of the crew health system:
 
-- **Chat** and **alert recommendations** with Gemini Pro (`google-genai`), structured
-  JSON output and safety guardrails.
+- **Chat** and **alert recommendations** with Gemini (`google-genai`, default
+  `gemini-3.5-flash`), structured JSON output and safety guardrails.
 - **Speech-to-text** with faster-whisper and **text-to-speech** with Piper, both on CPU.
 
 Only the backend calls this service. The frontend never talks to it directly.
@@ -28,11 +28,13 @@ faster-whisper and Piper, and `requirements-dev.txt` adds pytest and Ruff.
 Then:
 
 1. Copy `.env.example` to `.env` and set `GEMINI_API_KEY` (Google AI Studio).
-2. Check the exact Pro model name your key can use and set `GEMINI_MODEL`:
-   ```bash
-   .venv/Scripts/python -c "from google import genai; c = genai.Client(); [print(m.name) for m in c.models.list() if 'pro' in m.name]"
+2. `GEMINI_MODEL` defaults to `gemini-3.5-flash`, tested on 2026-11-14: about 6-8 s
+   per answer. Pro models (`gemini-2.5-pro`, `gemini-3.1-pro-preview`) return 404 for
+   new free-tier keys, and `gemini-3.8-flash` was overloaded (minutes per answer). To
+   list the models your key can use (PowerShell, from `agent/`):
+   ```powershell
+   $env:GEMINI_API_KEY="your_key"; .venv\Scripts\python -c "from google import genai; [print(m.name) for m in genai.Client().models.list() if 'gemini' in m.name]"
    ```
-   (`genai.Client()` reads `GEMINI_API_KEY` from the environment.)
 3. Download the Piper voice (about 60 MB, git-ignored):
    ```bash
    .venv/Scripts/python -m piper.download_voices en_US-ryan-medium --download-dir models/piper
@@ -74,6 +76,9 @@ Every context request (`/chat`, `/alerts/actions`) carries:
 
 `/chat` adds `message` and `history` (`ChiefMessage[]`, oldest first). `/alerts/actions`
 adds `alert`. A full example lives in `tests/conftest.py`.
+
+Each Gemini call is capped at `LLM_TIMEOUT_SECONDS` (30 s) and `LLM_ATTEMPTS` (2);
+past that, the answer is a fallback.
 
 Errors: `422` invalid body, `400`/`413` empty or too large audio, `503` voice packages or
 voice model missing. Gemini failures never return an error: they return a fallback

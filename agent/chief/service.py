@@ -49,8 +49,8 @@ class ChiefService:
 
         try:
             output = await self._llm.generate(self._system, turns, LlmChatOutput)
-        except LlmError:
-            logger.exception("Chat fell back to the rules engine")
+        except LlmError as exc:
+            logger.warning("Chat fell back to the rules engine: %s", exc.__cause__ or exc)
             return self._chat_fallback(request)
 
         actions = sanitize_actions(output.actions, request.formulary, self._settings.max_actions)
@@ -68,8 +68,8 @@ class ChiefService:
         turns = [Turn("user", f"{render_context(request)}\n\n{alert_task(alert)}")]
         try:
             output = await self._llm.generate(self._system, turns, LlmAlertOutput)
-        except LlmError:
-            logger.exception("Alert actions fell back to the rules engine")
+        except LlmError as exc:
+            logger.warning("Alert actions fell back to the rules engine: %s", exc.__cause__ or exc)
             return self._alert_fallback(alert)
 
         actions = sanitize_actions(output.actions, request.formulary, self._settings.max_actions)
