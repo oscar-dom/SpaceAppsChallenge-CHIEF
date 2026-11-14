@@ -8,3 +8,4 @@ backend/data
 .github
 backend/drizzle
 backend/var
+frontend/src/lib/bodyFigure.ts

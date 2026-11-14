@@ -37,9 +37,9 @@
   --chrome-muted: #9fb0c9;
   --chrome-accent: #7cb6ff;
   /* Body map. */
-  --body: #dfe5ee;
-  --body-line: #b3bfcf;
-  --organ: #c9d3e0;
+  --body: #e6e1d8;
+  --body-line: #cfc7b9;
+  --organ: #97a0b0;
   --capsule-shell: #ffffff;
   --sans: 'IBM Plex Sans', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -70,9 +70,9 @@
   --chrome: #0a101b;
   --chrome-2: #131c2c;
   --chrome-3: #1d2940;
-  --body: #27334a;
-  --body-line: #45526b;
-  --organ: #34425c;
+  --body: #2a3550;
+  --body-line: #3a4766;
+  --organ: #8592ad;
   --capsule-shell: #e8edf5;
   color-scheme: dark;
 }

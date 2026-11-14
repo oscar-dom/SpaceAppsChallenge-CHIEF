@@ -78,11 +78,19 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
 - **People first.** Crew members are the subject: large avatars with a status ring in the
   navigation, one card per person on the crew overview, the selected person named in the
   top bar.
-- **Body map.** A soft mannequin (about 8 heads tall, male and female proportions) with
-  the organs of each system: brain (sleep, cognition, behaviour), eyes (vision), lungs and
-  heart, stomach (nutrition), kidneys (blood biochemistry), lymph nodes (immune), long
-  bones (musculoskeletal). Healthy organs stay neutral, abnormal ones take the status
-  colour and critical ones pulse. Radiation is the body outline plus a dosimeter badge.
+- **Body map.** An illustrated male or female figure melted into one smooth silhouette
+  (hair included, ordinary build), with the organs of each system: brain (sleep,
+  cognition, behaviour), eyes (vision), lungs and heart, stomach (nutrition), kidneys
+  (blood biochemistry), lymph nodes (immune). Musculoskeletal tints the arms and legs.
+  Healthy organs stay neutral, abnormal ones take the status colour and critical ones
+  pulse. Radiation is the body outline plus a dosimeter badge. Small targets (eyes, lymph
+  nodes) have a wider invisible hit area.
+  - Credits: body outlines from
+    [react-native-body-highlighter](https://github.com/HichamELBSI/react-native-body-highlighter)
+    (MIT, notice in `src/lib/bodyFigure.ts`); lungs, heart, stomach and kidneys from
+    [Health Icons](https://healthicons.org) (CC0). The brain, eyes, lymph nodes and the
+    female hairstyle are drawn in the app. `src/lib/bodyFigure.ts` is generated: do not
+    edit it by hand.
 - Numbers, units and times use IBM Plex Mono with tabular figures.
 - Metrics without a sourced threshold are drawn as **Charted only**, never as nominal.
 - Every chart draws the nominal band and the caution and critical cut-offs of its threshold,
