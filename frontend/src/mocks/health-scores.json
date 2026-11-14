@@ -1,0 +1,56 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "t": "2026-11-14T04:00:00Z",
+      "score": 82,
+      "level": "ok",
+      "components": [
+        {
+          "module": "vitals",
+          "score": 84,
+          "level": "ok"
+        }
+      ]
+    },
+    {
+      "t": "2026-11-14T06:00:00Z",
+      "score": 78,
+      "level": "ok",
+      "components": [
+        {
+          "module": "vitals",
+          "score": 76,
+          "level": "ok"
+        }
+      ]
+    },
+    {
+      "t": "2026-11-14T08:00:00Z",
+      "score": 71,
+      "level": "watch",
+      "components": [
+        {
+          "module": "vitals",
+          "score": 66,
+          "level": "watch"
+        }
+      ]
+    },
+    {
+      "t": "2026-11-14T10:00:00Z",
+      "score": 64,
+      "level": "warning",
+      "components": [
+        {
+          "module": "vitals",
+          "score": 58,
+          "level": "warning"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "code": "solar_storm",
+      "name": "Tormenta solar",
+      "description": "Flujo de protones S2 y alerta de radiación",
+      "commDelaySec": 0
+    },
+    {
+      "code": "eclss_failure",
+      "name": "Fallo ECLSS",
+      "description": "CO₂ de cabina en aumento",
+      "commDelaySec": 0
+    },
+    {
+      "code": "mars_delay",
+      "name": "Marte, 20 min de retraso",
+      "description": "Comunicación con Tierra con retraso",
+      "commDelaySec": 1200
+    }
+  ]
+}

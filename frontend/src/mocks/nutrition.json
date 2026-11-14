@@ -1,0 +1,30 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "date": "2026-11-13",
+      "kcal": 2590,
+      "targetKcal": 2650,
+      "proteinG": 122,
+      "targetProteinG": 125,
+      "hydrationMl": 2480,
+      "targetHydrationMl": 2500,
+      "vitaminDIu": 800,
+      "level": "ok"
+    },
+    {
+      "date": "2026-11-14",
+      "kcal": 2450,
+      "targetKcal": 2650,
+      "proteinG": 118,
+      "targetProteinG": 125,
+      "hydrationMl": 2300,
+      "targetHydrationMl": 2500,
+      "vitaminDIu": 800,
+      "level": "ok"
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

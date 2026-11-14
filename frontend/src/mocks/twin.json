@@ -1,0 +1,49 @@
+{
+  "status": "success",
+  "data": {
+    "assumptions": {
+      "exerciseMinPerDay": 90,
+      "resistanceLoadPct": 60
+    },
+    "points": [
+      {
+        "day": 0,
+        "boneDensityLossPct": 0.0,
+        "muscleMassLossPct": 0.0
+      },
+      {
+        "day": 30,
+        "boneDensityLossPct": 1.1,
+        "muscleMassLossPct": 1.6
+      },
+      {
+        "day": 60,
+        "boneDensityLossPct": 2.0,
+        "muscleMassLossPct": 2.9
+      },
+      {
+        "day": 90,
+        "boneDensityLossPct": 2.8,
+        "muscleMassLossPct": 4.1
+      },
+      {
+        "day": 120,
+        "boneDensityLossPct": 3.7,
+        "muscleMassLossPct": 5.3
+      },
+      {
+        "day": 150,
+        "boneDensityLossPct": 4.6,
+        "muscleMassLossPct": 6.5
+      },
+      {
+        "day": 180,
+        "boneDensityLossPct": 5.5,
+        "muscleMassLossPct": 7.6
+      }
+    ]
+  },
+  "meta": {
+    "source": "simulated"
+  }
+}

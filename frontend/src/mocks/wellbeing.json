@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 31,
+      "recordedAt": "2026-11-13T20:00:00Z",
+      "mood": 4,
+      "isolation": 4,
+      "cohabitation": 5,
+      "note": "Buena dinámica durante el mantenimiento del rack."
+    },
+    {
+      "id": 32,
+      "recordedAt": "2026-11-14T08:30:00Z",
+      "mood": 3,
+      "isolation": 4,
+      "cohabitation": 5,
+      "note": "Ligera pesadez frontal al despertar."
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}

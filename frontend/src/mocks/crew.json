@@ -1,0 +1,158 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "C001",
+      "name": "Ana Ruiz",
+      "role": "Comandante",
+      "healthScore": {
+        "score": 86,
+        "level": "ok",
+        "components": [
+          {
+            "module": "vitals",
+            "score": 90,
+            "level": "ok"
+          },
+          {
+            "module": "sleep",
+            "score": 84,
+            "level": "ok"
+          },
+          {
+            "module": "cognitive",
+            "score": 88,
+            "level": "ok"
+          },
+          {
+            "module": "nutrition",
+            "score": 85,
+            "level": "ok"
+          },
+          {
+            "module": "wellbeing",
+            "score": 82,
+            "level": "ok"
+          },
+          {
+            "module": "bone",
+            "score": 80,
+            "level": "ok"
+          },
+          {
+            "module": "radiation",
+            "score": 78,
+            "level": "watch"
+          }
+        ]
+      }
+    },
+    {
+      "id": "C002",
+      "name": "Leo Martín",
+      "role": "Piloto",
+      "healthScore": {
+        "score": 64,
+        "level": "warning",
+        "components": [
+          {
+            "module": "vitals",
+            "score": 58,
+            "level": "warning"
+          },
+          {
+            "module": "sleep",
+            "score": 61,
+            "level": "watch"
+          },
+          {
+            "module": "cognitive",
+            "score": 70,
+            "level": "watch"
+          },
+          {
+            "module": "nutrition",
+            "score": 82,
+            "level": "ok"
+          },
+          {
+            "module": "wellbeing",
+            "score": 75,
+            "level": "ok"
+          },
+          {
+            "module": "bone",
+            "score": 72,
+            "level": "watch"
+          },
+          {
+            "module": "radiation",
+            "score": 55,
+            "level": "warning"
+          }
+        ]
+      }
+    },
+    {
+      "id": "C003",
+      "name": "Sofía Ibarra",
+      "role": "Ing. de vuelo",
+      "healthScore": {
+        "score": 92,
+        "level": "ok",
+        "components": [
+          {
+            "module": "vitals",
+            "score": 93,
+            "level": "ok"
+          },
+          {
+            "module": "sleep",
+            "score": 90,
+            "level": "ok"
+          },
+          {
+            "module": "cognitive",
+            "score": 94,
+            "level": "ok"
+          },
+          {
+            "module": "nutrition",
+            "score": 91,
+            "level": "ok"
+          },
+          {
+            "module": "wellbeing",
+            "score": 92,
+            "level": "ok"
+          },
+          {
+            "module": "bone",
+            "score": 89,
+            "level": "ok"
+          },
+          {
+            "module": "radiation",
+            "score": 88,
+            "level": "ok"
+          }
+        ]
+      }
+    },
+    {
+      "id": "C004",
+      "name": "Darío Costa",
+      "role": "Médico",
+      "healthScore": {
+        "score": null,
+        "level": "unknown",
+        "components": []
+      }
+    }
+  ],
+  "meta": {
+    "source": "simulated",
+    "fetchedAt": "2026-11-14T10:32:00Z",
+    "stale": false
+  }
+}

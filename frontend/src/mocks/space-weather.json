@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "data": {
+    "kp": 5.3,
+    "protonFluxPfu": 120,
+    "level": "critical",
+    "events": [
+      {
+        "type": "FLR",
+        "class": "M2.1",
+        "startedAt": "2026-11-14T09:12:00Z",
+        "source": "DONKI"
+      },
+      {
+        "type": "SEP",
+        "class": "S2",
+        "startedAt": "2026-11-14T10:05:00Z",
+        "source": "NOAA SWPC"
+      }
+    ]
+  },
+  "meta": {
+    "source": "live",
+    "fetchedAt": "2026-11-14T10:31:55Z",
+    "stale": false
+  }
+}

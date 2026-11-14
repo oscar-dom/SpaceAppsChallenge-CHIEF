@@ -1,0 +1,99 @@
+{
+  "C001": {
+    "status": "success",
+    "data": {
+      "crewId": "C001",
+      "bloodType": "A+",
+      "age": 41,
+      "heightCm": 171,
+      "weightKg": 64.0,
+      "allergies": [],
+      "conditions": [],
+      "medications": [
+        {
+          "name": "Colecalciferol (Vitamina D3)",
+          "dose": "800 UI",
+          "frequency": "Diaria",
+          "active": true
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C002": {
+    "status": "success",
+    "data": {
+      "crewId": "C002",
+      "bloodType": "O+",
+      "age": 38,
+      "heightCm": 179,
+      "weightKg": 76.5,
+      "allergies": [
+        "Penicilina"
+      ],
+      "conditions": [
+        "Tendencia a cefalea por hipercapnia leve"
+      ],
+      "medications": [
+        {
+          "name": "Colecalciferol (Vitamina D3)",
+          "dose": "800 UI",
+          "frequency": "Diaria",
+          "active": true
+        },
+        {
+          "name": "Ibuprofeno",
+          "dose": "400 mg",
+          "frequency": "A demanda",
+          "active": true
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C003": {
+    "status": "success",
+    "data": {
+      "crewId": "C003",
+      "bloodType": "B-",
+      "age": 34,
+      "heightCm": 168,
+      "weightKg": 60.2,
+      "allergies": [
+        "Látex"
+      ],
+      "conditions": [],
+      "medications": [
+        {
+          "name": "Colecalciferol (Vitamina D3)",
+          "dose": "800 UI",
+          "frequency": "Diaria",
+          "active": true
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C004": {
+    "status": "success",
+    "data": {
+      "crewId": "C004",
+      "bloodType": "O-",
+      "age": 44,
+      "heightCm": 182,
+      "weightKg": 81.0,
+      "allergies": [],
+      "conditions": [],
+      "medications": []
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  }
+}

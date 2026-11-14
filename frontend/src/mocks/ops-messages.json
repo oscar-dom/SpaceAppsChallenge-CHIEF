@@ -1,0 +1,37 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "kind": "telemetry_package",
+      "direction": "crew_to_ground",
+      "crewId": null,
+      "alertId": null,
+      "body": "Paquete horario de telemetría biomédica y ECLSS",
+      "originalBytes": 48200,
+      "compressedBytes": 11400,
+      "createdAt": "2026-11-14T10:00:00Z",
+      "deliverAt": "2026-11-14T10:00:00Z",
+      "delivered": true
+    },
+    {
+      "id": 2,
+      "kind": "decision",
+      "direction": "ground_to_crew",
+      "crewId": "C002",
+      "alertId": 41,
+      "body": "Houston Flight Surgeon: Confirmado refugio en módulo blindado durante paso por SAA y tormenta S2.",
+      "createdAt": "2026-11-14T10:31:30Z",
+      "deliverAt": "2026-11-14T10:31:30Z",
+      "delivered": true
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}

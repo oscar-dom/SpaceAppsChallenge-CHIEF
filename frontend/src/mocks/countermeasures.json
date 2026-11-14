@@ -1,0 +1,24 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 9,
+      "module": "radiation",
+      "title": "Refugio en módulo blindado (Zvezda / aguas)",
+      "rule": "protonFluxPfu > 100 || inSAA",
+      "priority": "high",
+      "status": "active"
+    },
+    {
+      "id": 10,
+      "module": "bone",
+      "title": "Incrementar carga resistiva ARED al 75 %",
+      "rule": "boneDensityLossRate > 1.0%/mes",
+      "priority": "normal",
+      "status": "active"
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

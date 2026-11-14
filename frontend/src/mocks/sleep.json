@@ -1,0 +1,73 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "date": "2026-11-10",
+      "durationMin": 450,
+      "efficiencyPct": 91,
+      "phases": {
+        "deepMin": 95,
+        "remMin": 102,
+        "lightMin": 212,
+        "awakeMin": 41
+      },
+      "circadianShiftMin": 15,
+      "level": "ok"
+    },
+    {
+      "date": "2026-11-11",
+      "durationMin": 420,
+      "efficiencyPct": 88,
+      "phases": {
+        "deepMin": 84,
+        "remMin": 90,
+        "lightMin": 196,
+        "awakeMin": 50
+      },
+      "circadianShiftMin": 22,
+      "level": "ok"
+    },
+    {
+      "date": "2026-11-12",
+      "durationMin": 435,
+      "efficiencyPct": 89,
+      "phases": {
+        "deepMin": 88,
+        "remMin": 96,
+        "lightMin": 203,
+        "awakeMin": 48
+      },
+      "circadianShiftMin": 25,
+      "level": "ok"
+    },
+    {
+      "date": "2026-11-13",
+      "durationMin": 380,
+      "efficiencyPct": 81,
+      "phases": {
+        "deepMin": 64,
+        "remMin": 78,
+        "lightMin": 166,
+        "awakeMin": 72
+      },
+      "circadianShiftMin": 55,
+      "level": "watch"
+    },
+    {
+      "date": "2026-11-14",
+      "durationMin": 345,
+      "efficiencyPct": 76,
+      "phases": {
+        "deepMin": 52,
+        "remMin": 68,
+        "lightMin": 142,
+        "awakeMin": 83
+      },
+      "circadianShiftMin": 70,
+      "level": "watch"
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

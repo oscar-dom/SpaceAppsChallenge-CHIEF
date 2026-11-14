@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "data": {
+    "lat": -28.4,
+    "lon": -41.7,
+    "altKm": 418,
+    "inSAA": true,
+    "lastSaaPassAt": "2026-11-14T10:20:00Z",
+    "nextSaaPassAt": "2026-11-14T11:55:00Z"
+  },
+  "meta": {
+    "source": "live",
+    "fetchedAt": "2026-11-14T10:31:55Z",
+    "stale": false
+  }
+}

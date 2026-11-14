@@ -1,0 +1,72 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 41,
+      "crewId": null,
+      "category": "radiation",
+      "level": "critical",
+      "title": "Tormenta de protones (S2)",
+      "message": "Flujo GOES >10 MeV sobre 100 pfu. Ir al refugio.",
+      "source": "NOAA SWPC",
+      "status": "active",
+      "createdAt": "2026-11-14T10:31:00Z",
+      "updatedAt": "2026-11-14T10:31:00Z",
+      "ackedAt": null,
+      "resolvedAt": null,
+      "groundDeadlineAt": null,
+      "actions": [
+        {
+          "type": "task",
+          "taskId": 77,
+          "crewId": "C002"
+        },
+        {
+          "type": "task",
+          "taskId": 79,
+          "crewId": "C001"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "crewId": null,
+      "category": "cabin",
+      "level": "watch",
+      "title": "CO₂ de cabina 4,1 mmHg",
+      "message": "Nivel ligeramente elevado en nodo Harmony.",
+      "source": "ECLSS",
+      "status": "active",
+      "createdAt": "2026-11-14T10:25:00Z",
+      "updatedAt": "2026-11-14T10:25:00Z",
+      "ackedAt": null,
+      "resolvedAt": null,
+      "groundDeadlineAt": null,
+      "actions": []
+    },
+    {
+      "id": 43,
+      "crewId": "C002",
+      "category": "vitals",
+      "level": "warning",
+      "title": "Corazón: FC en reposo 25 % sobre su línea base",
+      "message": "Frecuencia cardiaca sostenida en 104 bpm.",
+      "source": "Telemetry",
+      "status": "active",
+      "createdAt": "2026-11-14T10:28:00Z",
+      "updatedAt": "2026-11-14T10:28:00Z",
+      "ackedAt": null,
+      "resolvedAt": null,
+      "groundDeadlineAt": null,
+      "actions": []
+    }
+  ],
+  "meta": {
+    "total": 3,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}

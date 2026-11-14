@@ -1,0 +1,32 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 201,
+      "recordedAt": "2026-11-12T09:00:00Z",
+      "meanReactionMs": 248,
+      "lapses": 0,
+      "baselineMs": 240,
+      "level": "ok"
+    },
+    {
+      "id": 202,
+      "recordedAt": "2026-11-13T09:00:00Z",
+      "meanReactionMs": 276,
+      "lapses": 1,
+      "baselineMs": 240,
+      "level": "watch"
+    },
+    {
+      "id": 203,
+      "recordedAt": "2026-11-14T09:00:00Z",
+      "meanReactionMs": 304,
+      "lapses": 2,
+      "baselineMs": 240,
+      "level": "watch"
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

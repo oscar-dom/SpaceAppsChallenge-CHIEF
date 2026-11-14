@@ -1,0 +1,22 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "factorA": "co2",
+      "factorB": "headache",
+      "r": 0.78,
+      "summary": "Los episodios de cefalea coinciden con picos de CO₂ de cabina por encima de 4,0 mmHg."
+    },
+    {
+      "id": 2,
+      "factorA": "circadianShiftMin",
+      "factorB": "meanReactionMs",
+      "r": 0.69,
+      "summary": "El desfase circadiano acumulado > 50 min se correlaciona con tiempos de reacción PVT más lentos."
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

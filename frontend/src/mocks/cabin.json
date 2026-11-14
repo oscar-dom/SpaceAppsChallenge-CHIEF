@@ -1,0 +1,40 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "metric": "co2",
+      "value": 4.1,
+      "unit": "mmHg",
+      "level": "watch",
+      "source": "simulated",
+      "recordedAt": "2026-11-14T10:30:00Z"
+    },
+    {
+      "metric": "o2",
+      "value": 21.1,
+      "unit": "%",
+      "level": "ok",
+      "source": "simulated",
+      "recordedAt": "2026-11-14T10:30:00Z"
+    },
+    {
+      "metric": "cabinPressure",
+      "value": 101.2,
+      "unit": "kPa",
+      "level": "ok",
+      "source": "simulated",
+      "recordedAt": "2026-11-14T10:30:00Z"
+    },
+    {
+      "metric": "doseRate",
+      "value": 34.5,
+      "unit": "uGy/h",
+      "level": "warning",
+      "source": "simulated",
+      "recordedAt": "2026-11-14T10:30:00Z"
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 11,
+      "phase": "pre_flight",
+      "collectedAt": "2026-09-28T07:30:00Z",
+      "panel": "hemograma",
+      "analytes": [
+        {
+          "code": "wbc",
+          "name": "Leucocitos",
+          "value": 7.1,
+          "unit": "10^9/L",
+          "refLow": 4.0,
+          "refHigh": 10.0,
+          "baseline": 7.1,
+          "deltaPct": 0.0,
+          "level": "ok"
+        },
+        {
+          "code": "rbc",
+          "name": "Eritrocitos",
+          "value": 4.9,
+          "unit": "10^12/L",
+          "refLow": 4.5,
+          "refHigh": 5.9,
+          "baseline": 4.9,
+          "deltaPct": 0.0,
+          "level": "ok"
+        },
+        {
+          "code": "hgb",
+          "name": "Hemoglobina",
+          "value": 14.8,
+          "unit": "g/dL",
+          "refLow": 13.5,
+          "refHigh": 17.5,
+          "baseline": 14.8,
+          "deltaPct": 0.0,
+          "level": "ok"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "phase": "in_flight",
+      "collectedAt": "2026-11-12T08:00:00Z",
+      "panel": "hemograma",
+      "analytes": [
+        {
+          "code": "wbc",
+          "name": "Leucocitos",
+          "value": 11.2,
+          "unit": "10^9/L",
+          "refLow": 4.0,
+          "refHigh": 10.0,
+          "baseline": 7.1,
+          "deltaPct": 57.7,
+          "level": "warning"
+        },
+        {
+          "code": "rbc",
+          "name": "Eritrocitos",
+          "value": 4.7,
+          "unit": "10^12/L",
+          "refLow": 4.5,
+          "refHigh": 5.9,
+          "baseline": 4.9,
+          "deltaPct": -4.1,
+          "level": "ok"
+        },
+        {
+          "code": "hgb",
+          "name": "Hemoglobina",
+          "value": 14.2,
+          "unit": "g/dL",
+          "refLow": 13.5,
+          "refHigh": 17.5,
+          "baseline": 14.8,
+          "deltaPct": -4.1,
+          "level": "ok"
+        },
+        {
+          "code": "plt",
+          "name": "Plaquetas",
+          "value": 245,
+          "unit": "10^9/L",
+          "refLow": 150,
+          "refHigh": 400,
+          "baseline": 230,
+          "deltaPct": 6.5,
+          "level": "ok"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "phase": "in_flight",
+      "collectedAt": "2026-11-12T08:00:00Z",
+      "panel": "metabolico",
+      "analytes": [
+        {
+          "code": "ca",
+          "name": "Calcio sérico",
+          "value": 10.4,
+          "unit": "mg/dL",
+          "refLow": 8.5,
+          "refHigh": 10.2,
+          "baseline": 9.4,
+          "deltaPct": 10.6,
+          "level": "watch"
+        },
+        {
+          "code": "vitd",
+          "name": "25-OH Vitamina D",
+          "value": 34,
+          "unit": "ng/mL",
+          "refLow": 30,
+          "refHigh": 80,
+          "baseline": 42,
+          "deltaPct": -19.0,
+          "level": "ok"
+        },
+        {
+          "code": "cort",
+          "name": "Cortisol matutino",
+          "value": 24.5,
+          "unit": "ug/dL",
+          "refLow": 6.0,
+          "refHigh": 23.0,
+          "baseline": 16.2,
+          "deltaPct": 51.2,
+          "level": "warning"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "phase": "in_flight",
+      "collectedAt": "2026-11-12T08:00:00Z",
+      "panel": "citoquinas",
+      "analytes": [
+        {
+          "code": "il6",
+          "name": "Interleucina-6 (IL-6)",
+          "value": 8.4,
+          "unit": "pg/mL",
+          "refLow": 0.0,
+          "refHigh": 7.0,
+          "baseline": 3.1,
+          "deltaPct": 171.0,
+          "level": "watch"
+        },
+        {
+          "code": "crp",
+          "name": "Proteína C reactiva",
+          "value": 3.2,
+          "unit": "mg/L",
+          "refLow": 0.0,
+          "refHigh": 5.0,
+          "baseline": 1.4,
+          "deltaPct": 128.6,
+          "level": "ok"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "source": "simulated"
+  }
+}

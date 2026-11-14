@@ -1,0 +1,453 @@
+{
+  "C001": {
+    "status": "success",
+    "data": {
+      "crewId": "C001",
+      "healthScore": {
+        "score": 86,
+        "level": "ok"
+      },
+      "vitals": [
+        {
+          "metric": "heartRate",
+          "value": 72,
+          "unit": "bpm",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "spo2",
+          "value": 98,
+          "unit": "%",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "systolicBp",
+          "value": 118,
+          "unit": "mmHg",
+          "level": "ok",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:00:00Z"
+        },
+        {
+          "metric": "diastolicBp",
+          "value": 76,
+          "unit": "mmHg",
+          "level": "ok",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:00:00Z"
+        },
+        {
+          "metric": "respRate",
+          "value": 14,
+          "unit": "rpm",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "bodyTemp",
+          "value": 36.7,
+          "unit": "C",
+          "level": "ok",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "hrv",
+          "value": 54,
+          "unit": "ms",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        }
+      ],
+      "bodyZones": [
+        {
+          "zone": "head",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "eyes",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "chest",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "heart",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "lungs",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "abdomen",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "muscles",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "bones",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "skin",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C002": {
+    "status": "success",
+    "data": {
+      "crewId": "C002",
+      "healthScore": {
+        "score": 64,
+        "level": "warning"
+      },
+      "vitals": [
+        {
+          "metric": "heartRate",
+          "value": 104,
+          "unit": "bpm",
+          "level": "warning",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "spo2",
+          "value": 96,
+          "unit": "%",
+          "level": "ok",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "systolicBp",
+          "value": 132,
+          "unit": "mmHg",
+          "level": "watch",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:00:00Z"
+        },
+        {
+          "metric": "diastolicBp",
+          "value": 86,
+          "unit": "mmHg",
+          "level": "watch",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:00:00Z"
+        },
+        {
+          "metric": "respRate",
+          "value": 19,
+          "unit": "rpm",
+          "level": "watch",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "bodyTemp",
+          "value": 37.3,
+          "unit": "C",
+          "level": "watch",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "hrv",
+          "value": 28,
+          "unit": "ms",
+          "level": "warning",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        }
+      ],
+      "bodyZones": [
+        {
+          "zone": "head",
+          "level": "watch",
+          "reason": "Cefalea registrada; CO₂ de cabina 4,1 mmHg",
+          "reasonCode": "headache_high_co2"
+        },
+        {
+          "zone": "eyes",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "chest",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "heart",
+          "level": "warning",
+          "reason": "FC en reposo 25 % sobre su línea base",
+          "reasonCode": "resting_hr_above_baseline"
+        },
+        {
+          "zone": "lungs",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "abdomen",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "muscles",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "bones",
+          "level": "watch",
+          "reason": "Pérdida ósea estimada 1,2 % al mes",
+          "reasonCode": "bone_loss_rate"
+        },
+        {
+          "zone": "skin",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C003": {
+    "status": "success",
+    "data": {
+      "crewId": "C003",
+      "healthScore": {
+        "score": 92,
+        "level": "ok"
+      },
+      "vitals": [
+        {
+          "metric": "heartRate",
+          "value": 66,
+          "unit": "bpm",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "spo2",
+          "value": 99,
+          "unit": "%",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "systolicBp",
+          "value": 112,
+          "unit": "mmHg",
+          "level": "ok",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:15:00Z"
+        },
+        {
+          "metric": "diastolicBp",
+          "value": 72,
+          "unit": "mmHg",
+          "level": "ok",
+          "source": "manual",
+          "recordedAt": "2026-11-14T08:15:00Z"
+        },
+        {
+          "metric": "respRate",
+          "value": 13,
+          "unit": "rpm",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "bodyTemp",
+          "value": 36.6,
+          "unit": "C",
+          "level": "ok",
+          "source": "simulated",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        },
+        {
+          "metric": "hrv",
+          "value": 64,
+          "unit": "ms",
+          "level": "ok",
+          "source": "physionet",
+          "recordedAt": "2026-11-14T10:30:00Z"
+        }
+      ],
+      "bodyZones": [
+        {
+          "zone": "head",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "eyes",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "chest",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "heart",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "lungs",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "abdomen",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "muscles",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "bones",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        },
+        {
+          "zone": "skin",
+          "level": "ok",
+          "reason": null,
+          "reasonCode": null
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  },
+  "C004": {
+    "status": "success",
+    "data": {
+      "crewId": "C004",
+      "healthScore": {
+        "score": null,
+        "level": "unknown"
+      },
+      "vitals": [],
+      "bodyZones": [
+        {
+          "zone": "head",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "eyes",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "chest",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "heart",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "lungs",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "abdomen",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "muscles",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "bones",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        },
+        {
+          "zone": "skin",
+          "level": "unknown",
+          "reason": "Sin datos",
+          "reasonCode": "no_data"
+        }
+      ]
+    },
+    "meta": {
+      "source": "simulated"
+    }
+  }
+}

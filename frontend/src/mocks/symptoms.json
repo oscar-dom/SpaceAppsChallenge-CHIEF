@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "data": [
+    {
+      "id": 14,
+      "symptom": "headache",
+      "severity": 3,
+      "recordedAt": "2026-11-14T09:15:00Z",
+      "note": "Cefalea frontal moderada tras el ejercicio resistivo."
+    },
+    {
+      "id": 15,
+      "symptom": "fatigue",
+      "severity": 2,
+      "recordedAt": "2026-11-14T10:10:00Z",
+      "note": "Cansancio leve."
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}

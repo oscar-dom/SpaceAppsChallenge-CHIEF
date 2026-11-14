@@ -1,0 +1,27 @@
+{
+  "status": "success",
+  "data": {
+    "missionDay": 42,
+    "missionTime": "2026-11-14T10:32:00Z",
+    "timeScale": 1,
+    "commDelaySec": 0,
+    "scenario": null,
+    "iss": {
+      "lat": -28.4,
+      "lon": -41.7,
+      "altKm": 418,
+      "inSAA": true
+    },
+    "spaceWeather": {
+      "kp": 5.3,
+      "protonFluxPfu": 120,
+      "level": "critical"
+    },
+    "dataMode": "live"
+  },
+  "meta": {
+    "source": "live",
+    "fetchedAt": "2026-11-14T10:31:55Z",
+    "stale": false
+  }
+}
