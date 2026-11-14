@@ -27,6 +27,10 @@ export function crewController({ crew, health, alerts, clock }: Services) {
     res.json(health.metrics);
   };
 
+  const thresholds: RequestHandler = (_req, res) => {
+    res.json(health.listThresholds());
+  };
+
   const healthScore: RequestHandler = (req, res) => {
     const { crewId } = parseInput(crewParams, req.params);
     crew.get(crewId);
@@ -52,5 +56,5 @@ export function crewController({ crew, health, alerts, clock }: Services) {
     res.json(alerts.list(crewId));
   };
 
-  return { list, missionClock, metrics, healthScore, system, measurements, crewAlerts };
+  return { list, missionClock, metrics, thresholds, healthScore, system, measurements, crewAlerts };
 }

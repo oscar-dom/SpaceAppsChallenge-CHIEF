@@ -27,6 +27,7 @@ handlers) to `middlewares/error-handler.ts`.
 | `list` | `GET /crew` | `crew.list()` |
 | `missionClock` | `GET /mission/clock` | `clock.snapshot()` |
 | `metrics` | `GET /metrics` | `health.metrics` (catalog loaded at startup) |
+| `thresholds` | `GET /thresholds` | `health.listThresholds()` (loaded at startup) |
 | `healthScore` | `GET /crew/:crewId/health` | `health.evaluate(crewId).health` |
 | `system` | `GET /crew/:crewId/systems/:systemId` | `health.system(crewId, systemId)` |
 | `measurements` | `GET /crew/:crewId/measurements` | `health.measurements(crewId, metricId, period)` |

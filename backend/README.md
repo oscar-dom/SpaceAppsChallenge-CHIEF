@@ -34,6 +34,7 @@ answers `{ "error": { "code", "message" } }`.
 | GET | `/api/crew` | `CrewMember[]` |
 | GET | `/api/mission/clock` | `MissionClock` |
 | GET | `/api/metrics` | `Metric[]` |
+| GET | `/api/thresholds` | `Threshold[]`: ranges, escalation and source of every scored metric |
 | GET | `/api/crew/:crewId/health` | `HealthScore` |
 | GET | `/api/crew/:crewId/systems/:systemId` | `SystemStatus` |
 | GET | `/api/crew/:crewId/measurements?metricId=&period=` | `Measurement[]`, at most 300 points |

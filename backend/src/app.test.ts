@@ -1,6 +1,13 @@
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import type { AgentChatRequest, Alert, CrewMember, HealthScore, Measurement } from '@chief/shared';
+import type {
+  AgentChatRequest,
+  Alert,
+  CrewMember,
+  HealthScore,
+  Measurement,
+  Threshold,
+} from '@chief/shared';
 import { pino } from 'pino';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -59,6 +66,18 @@ describe('REST API', () => {
   it('lists the metric catalog', async () => {
     const res = await request(app).get('/api/metrics').expect(200);
     expect(res.body.length).toBe(services.health.metrics.length);
+  });
+
+  it('lists the sourced thresholds for the charts', async () => {
+    const res = await request(app).get('/api/thresholds').expect(200);
+    const thresholds = res.body as Threshold[];
+    expect(thresholds.length).toBeGreaterThan(0);
+    const metricIds = new Set(services.health.metrics.map((m) => m.id));
+    for (const threshold of thresholds) {
+      expect(metricIds.has(threshold.metricId)).toBe(true);
+      expect(threshold.ranges.some((r) => r.status === 'nominal')).toBe(true);
+      expect(threshold.source.document).toBeTruthy();
+    }
   });
 
   it('evaluates the health of a crew member over every body system', async () => {

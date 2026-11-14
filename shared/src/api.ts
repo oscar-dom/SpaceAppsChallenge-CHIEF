@@ -10,6 +10,7 @@ import type { Measurement } from './metrics.js';
  * GET  /api/crew                                   → CrewMember[]
  * GET  /api/mission/clock                          → MissionClock
  * GET  /api/metrics                                → Metric[]
+ * GET  /api/thresholds                             → Threshold[]
  * GET  /api/crew/:crewId/health                    → HealthScore
  * GET  /api/crew/:crewId/systems/:systemId         → SystemStatus
  * GET  /api/crew/:crewId/measurements?metricId=&period=  → Measurement[]
