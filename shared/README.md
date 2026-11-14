@@ -25,8 +25,8 @@ The package is consumed as TypeScript source (no build step). Vite (frontend) an
 | `metrics.ts` | `Metric`, `Measurement`, `Threshold`, `MetricStatus`, `Period` |
 | `health.ts` | `SystemStatus`, `HealthScore` |
 | `alerts.ts` | `Alert`, `AlertKind`, `AlertSeverity` |
-| `chief.ts` | CHIEF chat and alert-action requests and responses |
+| `chief.ts` | CHIEF chat and alert actions (frontend ↔ backend), `Medication`, and the backend → agent contract (`Agent*`) |
 | `api.ts` | REST routes, `ApiError`, Socket.IO events |
 
 **This package is owned by the whole team.** Agree on a change before merging it,
-because it affects both sides. The Python agent mirrors `chief.ts` in its JSON schemas.
+because it affects both sides. The Python agent mirrors the `Agent*` types of `chief.ts` in `agent/chief/schemas.py`.

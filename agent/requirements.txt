@@ -1,0 +1,7 @@
+# Core agent: API + Gemini. Install with: pip install -r requirements.txt
+fastapi~=0.162
+uvicorn[standard]~=0.54
+google-genai~=3.3
+pydantic~=2.14
+pydantic-settings~=2.16
+python-multipart~=0.0.33
