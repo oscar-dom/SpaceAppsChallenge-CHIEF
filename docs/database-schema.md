@@ -73,10 +73,8 @@ Rule: **no threshold without a source, and none invented by us.** [`backend/data
 
 | Verification | Metrics and source |
 | --- | --- |
-| **Verified** (cut-offs found in the document or in several sources quoting it) | heart rate 60–100 bpm (AHA); blood pressure (2017 ACC/AHA: normal < 120/80, stage 2 ≥ 140/90); vitamin D (NASA JSC: deficiency < 20 ng/mL, insufficiency 20–30); urine calcium (hypercalciuria review, PubMed 28846247: > 250 mg/day women, 275–300 men); white blood cells (reference interval of the Inspiration4 lab in NASA OSDR: 3.8–10.8 ×10³/µL); intraocular pressure (normal 10–21 mmHg); sleep duration (AASM/SRS 2015: 7 h or more); career radiation dose (NASA-STD-3001 Vol. 1 Rev. C, V1 4030, section 4.8.2: < 600 mSv); calcium intake and fluid intake (NASA JSC-67378 Rev. 1: calcium 1000–1200 mg/day, max 2500; fluid ≥ 2100 mL/day women, ≥ 2500 men) |
-| **Partially verified** (main cut-off confirmed, a second band or the document revision only in a secondary source) | SpO2 (95 % confirmed; < 90 % from the PhenX protocol based on the WHO manual); bone mineral density (NASA OCHMO bone brief: hip/spine ≥ 95 %, femoral neck ≥ 90 % of pre-mission; Rev C requirement still to identify); glucose (ADA fasting categories confirmed; hypoglycemia levels from a secondary source); C-reactive protein (CDC/AHA 2003 bands confirmed; > 10 mg/L from a summary); sleep efficiency (≥ 85 %, quoted from the NSF 2017 paper) |
-| **To verify** | optic disc edema (Frisén scale) |
-| **Team band** | A caution band between the normal range and the critical limit that the source does not define, marked `// team-band`: heart rate, white blood cells, optic disc edema, intraocular pressure, sleep duration and efficiency, calcium and fluid intake, and the 300 mSv ("half the career limit") margin of the radiation dose. The normal range always comes from the source |
+| **Verified** (cut-offs found in the document or in several sources quoting it) | heart rate 60–100 bpm (AHA); blood pressure (2017 ACC/AHA: normal < 120/80, stage 2 ≥ 140/90); vitamin D (NASA JSC: deficiency < 20 ng/mL, insufficiency 20–30); urine calcium (hypercalciuria review, PubMed 28846247: > 250 mg/day women, 275–300 men); white blood cells (reference interval of the Inspiration4 lab in NASA OSDR: 3.8–10.8 ×10³/µL); intraocular pressure (normal 10–21 mmHg); sleep duration (AASM/SRS 2015: 7 h or more); career radiation dose (NASA-STD-3001 Vol. 1 Rev. C, V1 4030, section 4.8.2: < 600 mSv); calcium intake and fluid intake (NASA JSC-67378 Rev. 1: calcium 1000–1200 mg/day, max 2500; fluid ≥ 2100 mL/day women, ≥ 2500 men); SpO2 (WHO pulse oximetry manual: ≥ 95 %, < 90 % emergency); bone mineral density (NASA-STD-3001 Vol. 1 Rev. C, V1 4027: hip/spine ≥ 95 %, femoral neck ≥ 90 % of pre-mission); glucose (ADA: prediabetes 100–125, diabetes ≥ 126, hypoglycemia level 1 < 70, level 2 < 54 mg/dL); C-reactive protein (CDC/AHA 2003: > 3 mg/L high risk, persistent > 10 mg/L look for another cause); optic disc edema (Frisén 1982 grades 0–5); sleep efficiency (NSF 2017, adults: ≥ 85 % good, ≤ 74 % not good) |
+| **Team band** | A caution band between the normal range and the critical limit that the source does not define, marked `// team-band`: heart rate, white blood cells, optic disc edema (which Frisén grades are caution or critical), intraocular pressure, sleep duration, calcium and fluid intake, and the 300 mSv ("half the career limit") margin of the radiation dose. The normal range always comes from the source |
 
 The fluid threshold uses the lower floor (2100 mL/day, women) because a threshold has no sex dimension; men need 2500 mL/day, which the rules engine could personalize later.
 
@@ -101,7 +99,7 @@ Planted in the seeded history by [`backend/data/scenarios.ts`](../backend/data/s
 | Rising kidney-stone risk | C001 Ana Ruiz | Urine calcium climbs into the 250–300 mg/day caution band | caution |
 | Early SANS | C002 Leo Martín | Optic disc edema grade 1–2, eye pressure about 23 mmHg | caution |
 | Vitamin D deficiency | C003 Sara Okafor | Vitamin D falls to about 16 ng/mL | critical |
-| Sleep deprivation | C004 Iker Vidal | Sleep about 5.5 h, efficiency about 70 %, slower reactions | critical / caution |
+| Sleep deprivation | C004 Iker Vidal | Sleep about 5.5 h, efficiency about 67 %, slower reactions | critical |
 | Solar storm | whole crew | Replays the proton events of the May 2024 storm (NASA DONKI), days 56–59: the dose rate jumps and fades | no dose-rate threshold (see above) |
 
 C002's career dose already starts at 280 mSv, so the cumulative dose reaches the 300 mSv caution band by day 60.
@@ -184,7 +182,7 @@ The health score is **not stored**: the rules engine computes it from the latest
 
 ## Open items
 
-- **Thresholds still to close:** check the Frisén mapping and the partially verified entries against their original documents, and decide with Carlos the space-weather rule (NOAA S1) that should raise the solar-storm alert.
+- **Solar-storm alert:** decide with Carlos the space-weather rule (NOAA S1) that should raise it. Every threshold is verified (see [data sources](data-sources.md#thresholds)).
 - **Wire the live simulator to the API:** the backend (Express + Socket.IO) has to create the `MissionSimulator`, forward its events and expose a way to launch the solar storm during the demo.
 - **More NASA data:** only white blood cells and glucose come from OSDR. Other Inspiration4 panels (hemoglobin, electrolytes, cytokines) could feed new metrics once they have sourced thresholds.
 - **Per-person radiation dose** is simulated from a shared dose rate plus each crew member's prior career dose; a personal dosimeter model would need its own offsets.
