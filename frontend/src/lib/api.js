@@ -26,7 +26,7 @@ import {
   readGetCache,
   enqueueMutation,
   getQueuedMutations,
-  deleteQueuedMutation
+  deleteQueuedMutation,
 } from './cache.js';
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -54,15 +54,18 @@ const mockStore = {
   issPosition: structuredClone(issPositionMock),
   cabin: structuredClone(cabinMock),
   opsMessages: structuredClone(opsMessagesMock),
-  scenarios: structuredClone(scenariosMock)
+  scenarios: structuredClone(scenariosMock),
 };
 
 export function withClientMeta(body = {}, isUpdate = false) {
   const now = new Date().toISOString();
   return {
-    clientId: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `cid-${Date.now()}-${Math.random()}`,
+    clientId:
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `cid-${Date.now()}-${Math.random()}`,
     [isUpdate ? 'clientUpdatedAt' : 'clientCreatedAt']: now,
-    ...body
+    ...body,
   };
 }
 
@@ -72,7 +75,9 @@ function isQueueableMutation(method, cleanPath) {
   }
   if (method === 'POST') {
     if (cleanPath === '/ops/messages') return true;
-    return /^\/crew\/C00[1-4]\/(vitals|cognitive|wellbeing|symptoms|nutrition|medications)$/.test(cleanPath);
+    return /^\/crew\/C00[1-4]\/(vitals|cognitive|wellbeing|symptoms|nutrition|medications)$/.test(
+      cleanPath,
+    );
   }
   return false;
 }
@@ -80,10 +85,20 @@ function isQueueableMutation(method, cleanPath) {
 function classifyVitalLevel(metric, value) {
   const num = Number(value);
   if (Number.isNaN(num)) return 'unknown';
-  if (metric === 'heartRate') return num > 130 || num < 50 ? 'critical' : num > 100 || num < 60 ? 'warning' : 'ok';
-  if (metric === 'spo2') return num < 90 ? 'critical' : num < 94 ? 'warning' : num < 95 ? 'watch' : 'ok';
-  if (metric === 'systolicBp') return num >= 160 || num < 90 ? 'critical' : num >= 140 ? 'warning' : num >= 129 ? 'watch' : 'ok';
-  if (metric === 'bodyTemp') return num >= 38.5 ? 'critical' : num >= 37.8 ? 'warning' : num >= 37.2 ? 'watch' : 'ok';
+  if (metric === 'heartRate')
+    return num > 130 || num < 50 ? 'critical' : num > 100 || num < 60 ? 'warning' : 'ok';
+  if (metric === 'spo2')
+    return num < 90 ? 'critical' : num < 94 ? 'warning' : num < 95 ? 'watch' : 'ok';
+  if (metric === 'systolicBp')
+    return num >= 160 || num < 90
+      ? 'critical'
+      : num >= 140
+        ? 'warning'
+        : num >= 129
+          ? 'watch'
+          : 'ok';
+  if (metric === 'bodyTemp')
+    return num >= 38.5 ? 'critical' : num >= 37.8 ? 'warning' : num >= 37.2 ? 'watch' : 'ok';
   return 'ok';
 }
 
@@ -112,7 +127,14 @@ function handleMockRequest(path, options = {}) {
       return {
         status: 'success',
         data: list,
-        meta: { total: list.length, page: 1, limit: 20, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+        meta: {
+          total: list.length,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
       };
     }
 
@@ -123,14 +145,22 @@ function handleMockRequest(path, options = {}) {
       return {
         status: 'success',
         data: list,
-        meta: { total: list.length, page: 1, limit: 20, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+        meta: {
+          total: list.length,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
       };
     }
 
     const crewMatch = cleanPath.match(/^\/crew\/(C00[1-4])\/(.+)$/);
     if (crewMatch) {
       const [, crewId, sub] = crewMatch;
-      if (sub === 'overview') return structuredClone(mockStore.overview[crewId] || mockStore.overview.C004);
+      if (sub === 'overview')
+        return structuredClone(mockStore.overview[crewId] || mockStore.overview.C004);
       if (sub === 'vitals') {
         const metric = params.get('metric') || 'heartRate';
         return structuredClone(mockStore.vitals[metric] || mockStore.vitals.heartRate);
@@ -141,7 +171,8 @@ function handleMockRequest(path, options = {}) {
       if (sub === 'nutrition') return structuredClone(mockStore.nutrition);
       if (sub === 'wellbeing') return structuredClone(mockStore.wellbeing);
       if (sub === 'symptoms') return structuredClone(mockStore.symptoms);
-      if (sub === 'medical') return structuredClone(mockStore.medical[crewId] || mockStore.medical.C002);
+      if (sub === 'medical')
+        return structuredClone(mockStore.medical[crewId] || mockStore.medical.C002);
       if (sub === 'labs') {
         const phase = params.get('phase');
         let list = structuredClone(mockStore.labs.data);
@@ -158,7 +189,14 @@ function handleMockRequest(path, options = {}) {
         return {
           status: 'success',
           data: list,
-          meta: { total: list.length, page: 1, limit: 20, totalPages: 1, hasNextPage: false, hasPrevPage: false }
+          meta: {
+            total: list.length,
+            page: 1,
+            limit: 20,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          },
         };
       }
     }
@@ -169,7 +207,7 @@ function handleMockRequest(path, options = {}) {
     mockStore.mission.data.scenario = null;
     mockStore.mission.data.commDelaySec = 0;
     mockStore.alerts.data = mockStore.alerts.data.map((a) =>
-      a.status === 'pending_ground' ? { ...a, status: 'active' } : a
+      a.status === 'pending_ground' ? { ...a, status: 'active' } : a,
     );
     return { status: 'success', data: { state: 'stopped' } };
   }
@@ -185,18 +223,30 @@ function handleMockRequest(path, options = {}) {
 
     if (code === 'mars_delay') {
       mockStore.alerts.data = mockStore.alerts.data.map((a) =>
-        a.id === 41 ? { ...a, status: 'pending_ground', groundDeadlineAt: '2026-11-14T10:52:00Z' } : a
+        a.id === 41
+          ? { ...a, status: 'pending_ground', groundDeadlineAt: '2026-11-14T10:52:00Z' }
+          : a,
       );
     } else if (code === 'eclss_failure') {
       mockStore.cabin.data = mockStore.cabin.data.map((c) =>
-        c.metric === 'co2' ? { ...c, value: 6.4, level: 'warning', recordedAt: startedAt } : c
+        c.metric === 'co2' ? { ...c, value: 6.4, level: 'warning', recordedAt: startedAt } : c,
       );
       if (!mockStore.alerts.data.some((a) => a.id === 99)) {
         mockStore.alerts.data.unshift({
-          id: 99, crewId: null, category: 'cabin', level: 'critical',
-          title: 'Fallo depurador CO₂ (CDRA)', message: 'CO₂ de cabina en 6,4 mmHg y subiendo.',
-          source: 'ECLSS', status: 'active', createdAt: startedAt, updatedAt: startedAt,
-          ackedAt: null, resolvedAt: null, groundDeadlineAt: null, actions: []
+          id: 99,
+          crewId: null,
+          category: 'cabin',
+          level: 'critical',
+          title: 'Fallo depurador CO₂ (CDRA)',
+          message: 'CO₂ de cabina en 6,4 mmHg y subiendo.',
+          source: 'ECLSS',
+          status: 'active',
+          createdAt: startedAt,
+          updatedAt: startedAt,
+          ackedAt: null,
+          resolvedAt: null,
+          groundDeadlineAt: null,
+          actions: [],
         });
       }
     } else if (code === 'solar_storm') {
@@ -207,7 +257,7 @@ function handleMockRequest(path, options = {}) {
 
     return {
       status: 'success',
-      data: { code: found.code, state: 'started', startedAt, commDelaySec: found.commDelaySec }
+      data: { code: found.code, state: 'started', startedAt, commDelaySec: found.commDelaySec },
     };
   }
 
@@ -219,14 +269,16 @@ function handleMockRequest(path, options = {}) {
     if (idx === -1) throw new Error('Alerta no encontrada');
     const current = mockStore.alerts.data[idx];
     if (current.status === 'pending_ground' && body.status === 'resolved') {
-      throw new Error('Conflict: no se puede resolver hasta recibir decisión de Tierra o protocolo autónomo');
+      throw new Error(
+        'Conflict: no se puede resolver hasta recibir decisión de Tierra o protocolo autónomo',
+      );
     }
     const updated = {
       ...current,
       status: body.status,
       updatedAt: new Date().toISOString(),
       ackedAt: body.status === 'ack' ? new Date().toISOString() : current.ackedAt,
-      resolvedAt: body.status === 'resolved' ? new Date().toISOString() : current.resolvedAt
+      resolvedAt: body.status === 'resolved' ? new Date().toISOString() : current.resolvedAt,
     };
     mockStore.alerts.data[idx] = updated;
     return { status: 'success', data: structuredClone(updated) };
@@ -240,7 +292,12 @@ function handleMockRequest(path, options = {}) {
       const idx = mockStore.tasks[cId].findIndex((t) => t.id === id);
       if (idx !== -1) {
         const task = mockStore.tasks[cId][idx];
-        const updated = { ...task, status: body.status || 'done', result: body.result || {}, updatedAt: new Date().toISOString() };
+        const updated = {
+          ...task,
+          status: body.status || 'done',
+          result: body.result || {},
+          updatedAt: new Date().toISOString(),
+        };
         mockStore.tasks[cId][idx] = updated;
         if (task.type === 'measurement' && task.expects && body.result?.value != null) {
           const level = classifyVitalLevel(task.expects.metric, body.result.value);
@@ -250,10 +307,12 @@ function handleMockRequest(path, options = {}) {
             unit: task.expects.unit,
             level,
             source: 'manual',
-            recordedAt: new Date().toISOString()
+            recordedAt: new Date().toISOString(),
           };
           if (mockStore.overview[cId]) {
-            const vIdx = mockStore.overview[cId].data.vitals.findIndex((v) => v.metric === entry.metric);
+            const vIdx = mockStore.overview[cId].data.vitals.findIndex(
+              (v) => v.metric === entry.metric,
+            );
             if (vIdx >= 0) mockStore.overview[cId].data.vitals[vIdx] = entry;
             else mockStore.overview[cId].data.vitals.push(entry);
           }
@@ -275,10 +334,12 @@ function handleMockRequest(path, options = {}) {
       unit: body.unit,
       level,
       source: 'manual',
-      recordedAt: body.clientCreatedAt || new Date().toISOString()
+      recordedAt: body.clientCreatedAt || new Date().toISOString(),
     };
     if (mockStore.overview[crewId]) {
-      const idx = mockStore.overview[crewId].data.vitals.findIndex((v) => v.metric === created.metric);
+      const idx = mockStore.overview[crewId].data.vitals.findIndex(
+        (v) => v.metric === created.metric,
+      );
       if (idx >= 0) mockStore.overview[crewId].data.vitals[idx] = created;
       else mockStore.overview[crewId].data.vitals.push(created);
     }
@@ -287,7 +348,7 @@ function handleMockRequest(path, options = {}) {
         t: created.recordedAt,
         value: created.value,
         min: created.value,
-        max: created.value
+        max: created.value,
       });
     }
     return { status: 'success', data: created };
@@ -303,7 +364,7 @@ function handleMockRequest(path, options = {}) {
       meanReactionMs: ms,
       lapses: Number(body.lapses || 0),
       baselineMs: 240,
-      level: ms > 350 ? 'warning' : ms > 270 ? 'watch' : 'ok'
+      level: ms > 350 ? 'warning' : ms > 270 ? 'watch' : 'ok',
     };
     mockStore.cognitive.data.push(created);
     return { status: 'success', data: created };
@@ -318,7 +379,7 @@ function handleMockRequest(path, options = {}) {
       mood: Number(body.mood),
       isolation: Number(body.isolation),
       cohabitation: Number(body.cohabitation),
-      note: body.note || ''
+      note: body.note || '',
     };
     mockStore.wellbeing.data.unshift(created);
     return { status: 'success', data: created };
@@ -332,7 +393,7 @@ function handleMockRequest(path, options = {}) {
       symptom: body.symptom,
       severity: Number(body.severity),
       recordedAt: body.clientCreatedAt || new Date().toISOString(),
-      note: body.note || ''
+      note: body.note || '',
     };
     mockStore.symptoms.data.unshift(created);
     return { status: 'success', data: created };
@@ -347,12 +408,12 @@ function handleMockRequest(path, options = {}) {
     const points = [0, 30, 60, 90, 120, 150, 180].map((day) => ({
       day,
       boneDensityLossPct: Number(((day / 180) * 5.5 * factor).toFixed(1)),
-      muscleMassLossPct: Number(((day / 180) * 7.6 * factor).toFixed(1))
+      muscleMassLossPct: Number(((day / 180) * 7.6 * factor).toFixed(1)),
     }));
     const result = {
       status: 'success',
       data: { assumptions: { exerciseMinPerDay: ex, resistanceLoadPct: load }, points },
-      meta: { source: 'simulated' }
+      meta: { source: 'simulated' },
     };
     mockStore.twin = structuredClone(result);
     return result;
@@ -372,7 +433,7 @@ function handleMockRequest(path, options = {}) {
       body: body.body,
       createdAt,
       deliverAt,
-      delivered: delaySec === 0
+      delivered: delaySec === 0,
     };
     mockStore.opsMessages.data.push(msg);
     return { status: 'success', data: msg };
@@ -398,7 +459,7 @@ export async function api(path, options = {}) {
       const res = await fetch(`${API_URL}${path}`, {
         headers: { 'Content-Type': 'application/json', ...options.headers },
         signal: controller.signal,
-        ...options
+        ...options,
       });
       clearTimeout(timeoutId);
       const json = await res.json();
@@ -417,8 +478,8 @@ export async function api(path, options = {}) {
           meta: {
             ...(cached.payload.meta || {}),
             fromOfflineCache: true,
-            offlineAgeMin: ageMin
-          }
+            offlineAgeMin: ageMin,
+          },
         };
       }
       throw err;
@@ -429,7 +490,7 @@ export async function api(path, options = {}) {
   try {
     const res = await fetch(`${API_URL}${path}`, {
       headers: { 'Content-Type': 'application/json', ...options.headers },
-      ...options
+      ...options,
     });
     const json = await res.json();
     if (!res.ok || json.status !== 'success') {
@@ -437,12 +498,16 @@ export async function api(path, options = {}) {
     }
     return json;
   } catch (err) {
-    if (isQueueableMutation(method, cleanPath) && typeof navigator !== 'undefined' && !navigator.onLine) {
+    if (
+      isQueueableMutation(method, cleanPath) &&
+      typeof navigator !== 'undefined' &&
+      !navigator.onLine
+    ) {
       await enqueueMutation({ path, method, body: options.body });
       return {
         status: 'success',
         data: options.body ? JSON.parse(options.body) : {},
-        meta: { queuedOffline: true }
+        meta: { queuedOffline: true },
       };
     }
     throw err;
@@ -457,7 +522,7 @@ export async function flushOfflineQueue() {
       const res = await fetch(`${API_URL}${item.path}`, {
         method: item.method,
         headers: { 'Content-Type': 'application/json' },
-        body: item.body
+        body: item.body,
       });
       if (res.ok || res.status === 400 || res.status === 409) {
         await deleteQueuedMutation(item.id);
@@ -470,7 +535,15 @@ export async function flushOfflineQueue() {
   }
 }
 
-export async function streamCopilotChat({ crewId, messages, signal, onContext, onToken, onDone, onError }) {
+export async function streamCopilotChat({
+  crewId,
+  messages,
+  signal,
+  onContext,
+  onToken,
+  onDone,
+  onError,
+}) {
   if (USE_MOCKS) {
     const ov = mockStore.overview[crewId]?.data || mockStore.overview.C004.data;
     const hr = ov.vitals.find((v) => v.metric === 'heartRate');
@@ -482,17 +555,20 @@ export async function streamCopilotChat({ crewId, messages, signal, onContext, o
       hr ? `FC ${hr.value} ${hr.unit}` : 'Sin telemetría cardiaca',
       spo2 ? `SpO2 ${spo2.value}%` : null,
       co2 ? `CO₂ de cabina ${co2.value} ${co2.unit}` : null,
-      activeAlerts.length ? `${activeAlerts.length} alerta(s) activa(s)` : 'sin alertas críticas'
-    ].filter(Boolean).join(', ');
+      activeAlerts.length ? `${activeAlerts.length} alerta(s) activa(s)` : 'sin alertas críticas',
+    ]
+      .filter(Boolean)
+      .join(', ');
 
     await new Promise((r) => setTimeout(r, 150));
     if (signal?.aborted) return;
     onContext?.({ summary: ctxSummary, vitals: ov.vitals, alerts: activeAlerts });
 
     const lastUserMsg = messages[messages.length - 1]?.content || '';
-    const reply = crewId === 'C004'
-      ? `No dispongo de constantes biomédicas recientes para Darío Costa (estado Sin datos). Recomiendo registrar tensión arterial y SpO2 manuales en la pestaña Constantes antes de valorar "${lastUserMsg}".`
-      : `He evaluado tu consulta ("${lastUserMsg}") junto con tus constantes actuales (${ctxSummary}). Con el flujo de protones S2 activo y CO₂ en ${co2?.value ?? 4.1} mmHg, permanece en el módulo blindado, hidrátate y completa tu medición de tensión arterial pendiente.`;
+    const reply =
+      crewId === 'C004'
+        ? `No dispongo de constantes biomédicas recientes para Darío Costa (estado Sin datos). Recomiendo registrar tensión arterial y SpO2 manuales en la pestaña Constantes antes de valorar "${lastUserMsg}".`
+        : `He evaluado tu consulta ("${lastUserMsg}") junto con tus constantes actuales (${ctxSummary}). Con el flujo de protones S2 activo y CO₂ en ${co2?.value ?? 4.1} mmHg, permanece en el módulo blindado, hidrátate y completa tu medición de tensión arterial pendiente.`;
 
     const words = reply.split(' ');
     for (let i = 0; i < words.length; i++) {
@@ -500,7 +576,11 @@ export async function streamCopilotChat({ crewId, messages, signal, onContext, o
       await new Promise((r) => setTimeout(r, 35));
       onToken?.((i === 0 ? '' : ' ') + words[i]);
     }
-    onDone?.({ answer: reply, model: 'ollama/llama3-medical-mock', triageLevel: ov.healthScore.level || 'watch' });
+    onDone?.({
+      answer: reply,
+      model: 'ollama/llama3-medical-mock',
+      triageLevel: ov.healthScore.level || 'watch',
+    });
     return;
   }
 
@@ -510,9 +590,12 @@ export async function streamCopilotChat({ crewId, messages, signal, onContext, o
     signal,
     body: JSON.stringify({
       crewId,
-      clientId: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `chat-${Date.now()}`,
-      messages
-    })
+      clientId:
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `chat-${Date.now()}`,
+      messages,
+    }),
   });
 
   if (!res.ok) {
@@ -520,7 +603,9 @@ export async function streamCopilotChat({ crewId, messages, signal, onContext, o
     try {
       const errJson = await res.json();
       msg = errJson.message || errJson.error || msg;
-    } catch {}
+    } catch {
+      // Body is not JSON: keep the HTTP status message.
+    }
     throw new Error(msg);
   }
 
@@ -545,7 +630,9 @@ export async function streamCopilotChat({ crewId, messages, signal, onContext, o
       const payload = JSON.parse(dataMatch[1]);
 
       if (event === 'context') {
-        const vStr = (payload.vitals || []).map((v) => `${v.metric} ${v.value} ${v.unit}`).join(', ');
+        const vStr = (payload.vitals || [])
+          .map((v) => `${v.metric} ${v.value} ${v.unit}`)
+          .join(', ');
         onContext?.({ ...payload, summary: vStr || 'Contexto de misión cargado' });
       } else if (event === 'token') {
         onToken?.(payload.text || '');

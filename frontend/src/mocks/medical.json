@@ -30,12 +30,8 @@
       "age": 38,
       "heightCm": 179,
       "weightKg": 76.5,
-      "allergies": [
-        "Penicilina"
-      ],
-      "conditions": [
-        "Tendencia a cefalea por hipercapnia leve"
-      ],
+      "allergies": ["Penicilina"],
+      "conditions": ["Tendencia a cefalea por hipercapnia leve"],
       "medications": [
         {
           "name": "Colecalciferol (Vitamina D3)",
@@ -63,9 +59,7 @@
       "age": 34,
       "heightCm": 168,
       "weightKg": 60.2,
-      "allergies": [
-        "Látex"
-      ],
+      "allergies": ["Látex"],
       "conditions": [],
       "medications": [
         {
