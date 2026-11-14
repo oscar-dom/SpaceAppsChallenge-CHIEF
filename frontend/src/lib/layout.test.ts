@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  allowedZones,
   allPanes,
   flatten,
   type LayoutNode,
+  MAX_PANES,
+  MIN_PANE_H,
+  MIN_PANE_W,
   mkPane,
+  minSize,
   mkSplit,
   removePane,
   splitPane,
@@ -64,5 +69,33 @@ describe('workspace layout', () => {
     expect(zoneAt(0.95, 0.5)).toBe('right');
     expect(zoneAt(0.5, 0.1)).toBe('top');
     expect(zoneAt(0.5, 0.9)).toBe('bottom');
+  });
+
+  it('sizes the workspace so the smallest pane keeps the minimum', () => {
+    expect(minSize(flatten(mkPane(['overview'])).panes)).toEqual({ w: MIN_PANE_W, h: MIN_PANE_H });
+    const grid = mkSplit('col', [
+      mkSplit('row', [mkPane(['overview']), mkPane(['vision'])]),
+      mkPane(['immune']),
+    ]);
+    expect(minSize(flatten(grid).panes)).toEqual({ w: 2 * MIN_PANE_W, h: 2 * MIN_PANE_H });
+    const uneven = mkSplit('row', [mkPane(['overview']), mkPane(['vision'])]);
+    uneven.sizes = [0.25, 0.75];
+    expect(minSize(flatten(uneven).panes).w).toBe(4 * MIN_PANE_W);
+  });
+
+  it('offers a split only when both halves keep the minimum pane size', () => {
+    const all = ['bottom', 'center', 'left', 'right', 'top'];
+    expect([...allowedZones(2 * MIN_PANE_W, 2 * MIN_PANE_H, 1)].sort()).toEqual(all);
+    expect([...allowedZones(2 * MIN_PANE_W - 1, 2 * MIN_PANE_H, 1)].sort()).toEqual([
+      'bottom',
+      'center',
+      'top',
+    ]);
+    expect([...allowedZones(2 * MIN_PANE_W, 2 * MIN_PANE_H - 1, 1)].sort()).toEqual([
+      'center',
+      'left',
+      'right',
+    ]);
+    expect([...allowedZones(4000, 4000, MAX_PANES)]).toEqual(['center']);
   });
 });

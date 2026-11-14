@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type BodySystemId, PERIODS, type Period } from '@chief/shared';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { hhmm, roleLine } from '../lib/format';
-import { type Pane, zoneAt, type Zone } from '../lib/layout';
+import { allowedZones, type Pane, zoneAt, type Zone } from '../lib/layout';
 import { SECTIONS, SYSTEM_IDS, type SectionId } from '../lib/sections';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus } from '../lib/status';
 import { useMissionStore } from '../stores/mission';
@@ -114,6 +114,8 @@ const header = computed(() => {
   };
 });
 
+const allowed = ref<Set<Zone>>(new Set(['center']));
+
 const dz = computed(() => {
   const d = ws.dropZone;
   if (!d || d.paneId !== props.pane.id) return null;
@@ -163,7 +165,10 @@ function contentOver(e: DragEvent) {
   if (!ws.drag) return;
   e.preventDefault();
   const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-  const zone = zoneAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  // A split that would leave a pane below the minimum size falls back to opening in this pane.
+  allowed.value = allowedZones(r.width, r.height, ws.panes.length);
+  const hit = zoneAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  const zone = allowed.value.has(hit) ? hit : 'center';
   const cur = ws.dropZone;
   if (!cur || cur.paneId !== props.pane.id || cur.zone !== zone) {
     ws.dropZone = { paneId: props.pane.id, zone };
@@ -222,9 +227,6 @@ function contentDrop(e: DragEvent) {
       </div>
       <span class="grow" />
       <div class="tools">
-        <button class="icon-btn small" title="Split right" @click.stop="ws.splitRight(pane.id)">
-          <Icon name="split" :size="15" />
-        </button>
         <button
           v-if="canClose"
           class="icon-btn small"
@@ -283,6 +285,7 @@ function contentDrop(e: DragEvent) {
               gridRow: r,
               gridColumn: c,
               borderColor: z === dz.zone ? 'var(--accent)' : 'var(--border-2)',
+              opacity: allowed.has(z) ? 1 : 0.25,
             }"
           >
             <div
