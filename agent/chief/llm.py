@@ -30,7 +30,13 @@ class LlmClient(Protocol):
 class GeminiClient:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
-        self._client = genai.Client(api_key=settings.gemini_api_key)
+        self._client = genai.Client(
+            api_key=settings.gemini_api_key,
+            http_options=types.HttpOptions(
+                timeout=int(settings.llm_timeout_seconds * 1000),
+                retry_options=types.HttpRetryOptions(attempts=settings.llm_attempts),
+            ),
+        )
 
     async def generate(self, system: str, turns: list[Turn], schema: type[T]) -> T:
         contents = [
