@@ -1,0 +1,14 @@
+{
+  "name": "@chief/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Types and constants shared by the CHIEF frontend and backend",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
