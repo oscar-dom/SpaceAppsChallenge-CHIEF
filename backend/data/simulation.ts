@@ -26,7 +26,7 @@ export interface SimParams {
 
 export const SIMULATION: Record<string, SimParams> = {
   'resting-heart-rate': {
-    base: 62,
+    base: 70,
     perCrew: [0, 3, -2, 5],
     noise: 2.5,
     daily: { amp: 3, peakHour: 15 },
