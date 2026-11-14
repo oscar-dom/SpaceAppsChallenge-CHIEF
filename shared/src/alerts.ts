@@ -29,4 +29,6 @@ export interface Alert {
   /** Simulated time of creation, ISO 8601. */
   createdAt: string;
   acknowledged: boolean;
+  /** Generic advice from the thresholds table; CHIEF's fallback when Gemini is down. */
+  recommendation?: string;
 }

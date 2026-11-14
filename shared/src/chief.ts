@@ -1,3 +1,6 @@
+import type { Alert } from './alerts.js';
+import type { CrewMember, MissionClock } from './crew.js';
+import type { HealthScore } from './health.js';
 import type { EscalationLevel } from './status.js';
 
 /**
@@ -55,4 +58,46 @@ export interface AlertActionsResponse {
   summary: string;
   actions: RecommendedAction[];
   fallback: boolean;
+}
+
+/** An item of the onboard formulary: the only medication CHIEF may suggest. */
+export interface Medication {
+  id: string;
+  name: string;
+  /** What it is used for, e.g. "Mild to moderate pain, headache". */
+  indication: string;
+  /** e.g. "400 mg every 8 h with food, max 1200 mg/day". */
+  dosage?: string;
+  notes?: string;
+}
+
+/**
+ * Backend → agent (Python, agent/). The backend builds this context from the rules
+ * engine and the database; the agent never reads the database itself.
+ */
+export interface AgentContext {
+  crewMember: CrewMember;
+  missionClock?: MissionClock;
+  health: HealthScore;
+  /** Alerts of this crew member; acknowledged ones are ignored by the agent. */
+  alerts: Alert[];
+  formulary: Medication[];
+}
+
+/** POST {AGENT_URL}/chat */
+export interface AgentChatRequest extends AgentContext {
+  message: string;
+  history: ChiefMessage[];
+}
+
+/** Answer of POST {AGENT_URL}/chat. The backend wraps `reply` into a ChiefMessage. */
+export interface AgentChatResponse {
+  reply: string;
+  actions: RecommendedAction[];
+  fallback: boolean;
+}
+
+/** POST {AGENT_URL}/alerts/actions, answered with AlertActionsResponse. */
+export interface AgentAlertActionsRequest extends AgentContext {
+  alert: Alert;
 }
