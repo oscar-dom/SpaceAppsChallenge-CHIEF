@@ -219,22 +219,35 @@ least one demo scenario.
 
 ## 9. Commands
 
-> Planned setup, not built yet. Update this section when the tooling lands.
+Requires **Node.js ≥ 20** and **Python 3.11+** (agent).
 
-- Root `package.json` with **npm workspaces**: `frontend`, `backend`, `shared`.
-- `agent/` uses a Python virtual environment (`agent/.venv`) and `requirements.txt`.
+- Root `package.json` with **npm workspaces**: `shared`, `backend`, `frontend`. Run
+  `npm install` **only at the root**; add a dependency to one workspace with
+  `npm install <pkg> -w backend`.
+- `shared/` is the `@chief/shared` package (see [`shared/README.md`](shared/README.md)).
+  Add `"@chief/shared": "*"` to a workspace's dependencies to import it.
+- Root tooling: `tsconfig.base.json` (every workspace `tsconfig.json` extends it),
+  `eslint.config.js` (flat config), `.prettierrc.json`, `.editorconfig`.
+- `agent/` uses a Python virtual environment (`agent/.venv`) and `requirements.txt`, and
+  is not an npm workspace.
 
 ```bash
-npm install                 # install JS workspaces
-npm run dev                 # start frontend, backend and agent together
-npm run lint                # ESLint on all TS workspaces
-npm run format              # Prettier
-npm test                    # Vitest (rules engine)
-npm run db:migrate          # Drizzle migrations
-npm run db:seed             # load mission history and demo scenarios
+npm install                 # install every JS workspace
+npm run dev                 # start backend, frontend and agent together
+npm run lint                # ESLint on all TS code
+npm run format              # Prettier (format:check in CI)
+npm run typecheck           # tsc --noEmit in every workspace
+npm test                    # tests in every workspace (Vitest, rules engine)
 ```
 
-CI will add build, lint and test jobs once these scripts exist.
+Each workspace provides its own `dev`, `build`, `typecheck` and `test` scripts; the root
+scripts run them with `--if-present`. `npm run dev` starts the agent through
+`scripts/dev-agent.mjs`, which skips it until `agent/main.py` exists. Planned backend
+scripts: `db:migrate` (Drizzle migrations) and `db:seed` (mission history and demo
+scenarios).
+
+CI runs two jobs on every PR: `Commit messages` (required) and
+`Lint, typecheck and test`.
 
 ---
 
