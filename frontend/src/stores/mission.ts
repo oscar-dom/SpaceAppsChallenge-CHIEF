@@ -58,6 +58,8 @@ export const useMissionStore = defineStore('mission', () => {
 
   /** Called with every alert the backend raises while the app is open. */
   let onNewAlert: (alert: Alert) => void = () => {};
+  /** While the backend is unreachable (e.g. still starting with `npm run dev`), retry. */
+  let retryTimer: ReturnType<typeof setTimeout> | undefined;
   const refetchTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   const member = computed(() => crew.value.find((c) => c.id === selected.value) ?? crew.value[0]);
@@ -181,6 +183,7 @@ export const useMissionStore = defineStore('mission', () => {
 
   async function init(handlers: { onNewAlert: (a: Alert) => void }) {
     onNewAlert = handlers.onNewAlert;
+    clearTimeout(retryTimer);
     try {
       const [c, m, t, k] = await Promise.all([
         api.crew(),
@@ -204,6 +207,7 @@ export const useMissionStore = defineStore('mission', () => {
       connect();
     } catch (error) {
       loadError.value = (error as Error).message;
+      retryTimer = setTimeout(() => void init(handlers), 3000);
     }
   }
 
