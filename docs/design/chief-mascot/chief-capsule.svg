@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="chief idle" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="CHIEF">
+  <!--
+    CHIEF mascot, "Capsule" concept: a medicine capsule dressed as an astronaut.
+    States: put one of idle | listening | thinking | alert next to "chief" in the
+    root class. As an <img> it stays in the state written here (idle); inline it
+    (see README.md) to switch states at runtime.
+  -->
+  <style>
+    .chief { --chief-accent: #38BDF8; overflow: visible; }
+    .chief.alert { --chief-accent: #F59E0B; }
+
+    @keyframes chief-float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-6px) rotate(-3deg); } }
+    @keyframes chief-blink { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.1); } }
+    @keyframes chief-halo { 0% { transform: scale(0.85); opacity: 0.8; } 100% { transform: scale(1.3); opacity: 0; } }
+    @keyframes chief-spin { to { transform: rotate(360deg); } }
+    @keyframes chief-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px); } 40% { transform: translateX(3px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+    @keyframes chief-wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-24deg); } }
+    @keyframes chief-badge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+    .chief .body { transform-box: view-box; transform-origin: 100px 168px; animation: chief-float 3.4s ease-in-out infinite; }
+    .chief .eye { transform-box: fill-box; transform-origin: center; animation: chief-blink 4s infinite; }
+    .chief .halo, .chief .dots, .chief .badge { opacity: 0; }
+    .chief .halo { transform-box: fill-box; transform-origin: center; }
+    .chief .dots { transform-origin: 100px 100px; }
+    .chief .arm-r { transform-box: fill-box; transform-origin: 50% 10%; }
+
+    .chief.listening .halo { opacity: 1; animation: chief-halo 1.6s ease-out infinite; }
+    .chief.listening .arm-r { animation: chief-wave 1.2s ease-in-out infinite; }
+
+    .chief.thinking .dots { opacity: 1; animation: chief-spin 2.4s linear infinite; }
+    .chief.thinking .eye { animation: none; transform: scaleY(0.45); }
+
+    .chief.alert .body { animation: chief-shake 0.6s ease-in-out infinite; }
+    .chief.alert .badge { opacity: 1; transform-box: fill-box; transform-origin: center; animation: chief-badge 1s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .chief *, .chief.alert .body { animation: none !important; }
+    }
+  </style>
+
+  <circle class="halo" cx="100" cy="100" r="76" fill="none" stroke="var(--chief-accent)" stroke-width="3"/>
+
+  <g class="body">
+    <!-- arms and feet -->
+    <rect x="48" y="106" width="16" height="32" rx="8" fill="#E2E8F0"/>
+    <rect class="arm-r" x="136" y="106" width="16" height="32" rx="8" fill="#E2E8F0"/>
+    <rect x="76" y="160" width="20" height="12" rx="6" fill="#CBD5E1"/>
+    <rect x="104" y="160" width="20" height="12" rx="6" fill="#CBD5E1"/>
+    <!-- capsule: accent half below, white helmet half above -->
+    <rect x="64" y="34" width="72" height="134" rx="36" fill="var(--chief-accent)"/>
+    <path d="M64 101 V70 A36 36 0 0 1 136 70 V101 Z" fill="#E2E8F0"/>
+    <line x1="64" y1="101" x2="136" y2="101" stroke="#0B1220" stroke-opacity="0.2" stroke-width="2"/>
+    <path d="M73 70 A27 27 0 0 1 88 48" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="3" stroke-linecap="round"/>
+    <!-- visor with eyes and smile -->
+    <rect x="76" y="56" width="48" height="30" rx="15" fill="#0F172A"/>
+    <circle class="eye" cx="91" cy="69" r="4.5" fill="var(--chief-accent)"/>
+    <circle class="eye" cx="109" cy="69" r="4.5" fill="var(--chief-accent)"/>
+    <path d="M94 78 Q100 82 106 78" fill="none" stroke="var(--chief-accent)" stroke-width="2" stroke-linecap="round"/>
+    <!-- medical cross on the chest -->
+    <rect x="97" y="116" width="6" height="18" rx="2" fill="#F8FAFC"/>
+    <rect x="91" y="122" width="18" height="6" rx="2" fill="#F8FAFC"/>
+  </g>
+
+  <!-- thinking: dots orbiting -->
+  <g class="dots">
+    <circle cx="100" cy="12" r="5" fill="var(--chief-accent)"/>
+    <circle cx="176" cy="144" r="5" fill="var(--chief-accent)" opacity="0.7"/>
+    <circle cx="24" cy="144" r="5" fill="var(--chief-accent)" opacity="0.4"/>
+  </g>
+
+  <!-- alert: warning badge -->
+  <g class="badge">
+    <circle cx="150" cy="40" r="14" fill="#F59E0B"/>
+    <rect x="148" y="31" width="4" height="12" rx="2" fill="#0B1220"/>
+    <circle cx="150" cy="48" r="2.4" fill="#0B1220"/>
+  </g>
+</svg>

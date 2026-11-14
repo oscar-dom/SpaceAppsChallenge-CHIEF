@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CHIEF mascot preview</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px 16px;
+        background: #0b1220;
+        color: #e2e8f0;
+        font-family: system-ui, sans-serif;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+      p {
+        margin: 0 0 32px;
+        color: #9fb3c8;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+        max-width: 960px;
+      }
+      .card {
+        background: #111a2e;
+        border-radius: 20px;
+        padding: 20px;
+        text-align: center;
+      }
+      .card img,
+      .card object {
+        width: 160px;
+        height: 160px;
+      }
+      .label {
+        margin-top: 8px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CHIEF — Capsule</h1>
+    <p>Open this file in a browser. Each card loads chief-capsule.svg in a different state.</p>
+    <div class="grid" id="grid"></div>
+    <script>
+      // Loads the SVG once and inlines a copy per state, the same way the app will.
+      const states = ['idle', 'listening', 'thinking', 'alert'];
+      fetch('chief-capsule.svg')
+        .then((r) => r.text())
+        .then((svg) => {
+          const grid = document.getElementById('grid');
+          for (const state of states) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = svg.replace(
+              'class="chief idle"',
+              `class="chief ${state}" width="160" height="160"`,
+            );
+            const label = document.createElement('div');
+            label.className = 'label';
+            label.textContent = state;
+            card.appendChild(label);
+            grid.appendChild(card);
+          }
+        })
+        .catch(() => {
+          // file:// blocks fetch in some browsers: fall back to <img> (idle only).
+          document.getElementById('grid').innerHTML =
+            '<div class="card"><img src="chief-capsule.svg" alt="CHIEF idle"><div class="label">idle (serve the folder to see every state: npx serve docs/design/chief-mascot)</div></div>';
+        });
+    </script>
+  </body>
+</html>
