@@ -2,6 +2,7 @@
 import { computed, onMounted, watch } from 'vue';
 import Capsule from './components/Capsule.vue';
 import { mdTime } from './lib/format';
+import { APP_MIN_W } from './lib/shell';
 import ChatPanel from './layout/ChatPanel.vue';
 import NavPanel from './layout/NavPanel.vue';
 import NotificationsPanel from './layout/NotificationsPanel.vue';
@@ -27,6 +28,7 @@ const evaluated = computed(() => {
     : 'Waiting for readings';
 });
 const paneCount = computed(() => ws.panes.length);
+const appMinW = `${APP_MIN_W}px`;
 
 // A drag that ends outside any pane must not leave drop zones behind.
 watch(
@@ -89,7 +91,7 @@ watch(
 <style scoped>
 .app {
   height: 100%;
-  min-width: 1280px;
+  min-width: v-bind(appMinW);
   min-height: 720px;
   display: flex;
   overflow: hidden;

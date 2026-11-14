@@ -4,6 +4,7 @@ import Capsule, { type CapsuleState } from '../components/Capsule.vue';
 import Icon from '../components/Icon.vue';
 import { firstName, initials } from '../lib/format';
 import { NAV_SECTIONS, SECTIONS, type SectionId } from '../lib/sections';
+import { NAV_RAIL_W, NAV_W } from '../lib/shell';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus } from '../lib/status';
 import { useChiefStore } from '../stores/chief';
 import { useMissionStore } from '../stores/mission';
@@ -96,6 +97,8 @@ function toggleChat() {
   if (ui.chatOpen) ui.chatOpen = false;
   else chief.openChat();
 }
+const navW = `${NAV_W}px`;
+const railW = `${NAV_RAIL_W}px`;
 </script>
 
 <template>
@@ -208,7 +211,7 @@ function toggleChat() {
 
 <style scoped>
 .nav {
-  width: 268px;
+  width: v-bind(navW);
   flex: none;
   display: flex;
   flex-direction: column;
@@ -223,7 +226,7 @@ function toggleChat() {
   --nodata: #8b97ab;
 }
 .nav.rail {
-  width: 72px;
+  width: v-bind(railW);
 }
 .brand {
   height: 60px;

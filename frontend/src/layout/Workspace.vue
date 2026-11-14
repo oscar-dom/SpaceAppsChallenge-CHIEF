@@ -1,12 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { type Divider, flatten, MIN_PANE_H, MIN_PANE_W, minSize, nodeAt } from '../lib/layout';
+import { NOTIF_RAIL_W, NOTIF_W } from '../lib/shell';
+import { useUiStore } from '../stores/ui';
 import { useWorkspaceStore } from '../stores/workspace';
 import PaneView from './PaneView.vue';
 
 /** Centre workspace: panes of tabs placed by the layout tree, with draggable dividers. */
 const ws = useWorkspaceStore();
+const ui = useUiStore();
+const main = ref<HTMLElement | null>(null);
 const root = ref<HTMLDivElement | null>(null);
+
+/**
+ * Tells the store how much room the panes have. A new alert can open the notifications
+ * panel at any moment, so its full width is always kept free: the panes never have to
+ * shrink or merge because an alert arrived.
+ */
+function measure() {
+  const el = main.value;
+  if (!el) return;
+  const reserve = ui.notifOpen ? 0 : NOTIF_W - NOTIF_RAIL_W;
+  ws.setArea({ w: el.clientWidth - reserve, h: el.clientHeight });
+}
+
+let observer: ResizeObserver | undefined;
+onMounted(() => {
+  measure();
+  observer = new ResizeObserver(measure);
+  if (main.value) observer.observe(main.value);
+});
+onBeforeUnmount(() => observer?.disconnect());
 
 const placed = computed(() => flatten(ws.layout));
 const multi = computed(() => placed.value.panes.length > 1);
@@ -60,9 +84,9 @@ function startResize(e: MouseEvent, d: Divider) {
 </script>
 
 <template>
-  <main class="workspace">
-    <!-- The canvas never shrinks below the layout's minimum: the workspace scrolls instead
-         of squeezing panes until their charts break. -->
+  <main ref="main" class="workspace">
+    <!-- The store keeps the layout inside the measured room; the minimum size is only a last
+         guard for a window too small for even one pane. -->
     <div ref="root" class="canvas" :style="{ minWidth: `${least.w}px`, minHeight: `${least.h}px` }">
       <PaneView
         v-for="p in placed.panes"

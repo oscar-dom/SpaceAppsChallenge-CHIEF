@@ -103,7 +103,36 @@ export function removePane(tree: LayoutNode, paneId: string): LayoutNode | null 
   if (!children.length) return null;
   if (children.length === 1) return children[0] as LayoutNode;
   const total = sizes.reduce((a, b) => a + b, 0) || 1;
-  return { ...tree, children, sizes: sizes.map((s) => s / total) };
+  return normalize({ ...tree, children, sizes: sizes.map((s) => s / total) });
+}
+
+/**
+ * Lifts a child split of the same direction into its parent (a row inside a row is just a
+ * longer row), so equal sizes really mean equal panes.
+ */
+function normalize(split: Split): Split {
+  const children: LayoutNode[] = [];
+  const sizes: number[] = [];
+  split.children.forEach((child, i) => {
+    const f = split.sizes[i] ?? 0;
+    if (child.type === 'split' && child.dir === split.dir) {
+      child.children.forEach((c, j) => {
+        children.push(c);
+        sizes.push(f * (child.sizes[j] ?? 0));
+      });
+    } else {
+      children.push(child);
+      sizes.push(f);
+    }
+  });
+  return { ...split, children, sizes };
+}
+
+/** Every split shares its space equally among its children. */
+export function balance(node: LayoutNode): LayoutNode {
+  if (node.type === 'pane') return node;
+  const n = node.children.length;
+  return { ...node, children: node.children.map(balance), sizes: node.children.map(() => 1 / n) };
 }
 
 /** Node at a path of child indexes from the root. */
@@ -168,33 +197,139 @@ export const MIN_PANE_H = 280;
 /** More panes than this on one screen makes every section too small to read. */
 export const MAX_PANES = 4;
 
+/** Room the workspace has for panes, in pixels. */
+export interface Area {
+  w: number;
+  h: number;
+}
+
 /**
  * Smallest workspace, in pixels, that keeps every placed pane at the minimum size, whatever
  * share of the workspace each pane has after its dividers were dragged.
  */
-export function minSize(panes: PlacedPane[]): { w: number; h: number } {
+export function minSize(panes: PlacedPane[]): Area {
   return {
     w: Math.max(MIN_PANE_W, ...panes.map((p) => MIN_PANE_W / p.w)),
     h: Math.max(MIN_PANE_H, ...panes.map((p) => MIN_PANE_H / p.h)),
   };
 }
 
+/** True when the layout has at most MAX_PANES panes and every pane keeps the minimum size. */
+export function fits(tree: LayoutNode, area: Area): boolean {
+  const { panes } = flatten(tree);
+  if (panes.length > MAX_PANES) return false;
+  const min = minSize(panes);
+  // Half a pixel of slack for rounding in the measured size.
+  return min.w <= area.w + 0.5 && min.h <= area.h + 0.5;
+}
+
 /**
- * Drop zones a pane of `w` × `h` pixels accepts: a split is offered only when both halves
- * would still be at least the minimum pane size and the pane limit is not reached.
+ * A layout produced by a split or a drop, as it will be shown: kept as is when it fits,
+ * with its splits balanced when only that makes it fit, or null when it cannot fit.
  */
-export function allowedZones(w: number, h: number, paneCount: number): Set<Zone> {
-  const zones = new Set<Zone>(['center']);
-  if (paneCount >= MAX_PANES) return zones;
-  if (w / 2 >= MIN_PANE_W) {
-    zones.add('left');
-    zones.add('right');
+export function accept(tree: LayoutNode, area: Area): LayoutNode | null {
+  if (fits(tree, area)) return tree;
+  const even = balance(tree);
+  return fits(even, area) ? even : null;
+}
+
+/** Moves the tabs of pane `fromId` into pane `toId` (skipping sections it already has). */
+function mergeInto(tree: LayoutNode, fromId: string, toId: string): LayoutNode {
+  const next = clone(tree);
+  const from = findPane(next, fromId);
+  const to = findPane(next, toId);
+  if (!from || !to) return tree;
+  for (const t of from.tabs) if (!to.tabs.some((x) => x.sec === t.sec)) to.tabs.push(t);
+  to.active ??= to.tabs[0]?.id ?? null;
+  return removePane(next, fromId) ?? next;
+}
+
+/**
+ * Makes an existing layout fit a workspace that got smaller (window resized, chat opened):
+ * first the splits are balanced, then the last panes are merged into the ones before them
+ * until it fits. No tab is lost, and a layout that already fits is returned unchanged.
+ */
+export function fitLayout(tree: LayoutNode, area: Area): LayoutNode {
+  if (fits(tree, area)) return tree;
+  let t = balance(tree);
+  while (!fits(t, area)) {
+    const panes = allPanes(t);
+    const last = panes[panes.length - 1];
+    const prev = panes[panes.length - 2];
+    if (!last || !prev) break;
+    t = balance(mergeInto(t, last.id, prev.id));
   }
-  if (h / 2 >= MIN_PANE_H) {
-    zones.add('top');
-    zones.add('bottom');
+  return t;
+}
+
+/** What is being dragged: a section from the left panel or a tab from a pane. */
+export type DragInfo =
+  | { kind: 'section'; sec: SectionId }
+  | { kind: 'tab'; sec: SectionId; paneId: string; tabId: string };
+
+/** A new pane holding one tab. */
+export function paneOf(tab: Tab): Pane {
+  return { type: 'pane', id: nid('p'), tabs: [tab], active: tab.id };
+}
+
+/** Removes a tab from a pane (in place) and activates its neighbour. */
+export function takeTab(p: Pane, tabId: string): Tab | undefined {
+  const i = p.tabs.findIndex((t) => t.id === tabId);
+  if (i < 0) return undefined;
+  const [tab] = p.tabs.splice(i, 1);
+  if (p.active === tabId) p.active = p.tabs[Math.max(0, i - 1)]?.id ?? null;
+  return tab;
+}
+
+/**
+ * The layout after dropping `d` on pane `paneId`: into it (`center`, at tab `index` when
+ * dropped on the tab bar) or as a new pane on one side of it. Null when the drop changes
+ * nothing. The size limits are checked by the caller with `accept`.
+ */
+export function applyDrop(
+  tree: LayoutNode,
+  d: DragInfo,
+  paneId: string,
+  zone: Zone,
+  index?: number,
+): { tree: LayoutNode; focus: string } | null {
+  let next: LayoutNode = clone(tree);
+  let tab: Tab | undefined;
+  if (d.kind === 'tab') {
+    const src = findPane(next, d.paneId);
+    if (!src) return null;
+    // Splitting a pane with its only tab would leave it where it was.
+    if (zone !== 'center' && d.paneId === paneId && src.tabs.length === 1) return null;
+    if (index !== undefined && d.paneId === paneId) {
+      const from = src.tabs.findIndex((t) => t.id === d.tabId);
+      if (from < index) index--;
+    }
+    tab = takeTab(src, d.tabId);
+  } else tab = mkTab(d.sec);
+  if (!tab) return null;
+  const moved: Tab = tab;
+  let focus = paneId;
+  if (zone === 'center') {
+    const target = findPane(next, paneId);
+    if (!target) return null;
+    const existing = target.tabs.find((t) => t.sec === moved.sec);
+    if (existing && d.kind === 'section') target.active = existing.id;
+    else {
+      if (existing) target.tabs.splice(target.tabs.indexOf(existing), 1);
+      const at = index === undefined ? target.tabs.length : Math.min(index, target.tabs.length);
+      target.tabs.splice(at, 0, moved);
+      target.active = moved.id;
+    }
+  } else {
+    const np = paneOf(moved);
+    next = splitPane(next, paneId, zone, np);
+    focus = np.id;
   }
-  return zones;
+  if (d.kind === 'tab') {
+    const src = findPane(next, d.paneId);
+    if (src && !src.tabs.length) next = removePane(next, d.paneId) ?? mkPane(['crew']);
+  }
+  return { tree: next, focus };
 }
 
 /** Which drop zone the pointer is in: the outer quarter of each edge, else the centre. */

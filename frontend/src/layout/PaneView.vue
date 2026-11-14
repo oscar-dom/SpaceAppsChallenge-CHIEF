@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type BodySystemId, PERIODS, type Period } from '@chief/shared';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { hhmm, roleLine } from '../lib/format';
-import { allowedZones, type Pane, zoneAt, type Zone } from '../lib/layout';
+import { MAX_PANES, type Pane, zoneAt, type Zone } from '../lib/layout';
 import { SECTIONS, SYSTEM_IDS, type SectionId } from '../lib/sections';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus } from '../lib/status';
 import { useMissionStore } from '../stores/mission';
@@ -114,7 +114,25 @@ const header = computed(() => {
   };
 });
 
-const allowed = ref<Set<Zone>>(new Set(['center']));
+const ZONES: Zone[] = ['left', 'right', 'top', 'bottom', 'center'];
+/**
+ * Zones where the current drag can land: a split only when the new layout keeps every
+ * pane at the minimum size and stays within the pane limit.
+ */
+const allowed = computed(
+  () =>
+    new Set<Zone>(
+      ws.drag ? ZONES.filter((z) => ws.canDrop(props.pane.id, z)) : (['center'] as Zone[]),
+    ),
+);
+const canSplit = computed(() => ws.canSplitRight(props.pane.id));
+const splitTitle = computed(() =>
+  canSplit.value
+    ? 'Split right'
+    : ws.panes.length >= MAX_PANES
+      ? `At most ${MAX_PANES} panes`
+      : 'No room for another pane',
+);
 
 const dz = computed(() => {
   const d = ws.dropZone;
@@ -165,8 +183,7 @@ function contentOver(e: DragEvent) {
   if (!ws.drag) return;
   e.preventDefault();
   const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-  // A split that would leave a pane below the minimum size falls back to opening in this pane.
-  allowed.value = allowedZones(r.width, r.height, ws.panes.length);
+  // A split that is not allowed falls back to opening in this pane.
   const hit = zoneAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
   const zone = allowed.value.has(hit) ? hit : 'center';
   const cur = ws.dropZone;
@@ -227,7 +244,12 @@ function contentDrop(e: DragEvent) {
       </div>
       <span class="grow" />
       <div class="tools">
-        <button class="icon-btn small" title="Split right" @click.stop="ws.splitRight(pane.id)">
+        <button
+          class="icon-btn small"
+          :title="splitTitle"
+          :disabled="!canSplit"
+          @click.stop="ws.splitRight(pane.id)"
+        >
           <Icon name="split" :size="15" />
         </button>
         <button

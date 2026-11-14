@@ -52,6 +52,7 @@ const LAYOUTS = [
 ] as const;
 
 function pick(id: (typeof LAYOUTS)[number]['id']) {
+  if (!ws.presetFits(id)) return;
   ws.preset(id);
   menuOpen.value = false;
 }
@@ -109,9 +110,17 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
           <div class="scrim" @click="menuOpen = false" />
           <div class="menu">
             <div class="label menu-label">Demo layouts</div>
-            <button v-for="l in LAYOUTS" :key="l.id" class="menu-item" @click="pick(l.id)">
+            <button
+              v-for="l in LAYOUTS"
+              :key="l.id"
+              class="menu-item"
+              :disabled="!ws.presetFits(l.id)"
+              @click="pick(l.id)"
+            >
               <span>{{ l.label }}</span>
-              <span class="muted small-text">{{ l.sub }}</span>
+              <span class="muted small-text">{{
+                ws.presetFits(l.id) ? l.sub : 'Needs a wider workspace'
+              }}</span>
             </button>
           </div>
         </template>
@@ -305,7 +314,7 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
   background: transparent;
   text-align: left;
 }
-.menu-item:hover {
+.menu-item:hover:not(:disabled) {
   background: var(--accent-tint);
 }
 .small-text {
