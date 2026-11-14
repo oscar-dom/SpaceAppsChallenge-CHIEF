@@ -4,7 +4,9 @@ import { FORMULARY } from '../../data/formulary.js';
 import { METRICS } from '../../data/metrics.js';
 import { SCENARIOS } from '../../data/scenarios.js';
 import { THRESHOLDS } from '../../data/thresholds.js';
-import { generateHistory, toIso } from '../services/simulator/history.js';
+import { OSDR_METRICS, OSDR_PREFLIGHT } from '../../data/datasets.js';
+import { generateHistory } from '../services/simulator/history.js';
+import { toIso } from '../services/simulator/model.js';
 import type { Db } from './client.js';
 import { crewMembers, formulary, measurements, metrics, mission, thresholds } from './schema.js';
 
@@ -23,7 +25,10 @@ export interface PopulateSummary {
   metrics: number;
   thresholds: number;
   formulary: number;
+  /** Simulated readings generated for the mission. */
   measurements: number;
+  /** Real NASA OSDR readings (preflight baselines), stored with simulated = false. */
+  realMeasurements: number;
 }
 
 /** Checks that the data files agree with each other before anything is written. */
@@ -68,6 +73,19 @@ export function populateDatabase(db: Db, options: PopulateOptions = {}): Populat
     seed,
   });
 
+  // Real preflight blood values of the Inspiration4 crew (NASA OSDR), placed the same number of days
+  // before this mission's start as they were taken before launch. Stored as real (simulated = false).
+  const crewIds = new Set(CREW.map((c) => c.id));
+  const realReadings = OSDR_PREFLIGHT.filter((sample) => crewIds.has(sample.crewId)).flatMap(
+    (sample) =>
+      Object.entries(OSDR_METRICS).flatMap(([metricId, field]) => {
+        const value = sample[field];
+        if (value === null) return [];
+        const takenAt = toIso(startMs + sample.daysFromLaunch * DAY + 9 * 3_600_000);
+        return [{ crewId: sample.crewId, metricId, value, takenAt, simulated: false }];
+      }),
+  );
+
   db.transaction((tx) => {
     tx.insert(crewMembers).values(CREW).run();
     tx.insert(mission)
@@ -93,6 +111,7 @@ export function populateDatabase(db: Db, options: PopulateOptions = {}): Populat
       )
       .run();
     tx.insert(formulary).values(FORMULARY).run();
+    if (realReadings.length > 0) tx.insert(measurements).values(realReadings).run();
     for (let i = 0; i < history.length; i += CHUNK) {
       tx.insert(measurements)
         .values(history.slice(i, i + CHUNK))
@@ -108,5 +127,6 @@ export function populateDatabase(db: Db, options: PopulateOptions = {}): Populat
     thresholds: THRESHOLDS.length,
     formulary: FORMULARY.length,
     measurements: history.length,
+    realMeasurements: realReadings.length,
   };
 }

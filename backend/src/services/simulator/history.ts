@@ -1,12 +1,11 @@
 import type { Metric } from '@chief/shared';
+import { RAMP_END_DAY, type ScenarioDefinition } from '../../../data/scenarios.js';
 import { PRIOR_RADIATION_DOSE_MSV, SIMULATION } from '../../../data/simulation.js';
-import type { ScenarioDefinition } from '../../../data/scenarios.js';
-import { effectAt, sampleValue } from './model.js';
-import { createRandom } from './random.js';
+import { effectsFor, readingValue, toIso } from './model.js';
+import { readingTimes } from './schedule.js';
 
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
+export const DOSE_RATE_METRIC = 'radiation-dose-rate';
+export const CUMULATIVE_DOSE_METRIC = 'cumulative-radiation-dose';
 
 export interface HistoryRow {
   crewId: string;
@@ -28,74 +27,54 @@ export interface HistoryOptions {
   seed: number;
 }
 
-export function toIso(ms: number): string {
-  return new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
+/** Career dose in mSv: previous dose plus the hourly dose-rate readings (uSv/h x 1 h) added up. */
+export function cumulativeDose(previousMsv: number, addedMicroSv: number): number {
+  const factor = 10 ** (SIMULATION[CUMULATIVE_DOSE_METRIC]?.precision ?? 2);
+  return Math.round((previousMsv + addedMicroSv / 1000) * factor) / factor;
 }
 
 /**
  * Generates the mission history from its start to the simulated "now": every metric at its own
- * cadence, with the demo scenarios planted. Deterministic for a given seed.
+ * cadence, with the demo scenarios planted. Deterministic for a given seed, and identical to what
+ * the live simulator would have produced over the same period.
  */
 export function generateHistory(options: HistoryOptions): HistoryRow[] {
   const { crewIds, metrics, scenarios, startMs, endMs, seed } = options;
-  const rand = createRandom(seed);
-  const endDay = (endMs - startMs) / DAY;
   const rows: HistoryRow[] = [];
 
   crewIds.forEach((crewId, crewIndex) => {
-    const effectsFor = (metricId: string) =>
-      scenarios
-        .filter((s) => s.crewId === null || s.crewId === crewId)
-        .flatMap((s) => s.effects)
-        .filter((e) => e.metricId === metricId);
-
-    const doseSeries: { ms: number; rate: number }[] = [];
+    const doseRates: { ms: number; value: number }[] = [];
 
     for (const metric of metrics) {
-      const params = SIMULATION[metric.id];
-      if (!params) throw new Error(`No simulation parameters for metric "${metric.id}"`);
-      if (metric.id === 'cumulative-radiation-dose') continue; // derived below, from the dose rate
-      const effects = effectsFor(metric.id);
-
-      const push = (ms: number) => {
-        const day = (ms - startMs) / DAY;
-        const value = sampleValue(params, {
+      if (metric.id === CUMULATIVE_DOSE_METRIC) continue; // derived below, from the dose rate
+      const effects = effectsFor(scenarios, crewId, metric.id);
+      for (const ms of readingTimes(metric, crewIndex, startMs, startMs - 1, endMs)) {
+        const value = readingValue({
+          seed,
+          crewId,
           crewIndex,
-          day,
-          hour: (ms % DAY) / HOUR,
-          effect: effectAt(effects, day, endDay),
-          rand,
+          metricId: metric.id,
+          ms,
+          missionStartMs: startMs,
+          rampEndDay: RAMP_END_DAY,
+          effects,
         });
         rows.push({ crewId, metricId: metric.id, value, takenAt: toIso(ms), simulated: true });
-        if (metric.id === 'radiation-dose-rate') doseSeries.push({ ms, rate: value });
-      };
-
-      if (metric.cadenceMinutes < 1440) {
-        for (let ms = startMs; ms <= endMs; ms += metric.cadenceMinutes * MINUTE) push(ms);
-      } else {
-        const periodDays = Math.round(metric.cadenceMinutes / 1440);
-        for (let day = 0; ; day++) {
-          const ms = startMs + day * DAY + (params.atHour ?? 9) * HOUR;
-          if (ms > endMs) break;
-          if ((day + crewIndex) % periodDays === 0) push(ms);
-        }
+        if (metric.id === DOSE_RATE_METRIC) doseRates.push({ ms, value });
       }
     }
 
-    // Cumulative career dose: previous flights plus the integral of the dose rate (hourly samples).
-    const cumulative = metrics.find((m) => m.id === 'cumulative-radiation-dose');
-    if (cumulative) {
-      const params = SIMULATION[cumulative.id];
-      const prior = PRIOR_RADIATION_DOSE_MSV[crewIndex] ?? 0;
-      const factor = 10 ** (params?.precision ?? 2);
-      for (let day = 0; ; day++) {
-        const ms = startMs + day * DAY + (params?.atHour ?? 23) * HOUR;
-        if (ms > endMs) break;
-        let microSv = 0;
-        for (const sample of doseSeries) if (sample.ms <= ms) microSv += sample.rate; // 1 h each
-        const value = Math.round((prior + microSv / 1000) * factor) / factor;
-        rows.push({ crewId, metricId: cumulative.id, value, takenAt: toIso(ms), simulated: true });
+    const cumulative = metrics.find((m) => m.id === CUMULATIVE_DOSE_METRIC);
+    if (!cumulative) return;
+    let added = 0;
+    let next = 0;
+    for (const ms of readingTimes(cumulative, crewIndex, startMs, startMs - 1, endMs)) {
+      while (next < doseRates.length && (doseRates[next]?.ms ?? Infinity) <= ms) {
+        added += doseRates[next]?.value ?? 0;
+        next++;
       }
+      const value = cumulativeDose(PRIOR_RADIATION_DOSE_MSV[crewIndex] ?? 0, added);
+      rows.push({ crewId, metricId: cumulative.id, value, takenAt: toIso(ms), simulated: true });
     }
   });
 

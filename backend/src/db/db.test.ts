@@ -59,13 +59,15 @@ describe('seed', () => {
     expect(clock.missionLengthDays).toBe(MISSION.lengthDays);
   });
 
-  it('marks every measurement as simulated', () => {
-    const rows = handle.sqlite
-      .prepare('SELECT COUNT(*) AS n FROM measurements WHERE simulated = 0')
-      .get() as {
-      n: number;
-    };
-    expect(rows.n).toBe(0);
+  it('marks generated readings as simulated and only the OSDR baselines as real', () => {
+    const real = handle.sqlite
+      .prepare('SELECT metric_id, taken_at FROM measurements WHERE simulated = 0')
+      .all() as { metric_id: string; taken_at: string }[];
+    expect(real.length).toBe(24); // 4 crew x 3 preflight timepoints x 2 metrics
+    for (const row of real) {
+      expect(['white-blood-cell-count', 'fasting-glucose']).toContain(row.metric_id);
+      expect(row.taken_at < MISSION.startAt).toBe(true);
+    }
   });
 
   it('never creates readings after the simulated clock', () => {

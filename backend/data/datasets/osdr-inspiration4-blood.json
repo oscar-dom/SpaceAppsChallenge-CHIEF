@@ -1,0 +1,210 @@
+{
+  "source": {
+    "document": "NASA OSDR, Inspiration4 crew: OSD-569 (complete blood count) and OSD-575 (comprehensive metabolic panel)",
+    "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-575"
+  },
+  "retrievedAt": "2026-11-14T11:40:15Z",
+  "note": "Real measurements of the 4 anonymous Inspiration4 crew members (C001-C004), 3-day flight. daysFromLaunch: launch = 0, return timepoints (R+n) are 3 + n.",
+  "units": {
+    "whiteBloodCellCount": "10^3/uL",
+    "glucose": "mg/dL"
+  },
+  "samples": [
+    {
+      "crewId": "C001",
+      "timepoint": "L-92",
+      "daysFromLaunch": -92,
+      "whiteBloodCellCount": 5.4,
+      "glucose": 83
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "L-44",
+      "daysFromLaunch": -44,
+      "whiteBloodCellCount": 5.5,
+      "glucose": 80
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "L-3",
+      "daysFromLaunch": -3,
+      "whiteBloodCellCount": 7,
+      "glucose": 69
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "R+1",
+      "daysFromLaunch": 4,
+      "whiteBloodCellCount": 5,
+      "glucose": 90
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "R+45",
+      "daysFromLaunch": 48,
+      "whiteBloodCellCount": 4.9,
+      "glucose": 84
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "R+82",
+      "daysFromLaunch": 85,
+      "whiteBloodCellCount": 4.9,
+      "glucose": 91
+    },
+    {
+      "crewId": "C001",
+      "timepoint": "R+194",
+      "daysFromLaunch": 197,
+      "whiteBloodCellCount": 4.9,
+      "glucose": 87
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "L-92",
+      "daysFromLaunch": -92,
+      "whiteBloodCellCount": 6.5,
+      "glucose": 69
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "L-44",
+      "daysFromLaunch": -44,
+      "whiteBloodCellCount": 5.4,
+      "glucose": 72
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "L-3",
+      "daysFromLaunch": -3,
+      "whiteBloodCellCount": 7.2,
+      "glucose": 78
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "R+1",
+      "daysFromLaunch": 4,
+      "whiteBloodCellCount": 5.5,
+      "glucose": 83
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "R+45",
+      "daysFromLaunch": 48,
+      "whiteBloodCellCount": 6.4,
+      "glucose": 44
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "R+82",
+      "daysFromLaunch": 85,
+      "whiteBloodCellCount": 5.3,
+      "glucose": 77
+    },
+    {
+      "crewId": "C002",
+      "timepoint": "R+194",
+      "daysFromLaunch": 197,
+      "whiteBloodCellCount": 6.4,
+      "glucose": 84
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "L-92",
+      "daysFromLaunch": -92,
+      "whiteBloodCellCount": 9.6,
+      "glucose": 77
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "L-44",
+      "daysFromLaunch": -44,
+      "whiteBloodCellCount": 9.3,
+      "glucose": 62
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "L-3",
+      "daysFromLaunch": -3,
+      "whiteBloodCellCount": 9.8,
+      "glucose": 75
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "R+1",
+      "daysFromLaunch": 4,
+      "whiteBloodCellCount": 7,
+      "glucose": 103
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "R+45",
+      "daysFromLaunch": 48,
+      "whiteBloodCellCount": 7.8,
+      "glucose": 36
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "R+82",
+      "daysFromLaunch": 85,
+      "whiteBloodCellCount": 8.8,
+      "glucose": 80
+    },
+    {
+      "crewId": "C003",
+      "timepoint": "R+194",
+      "daysFromLaunch": 197,
+      "whiteBloodCellCount": 7.4,
+      "glucose": 73
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "L-92",
+      "daysFromLaunch": -92,
+      "whiteBloodCellCount": 7.7,
+      "glucose": 100
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "L-44",
+      "daysFromLaunch": -44,
+      "whiteBloodCellCount": 6.4,
+      "glucose": 83
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "L-3",
+      "daysFromLaunch": -3,
+      "whiteBloodCellCount": 10.6,
+      "glucose": 56
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "R+1",
+      "daysFromLaunch": 4,
+      "whiteBloodCellCount": 8.1,
+      "glucose": 97
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "R+45",
+      "daysFromLaunch": 48,
+      "whiteBloodCellCount": 6.8,
+      "glucose": 43
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "R+82",
+      "daysFromLaunch": 85,
+      "whiteBloodCellCount": 7.9,
+      "glucose": 80
+    },
+    {
+      "crewId": "C004",
+      "timepoint": "R+194",
+      "daysFromLaunch": 197,
+      "whiteBloodCellCount": 8.3,
+      "glucose": 84
+    }
+  ]
+}

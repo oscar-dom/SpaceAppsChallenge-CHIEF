@@ -1,5 +1,4 @@
-import type { SourceReference } from '@chief/shared';
-import type { Medication } from '../src/db/types.js';
+import type { Medication, SourceReference } from '@chief/shared';
 
 /**
  * Onboard formulary: the only medication CHIEF may suggest. Based on the ISS medical kit.

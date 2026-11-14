@@ -12,6 +12,16 @@ export function createRandom(seed: number): Random {
   };
 }
 
+/** 32-bit FNV-1a hash of a string, used to derive one seed per reading. */
+export function hashString(text: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
 /** Normally distributed number (Box-Muller). */
 export function gaussian(rand: Random, mean = 0, sd = 1): number {
   const u = 1 - rand();
