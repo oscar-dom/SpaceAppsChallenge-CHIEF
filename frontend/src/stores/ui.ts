@@ -2,13 +2,14 @@ import type { Alert } from '@chief/shared';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-const THEME_KEY = 'chief.theme';
+// v2: the light theme became the default with the redesign.
+const THEME_KEY = 'chief.theme.v2';
 
 function readTheme(): 'dark' | 'light' {
   try {
-    return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark';
+    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
   } catch {
-    return 'dark';
+    return 'light';
   }
 }
 

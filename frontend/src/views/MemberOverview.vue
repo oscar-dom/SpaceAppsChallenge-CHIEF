@@ -115,11 +115,14 @@ const vitals = computed(() => {
         />
       </div>
       <div class="legend">
-        <span><i class="sw" style="--c: var(--nominal); --a: 30%" />Nominal</span>
-        <span><i class="sw" style="--c: var(--caution); --a: 45%" />Caution</span>
-        <span><i class="sw" style="--c: var(--critical); --a: 45%" />Critical</span>
+        <span><i class="sw" style="--c: var(--organ); --a: 100%" />Nominal</span>
+        <span><i class="sw" style="--c: var(--caution); --a: 90%" />Caution</span>
+        <span><i class="sw" style="--c: var(--critical); --a: 90%" />Critical (pulses)</span>
         <span><i class="sw dashed" style="--c: var(--nodata); --a: 25%" />No data</span>
-        <span class="note">Body outline shows whole-body radiation dose.</span>
+        <span class="note"
+          >Only systems that need attention take a colour. The body outline and the badge show the
+          radiation dose.</span
+        >
       </div>
     </div>
 
@@ -183,7 +186,14 @@ const vitals = computed(() => {
             >
             <span class="score-bar">
               <span class="track"
-                ><span :style="{ width: `${s.score ?? 0}%`, background: STATUS_COLOR[s.status] }"
+                ><span
+                  :style="{
+                    width: `${s.score ?? 0}%`,
+                    background:
+                      s.status === 'caution' || s.status === 'critical'
+                        ? STATUS_COLOR[s.status]
+                        : 'var(--text-3)',
+                  }"
               /></span>
               <span class="mono small num">{{ s.score ?? '—' }}</span>
             </span>
@@ -224,7 +234,7 @@ const vitals = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  padding: 16px;
+  padding: 4px 20px 20px;
   align-items: stretch;
   min-height: 100%;
 }
