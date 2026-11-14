@@ -6,6 +6,7 @@ SQLite database of the CHIEF backend, defined with **Drizzle ORM** (better-sqlit
 - Reference data (committed, with sources): [`backend/data/`](../backend/data/README.md).
 - Access functions and CLI: [`backend/src/db/`](../backend/src/db/README.md).
 - Owner: Héctor (Backend DB). The rules engine (Carlos) and the agent context (Óscar) read from here through `queries.ts`.
+- See also: [simulator](simulator.md), [data sources](data-sources.md) and the [decision log](database-decisions.md).
 
 ## Design principles
 
