@@ -7,5 +7,6 @@
 | [`simulator.md`](simulator.md) | Mission simulator: clock, value model, parameters, demo scenarios, live API |
 | [`data-sources.md`](data-sources.md) | Every data source: real NASA datasets, threshold sources and verification, formulary, simulated assumptions |
 | [`database-decisions.md`](database-decisions.md) | Why the database, simulator and data look the way they do |
+| [`design/chief-mascot/`](design/chief-mascot/README.md) | Design of the CHIEF capsule mascot |
 
 Project-wide decisions live in [`CLAUDE.md`](../CLAUDE.md); contribution rules in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
