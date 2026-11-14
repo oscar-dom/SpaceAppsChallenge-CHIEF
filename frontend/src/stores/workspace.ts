@@ -95,6 +95,16 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     set(removePane(clone(layout.value), paneId) ?? mkPane(['crew']));
   }
 
+  /** Opens the active tab of a pane again in a new pane to its right. */
+  function splitRight(paneId: string) {
+    const p = findPane(layout.value, paneId);
+    const active = p?.tabs.find((t) => t.id === p.active);
+    if (!active) return;
+    const t = mkTab(active.sec, active.period);
+    const np: Pane = { type: 'pane', id: `${paneId}-r${Date.now()}`, tabs: [t], active: t.id };
+    set(splitPane(clone(layout.value), paneId, 'right', np), np.id);
+  }
+
   /** Drops what is being dragged on a pane: into it (center) or as a new split beside it. */
   function drop(paneId: string, zone: Zone, index?: number) {
     const d = drag.value;
@@ -194,6 +204,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     setPeriod,
     closeTab,
     closePane,
+    splitRight,
     drop,
     startDrag,
     endDrag,
