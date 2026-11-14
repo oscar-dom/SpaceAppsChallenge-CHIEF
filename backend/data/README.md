@@ -1,12 +1,16 @@
 # `data/`
 
-The local SQLite database lives here. **It is not committed to Git** (it is in `.gitignore`):
+Reference data of the project, committed to Git and loaded into the database by `npm run db:seed -w backend`. Every file says where its values come from.
 
-| File | What it is |
-| --- | --- |
-| `chief.db` | The backend's working database (with its `-wal` and `-shm` files while open) |
-| `chief.base.db` | Clean copy of the initial state, for `npm run db:restore` between demos |
+| File | Contents | Source rule |
+| --- | --- | --- |
+| `crew.ts` | The 4 fictional crew members and the simulated mission (start, 180 days, time scale, demo day) | Names are made up; ids are the anonymous OSDR codes |
+| `metrics.ts` | Catalog of the 25 metrics, by body system | HRP Spaceflight Standard Measures (which indicators NASA tracks) |
+| `thresholds.ts` | Ranges per status, escalation and fallback advice | **No threshold without a source**; each entry says how far the source was checked |
+| `formulary.ts` | Onboard formulary CHIEF may suggest from | NASA ISS Medical Kit Checklist. No dosages without a cited source |
+| `simulation.ts` | Parameters of the simulated values (baseline, noise, trend) | Plausible values, not medical thresholds |
+| `scenarios.ts` | Demo scenarios planted on crew members | Change simulated readings only |
 
-Both are generated with `npm run db:reset` (see [`src/db/README.md`](../src/db/README.md)). If you copy
-`chief.db` by hand while the backend is running you will lose data: use `VACUUM INTO`, or stop the
-backend first.
+Everything generated from `simulation.ts` and `scenarios.ts` is stored with `simulated = true` and must never be presented as a real measurement.
+
+The SQLite file is **not** here: it lives in `backend/var/` and is git-ignored. See [`src/db/README.md`](../src/db/README.md) and [`docs/database-schema.md`](../../docs/database-schema.md).

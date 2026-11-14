@@ -6,3 +6,5 @@ agent
 backend/data
 *.md
 .github
+backend/drizzle
+backend/var
