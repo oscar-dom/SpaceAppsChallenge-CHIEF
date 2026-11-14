@@ -121,7 +121,7 @@ export const THRESHOLDS: ThresholdSeed[] = [
     ], // < 20: deficiency
     escalation: { caution: 'crew-medical-officer', critical: 'flight-surgeon' },
     fallbackRecommendation:
-      'Take the vitamin D supplement from the onboard kit as prescribed, keep calcium intake up and ask the flight surgeon whether the dose needs a review.',
+      'Eat the vitamin D rich foods on the menu, keep calcium intake up and contact the flight surgeon: vitamin D supplements are not in the onboard formulary.',
     source: {
       document:
         'NASA JSC clinical decision flow: vitamin D deficiency is 25-OH D below 20 ng/mL, insufficiency 20 to 30 ng/mL',

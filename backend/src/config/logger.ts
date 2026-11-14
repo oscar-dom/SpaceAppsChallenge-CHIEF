@@ -6,7 +6,12 @@ export function createLogger(env: Pick<Env, 'LOG_LEVEL' | 'NODE_ENV'>): Logger {
   return pino({
     level: env.NODE_ENV === 'test' ? 'silent' : env.LOG_LEVEL,
     ...(env.NODE_ENV === 'development'
-      ? { transport: { target: 'pino-pretty', options: { translateTime: 'HH:MM:ss' } } }
+      ? {
+          transport: {
+            target: 'pino-pretty',
+            options: { translateTime: 'HH:MM:ss', ignore: 'pid,hostname,reqId,responseTime' },
+          },
+        }
       : {}),
   });
 }
