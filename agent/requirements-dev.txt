@@ -1,0 +1,5 @@
+# Tests and linting. Voice packages are not needed to run the tests.
+-r requirements.txt
+pytest~=9.2
+httpx~=0.28
+ruff~=0.17

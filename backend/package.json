@@ -1,0 +1,29 @@
+{
+  "name": "@chief/backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CHIEF backend: Express API, Socket.IO, rules engine and SQLite database",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:reset": "tsx src/db/reset.ts",
+    "data:fetch": "tsx scripts/fetch-nasa-data.ts",
+    "simulate": "tsx src/services/simulator/cli.ts"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.6.6",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "@chief/shared": "*",
+    "better-sqlite3": "^13.2.0",
+    "drizzle-orm": "^0.45.4"
+  }
+}
