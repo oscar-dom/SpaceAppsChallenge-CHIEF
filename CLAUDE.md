@@ -110,8 +110,10 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
   **health score** (weighted average of system statuses, weights in config), and creates
   alerts. It is the source of truth for every status shown in the UI.
 - **Agent** (`agent/`): receives the context from the backend and returns CHIEF's
-  answers. Planned endpoints: `POST /chat`, `POST /alerts/actions` (recommended actions
-  for one alert), `POST /stt` (audio → text), `POST /tts` (text → audio).
+  answers. Endpoints: `GET /health`, `POST /chat`, `POST /alerts/actions` (recommended
+  actions for one alert), `POST /stt` (audio → text), `POST /tts` (text → WAV). Gemini
+  failures never surface as errors: the agent answers in fallback mode
+  (`fallback: true`). See [`agent/README.md`](agent/README.md).
 
 ### Shared vocabulary (define in `shared/` first)
 
@@ -124,10 +126,11 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
   `blood-biochemistry`, `immune`, `vision` (SANS), `sleep-cognition`,
   `behavioral-health`, `radiation`, `nutrition`
 - Core entities: `CrewMember`, `Metric`, `Measurement`, `Threshold`, `SystemStatus`,
-  `HealthScore`, `Alert`, `ChiefMessage`
+  `HealthScore`, `Alert`, `ChiefMessage`, `Medication` (onboard formulary)
 
-The agent is Python, so its request and response bodies are documented as JSON schemas
-in `agent/README.md` and must match the types in `shared/`.
+The agent is Python: its Pydantic models (`agent/chief/schemas.py`) mirror the
+backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
+`AgentAlertActionsRequest`, ...). Change both sides together.
 
 ---
 
@@ -228,8 +231,10 @@ Requires **Node.js ≥ 20** and **Python 3.11+** (agent).
   Add `"@chief/shared": "*"` to a workspace's dependencies to import it.
 - Root tooling: `tsconfig.base.json` (every workspace `tsconfig.json` extends it),
   `eslint.config.js` (flat config), `.prettierrc.json`, `.editorconfig`.
-- `agent/` uses a Python virtual environment (`agent/.venv`) and `requirements.txt`, and
-  is not an npm workspace.
+- `agent/` uses a Python virtual environment (`agent/.venv`) and is not an npm
+  workspace. Setup (venv, requirements, `.env`, Piper voice download) is in
+  [`agent/README.md`](agent/README.md). On Windows create the venv with `py`, not the
+  MSYS/Git Bash `python`.
 
 ```bash
 npm install                 # install every JS workspace
@@ -246,8 +251,8 @@ scripts run them with `--if-present`. `npm run dev` starts the agent through
 scripts: `db:migrate` (Drizzle migrations) and `db:seed` (mission history and demo
 scenarios).
 
-CI runs two jobs on every PR: `Commit messages` (required) and
-`Lint, typecheck and test`.
+CI runs three jobs on every PR: `Commit messages` (required), `Lint, typecheck and test`
+(TypeScript) and `Agent tests and lint` (pytest + Ruff).
 
 ---
 

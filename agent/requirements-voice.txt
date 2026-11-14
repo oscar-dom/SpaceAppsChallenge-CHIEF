@@ -1,0 +1,6 @@
+# Voice: speech-to-text and text-to-speech on CPU.
+-r requirements.txt
+faster-whisper~=1.2
+# PyAV 19 removed the metadata_errors argument faster-whisper 1.2 still passes.
+av<19
+piper-tts~=1.8
