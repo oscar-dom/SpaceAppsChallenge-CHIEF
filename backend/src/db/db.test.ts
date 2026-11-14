@@ -305,3 +305,63 @@ describe('data files', () => {
     for (const item of FORMULARY) expect(item.dosage).toBeUndefined();
   });
 });
+
+describe('thresholds against the demo scenarios', () => {
+  /** Same rule as the contract: inclusive min, exclusive max, outside every range is critical. */
+  function statusOf(metricId: string, value: number): string {
+    const threshold = THRESHOLDS.find((t) => t.metricId === metricId);
+    if (!threshold) return 'no-threshold';
+    const match = threshold.ranges.find(
+      ({ range }) =>
+        (range.min === undefined || value >= range.min) &&
+        (range.max === undefined || value < range.max),
+    );
+    return match?.status ?? 'critical';
+  }
+
+  it('never lets two ranges of one threshold overlap', () => {
+    for (const t of THRESHOLDS) {
+      const ranges = t.ranges.map(
+        (r) => [r.range.min ?? -Infinity, r.range.max ?? Infinity] as const,
+      );
+      for (let i = 0; i < ranges.length; i++) {
+        for (let j = i + 1; j < ranges.length; j++) {
+          const [a, b] = [ranges[i], ranges[j]];
+          if (!a || !b) continue;
+          expect(a[0] < b[1] && b[0] < a[1], `${t.metricId}: ranges ${i} and ${j} overlap`).toBe(
+            false,
+          );
+        }
+      }
+    }
+  });
+
+  it('makes every planted case leave the nominal range', () => {
+    const cases: [string, string][] = [
+      ['C001', 'bone-mineral-density-change'],
+      ['C001', 'urine-calcium'],
+      ['C002', 'optic-disc-edema-grade'],
+      ['C002', 'intraocular-pressure'],
+      ['C002', 'cumulative-radiation-dose'],
+      ['C003', 'vitamin-d-25-oh'],
+      ['C004', 'sleep-duration'],
+      ['C004', 'sleep-efficiency'],
+    ];
+    for (const [crewId, metricId] of cases) {
+      expect(statusOf(metricId, latest(crewId, metricId)), `${crewId} ${metricId}`).not.toBe(
+        'nominal',
+      );
+    }
+  });
+
+  it('keeps the healthy readings of the other crew members nominal', () => {
+    expect(
+      statusOf('bone-mineral-density-change', latest('C003', 'bone-mineral-density-change')),
+    ).toBe('nominal');
+    expect(statusOf('vitamin-d-25-oh', latest('C001', 'vitamin-d-25-oh'))).toBe('nominal');
+    expect(statusOf('sleep-duration', latest('C001', 'sleep-duration'))).toBe('nominal');
+    expect(statusOf('cumulative-radiation-dose', latest('C003', 'cumulative-radiation-dose'))).toBe(
+      'nominal',
+    );
+  });
+});

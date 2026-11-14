@@ -199,6 +199,11 @@ NASA data and standards**, and document where every value or threshold comes fro
 Synthetic values must be **marked as simulated** in the data, never presented as real
 measurements.
 
+Every source in use (NASA datasets, threshold documents and how far each was verified,
+formulary, simulated assumptions) is listed in [`docs/data-sources.md`](docs/data-sources.md).
+The simulator is described in [`docs/simulator.md`](docs/simulator.md) and the database
+decisions in [`docs/database-decisions.md`](docs/database-decisions.md).
+
 ### Demo crew
 
 4 fictional crew members on a 6-month ISS mission, each with a different profile and at
