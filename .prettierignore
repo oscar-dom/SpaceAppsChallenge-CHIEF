@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+package-lock.json
+agent
+backend/data
+*.md
+.github
