@@ -1,0 +1,27 @@
+{
+  "name": "@chief/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CHIEF frontend: the crew's onboard health interface",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@chief/shared": "*",
+    "pinia": "^3.0.4",
+    "socket.io-client": "^4.8.4",
+    "vue": "^3.5.45"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.11",
+    "eslint-plugin-vue": "^10.12.1",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0",
+    "vue-tsc": "^3.3.14"
+  }
+}
