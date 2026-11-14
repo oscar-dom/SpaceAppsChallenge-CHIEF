@@ -314,7 +314,7 @@ function contentDrop(e: DragEvent) {
   min-width: 0;
 }
 .tabbar {
-  height: 36px;
+  height: 40px;
   flex: none;
   display: flex;
   align-items: stretch;
@@ -413,8 +413,7 @@ function contentDrop(e: DragEvent) {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 9px 16px;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 12px;
   flex-wrap: wrap;
   row-gap: 8px;
 }
@@ -425,7 +424,7 @@ function contentDrop(e: DragEvent) {
   min-width: 0;
 }
 .title {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
 }

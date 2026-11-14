@@ -1,15 +1,36 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import Icon from '../components/Icon.vue';
-import { clockText, initials } from '../lib/format';
+import StatusChip from '../components/StatusChip.vue';
+import { clockText, initials, roleLine } from '../lib/format';
+import { STATUS_COLOR, type UiStatus } from '../lib/status';
 import { useMissionStore } from '../stores/mission';
 import { useUiStore } from '../stores/ui';
 import { useWorkspaceStore } from '../stores/workspace';
 
+/**
+ * Context header: who the workspace is showing (named big, with the health score) on the
+ * left, mission telemetry on the right.
+ */
 const mission = useMissionStore();
 const ws = useWorkspaceStore();
 const ui = useUiStore();
 const menuOpen = ref(false);
+
+const context = computed(() => {
+  if (ws.focusedSection === 'crew' || !mission.member) return null;
+  const m = mission.member;
+  const h = mission.health[m.id];
+  const status: UiStatus = h?.status ?? 'nodata';
+  return {
+    name: m.name,
+    ini: initials(m.name),
+    role: roleLine(m),
+    score: h ? String(h.score) : '—',
+    status,
+    ring: STATUS_COLOR[status],
+  };
+});
 
 const day = computed(() => mission.clock?.missionDay ?? 0);
 const length = computed(() => mission.clock?.missionLengthDays ?? 180);
@@ -39,9 +60,21 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
 <template>
   <header class="topbar">
     <div class="side">
-      <span class="brand">CHIEF</span>
-      <span class="sep" />
-      <span class="muted nowrap">ISS Expedition · simulated</span>
+      <template v-if="context">
+        <span class="avatar" :style="{ '--ring': context.ring }">{{ context.ini }}</span>
+        <div class="who">
+          <span class="who-name">{{ context.name }}</span>
+          <span class="muted who-role">{{ context.role }}</span>
+        </div>
+        <div class="who-score" title="Health score: weighted average of the body systems">
+          <span class="mono who-num">{{ context.score }}<span class="faint">/100</span></span>
+          <StatusChip :status="context.status" />
+        </div>
+      </template>
+      <div v-else class="who">
+        <span class="who-name">Crew overview</span>
+        <span class="muted who-role">{{ mission.crew.length }} crew members · ISS expedition</span>
+      </div>
     </div>
     <div class="telemetry">
       <div class="cell">
@@ -61,16 +94,13 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
       </div>
       <div class="cell">
         <span class="label small">Crew dose rate</span>
-        <span class="mono val inline"
-          ><span class="dot" style="background: var(--border-2)" />{{ doseRate }}
-          <span class="faint unit">µSv/h</span></span
-        >
-      </div>
-      <div class="cell">
-        <span class="pill">SIMULATED DATA</span>
+        <span class="mono val">{{ doseRate }} <span class="faint unit">µSv/h</span></span>
       </div>
     </div>
-    <div class="side right">
+    <div class="right">
+      <span class="pill" title="Every reading is simulated from NASA data and standards"
+        >Simulated data</span
+      >
       <div class="menu-wrap">
         <button class="menu-btn" @click="menuOpen = !menuOpen">
           Layouts<Icon name="chevronDown" :size="14" />
@@ -86,9 +116,6 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
           </div>
         </template>
       </div>
-      <div v-if="mission.member" class="avatar" :title="`${mission.member.name} (selected)`">
-        {{ initials(mission.member.name) }}
-      </div>
       <button
         class="icon-btn"
         :title="ui.theme === 'dark' ? 'Light theme' : 'Dark theme'"
@@ -102,12 +129,12 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
 
 <style scoped>
 .topbar {
-  height: 56px;
+  height: 68px;
   flex: none;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 16px;
+  gap: 20px;
+  padding: 0 20px 0 24px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
   position: relative;
@@ -116,26 +143,56 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
 .side {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
   flex: 1 1 0;
 }
-.side.right {
-  justify-content: flex-end;
-  gap: 8px;
-}
-.brand {
+.avatar {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 17px;
-  letter-spacing: 0.16em;
+  background: var(--chrome);
+  color: var(--chrome-text);
+  box-shadow:
+    0 0 0 2px var(--panel),
+    0 0 0 4px var(--ring);
 }
-.sep {
-  width: 1px;
-  height: 20px;
-  background: var(--border-2);
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
 }
-.nowrap {
+.who-name {
+  font-size: 20px;
+  font-weight: 600;
   white-space: nowrap;
+}
+.who-role {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.who-score {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 16px;
+  margin-left: 4px;
+  border-left: 1px solid var(--border);
+}
+.who-num {
+  font-size: 24px;
+  font-weight: 600;
+}
+.who-num .faint {
+  font-size: 13px;
+  font-weight: 400;
 }
 .telemetry {
   display: flex;
@@ -146,7 +203,7 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 0 20px;
+  padding: 0 18px;
 }
 .cell + .cell {
   border-left: 1px solid var(--border);
@@ -164,7 +221,7 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
   font-weight: 500;
 }
 .clock {
-  min-width: 170px;
+  min-width: 166px;
 }
 .unit {
   font-size: 11px;
@@ -173,41 +230,47 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
   width: 56px;
   height: 4px;
   border-radius: 2px;
-  background: var(--border-2);
+  background: var(--panel-3);
   overflow: hidden;
   display: block;
 }
 .progress span {
   display: block;
   height: 100%;
-  background: var(--text-2);
+  background: var(--accent);
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
 }
 .pill {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.1em;
   color: var(--text-2);
-  border: 1px solid var(--border-2);
-  border-radius: 4px;
-  padding: 3px 8px;
+  background: var(--panel-3);
+  border-radius: 999px;
+  padding: 4px 10px;
   white-space: nowrap;
 }
 .menu-wrap {
   position: relative;
 }
 .menu-btn {
-  height: 32px;
+  height: 34px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 10px 0 12px;
+  padding: 0 10px 0 14px;
   border: 1px solid var(--border-2);
-  border-radius: 4px;
-  background: var(--panel-2);
+  border-radius: 8px;
+  background: var(--panel);
   font-weight: 500;
 }
 .menu-btn:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 .scrim {
   position: fixed;
@@ -217,13 +280,13 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
 .menu {
   position: absolute;
   right: 0;
-  top: 40px;
+  top: 42px;
   z-index: 60;
   width: 300px;
-  background: var(--panel-2);
-  border: 1px solid var(--border-2);
-  border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
   padding: 6px;
   animation: chOpen 150ms ease;
 }
@@ -236,29 +299,16 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 7px 10px;
+  padding: 8px 10px;
   border: 0;
-  border-radius: 4px;
+  border-radius: 6px;
   background: transparent;
   text-align: left;
 }
 .menu-item:hover {
-  background: var(--panel-3);
+  background: var(--accent-tint);
 }
 .small-text {
   font-size: 12px;
-}
-.avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--panel-3);
-  border: 1px solid var(--border-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: 4px;
 }
 </style>

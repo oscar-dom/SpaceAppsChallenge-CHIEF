@@ -118,7 +118,7 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
     <div class="cols">
       <div v-for="c in columns" :key="c.id" class="col">
         <div class="who" @click="go(c.id, 'overview')">
-          <div class="avatar">{{ c.ini }}</div>
+          <div class="avatar" :style="{ '--ring': STATUS_COLOR[c.status] }">{{ c.ini }}</div>
           <div class="names">
             <span class="name">{{ c.name }}</span>
             <span class="muted ellipsis small">{{ c.role }}</span>
@@ -214,33 +214,44 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
 .cols {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding: 4px 20px 14px;
 }
+/* One card per person: the crew are the subject of the screen, not a grid of cells. */
 .col {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 14px 16px 12px;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  padding: 16px 16px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 .who {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
   min-width: 0;
 }
+.who:hover .name {
+  color: var(--accent);
+}
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--panel-3);
-  border: 1px solid var(--border-2);
+  background: var(--chrome);
+  color: var(--chrome-text);
+  box-shadow:
+    0 0 0 2px var(--panel),
+    0 0 0 4px var(--ring);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   flex: none;
 }
@@ -251,7 +262,7 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
   min-width: 0;
 }
 .name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -304,12 +315,14 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
   grid-template-columns: minmax(0, 1fr) auto 14px;
   align-items: center;
   gap: 8px;
-  height: 28px;
+  height: 30px;
+  padding: 0 4px;
+  border-radius: 4px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
 }
 .vital:hover {
-  background: var(--panel);
+  background: var(--panel-2);
 }
 .vval {
   display: flex;
@@ -329,7 +342,8 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
   flex: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  background: var(--panel);
+  gap: 14px;
+  padding: 0 20px 20px;
 }
 .cell {
   padding: 12px 16px;
@@ -337,9 +351,10 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
   flex-direction: column;
   gap: 6px;
   min-width: 0;
-}
-.cell + .cell {
-  border-left: 1px solid var(--border);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 .mid {
   font-size: 20px;
@@ -355,7 +370,7 @@ const upcoming = computed(() => mission.tasks.filter((t) => !t.acknowledged).sli
 .progress span {
   display: block;
   height: 100%;
-  background: var(--text-2);
+  background: var(--accent);
 }
 .row {
   display: flex;

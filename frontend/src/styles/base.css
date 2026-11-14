@@ -1,53 +1,80 @@
-/* Design tokens. Status colours mean health status only; the accent marks selection,
-   focus, primary actions and links, never status. */
+/* Design tokens.
+   - Canvas: warm off-white paper. Dense numbers read best dark-on-light, and a warm
+     neutral glares less than pure white over a long shift.
+   - Chrome: the navigation (crew, sections, CHIEF) sits on a deep navy layer, so "who and
+     where" is a different plane from the data and is found at a glance.
+   - Accent: cobalt blue marks selection, focus, primary actions and links. Never green:
+     green, amber and red mean health status only (ISA-101 style: colour is for state).
+   - Status colours are tuned for AA contrast as text on the paper and on white cards. */
 :root {
-  --bg: #0b0f14;
-  --panel: #11161d;
-  --panel-2: #161c24;
-  --panel-3: #1c232d;
-  --border: #232b36;
-  --border-2: #2f3946;
-  --text-1: #e6edf3;
-  --text-2: #9da7b3;
-  --text-3: #7d8794;
-  --accent: #4da3ff;
-  --accent-tint: rgba(77, 163, 255, 0.14);
-  --on-accent: #0b0f14;
-  --nominal: #3fb950;
-  --caution: #d29922;
-  --critical: #f85149;
-  --nodata: #6e7681;
-  --info: #8b949e;
-  --body: #1a222c;
-  --body-line: #3a4553;
-  --capsule-shell: #e6edf3;
+  --bg: #f3f0e9;
+  --panel: #ffffff;
+  --panel-2: #faf8f4;
+  --panel-3: #efebe3;
+  --border: #e6e1d7;
+  --border-2: #d3ccbf;
+  --text-1: #1b2230;
+  --text-2: #4f5866;
+  --text-3: #6b7380;
+  --accent: #2457d6;
+  --accent-strong: #1b45ad;
+  --accent-tint: rgba(36, 87, 214, 0.1);
+  --on-accent: #ffffff;
+  --nominal: #1e7d46;
+  --caution: #a8650a;
+  --critical: #c42f26;
+  --nodata: #7a8190;
+  --info: #5d6675;
+  --shadow: 0 1px 2px rgba(27, 34, 48, 0.06), 0 2px 8px rgba(27, 34, 48, 0.05);
+  --shadow-lg: 0 8px 28px rgba(27, 34, 48, 0.16);
+  --radius: 10px;
+  /* Navigation chrome. */
+  --chrome: #12213b;
+  --chrome-2: #1a2c4b;
+  --chrome-3: #243a5e;
+  --chrome-line: rgba(255, 255, 255, 0.09);
+  --chrome-text: #eef2f8;
+  --chrome-muted: #9fb0c9;
+  --chrome-accent: #7cb6ff;
+  /* Body map. */
+  --body: #dfe5ee;
+  --body-line: #b3bfcf;
+  --organ: #c9d3e0;
+  --capsule-shell: #ffffff;
   --sans: 'IBM Plex Sans', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-:root[data-theme='light'] {
-  --bg: #f2f2f3;
-  --panel: #ffffff;
-  --panel-2: #f7f8fa;
-  --panel-3: #eceef1;
-  --border: #d9dde2;
-  --border-2: #c4cad1;
-  --text-1: #1d1f20;
-  --text-2: #4d5662;
-  --text-3: #5f6873;
-  --accent: #1f6fcc;
-  --accent-tint: rgba(31, 111, 204, 0.1);
-  --on-accent: #ffffff;
-  --nominal: #1a7f37;
-  --caution: #9a6700;
-  --critical: #cf222e;
-  --nodata: #6e7781;
-  --info: #57606a;
-  --body: #e3e7ec;
-  --body-line: #a9b1bb;
-  --capsule-shell: #ffffff;
-  color-scheme: light;
+:root[data-theme='dark'] {
+  --bg: #0e1420;
+  --panel: #151d2b;
+  --panel-2: #1a2333;
+  --panel-3: #222c3e;
+  --border: #263044;
+  --border-2: #344058;
+  --text-1: #e8edf5;
+  --text-2: #a3aec0;
+  --text-3: #8591a5;
+  --accent: #5b8cff;
+  --accent-strong: #7aa2ff;
+  --accent-tint: rgba(91, 140, 255, 0.16);
+  --on-accent: #0b1220;
+  --nominal: #46b871;
+  --caution: #e0a33a;
+  --critical: #f0625a;
+  --nodata: #7d8799;
+  --info: #94a0b3;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --chrome: #0a101b;
+  --chrome-2: #131c2c;
+  --chrome-3: #1d2940;
+  --body: #27334a;
+  --body-line: #45526b;
+  --organ: #34425c;
+  --capsule-shell: #e8edf5;
+  color-scheme: dark;
 }
 
 *,
@@ -67,7 +94,7 @@ body,
 body {
   color: var(--text-1);
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
@@ -121,7 +148,7 @@ a {
 .label {
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-3);
 }
@@ -145,8 +172,9 @@ a {
 .card {
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--panel);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
@@ -177,16 +205,26 @@ a {
 }
 
 .btn {
-  height: 24px;
-  padding: 0 9px;
+  height: 28px;
+  padding: 0 12px;
   border: 1px solid var(--border-2);
-  border-radius: 4px;
-  background: var(--panel-3);
+  border-radius: 6px;
+  background: var(--panel);
   font-size: 12px;
   font-weight: 500;
 }
 .btn:hover {
   border-color: var(--accent);
+  color: var(--accent);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.btn.primary:hover {
+  background: var(--accent-strong);
+  color: var(--on-accent);
 }
 
 .link-btn {
@@ -206,7 +244,8 @@ a {
 .segmented {
   display: flex;
   border: 1px solid var(--border-2);
-  border-radius: 4px;
+  border-radius: 6px;
+  background: var(--panel);
   overflow: hidden;
   flex: none;
 }
@@ -227,8 +266,16 @@ a {
   color: var(--text-1);
 }
 .segmented button.on {
-  background: var(--panel-3);
-  color: var(--text-1);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .ellipsis {

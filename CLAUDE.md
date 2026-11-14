@@ -72,6 +72,8 @@ Why these choices:
   in one service gives the AI work a single home.
 - **No Vuetify or vue-echarts:** the interface follows a custom flight-software design
   (status colours only for health, mono tabular numbers, threshold bands on every chart).
+  Light warm canvas with a navy navigation layer and a cobalt accent; design rules in
+  [`frontend/README.md`](frontend/README.md).
   Plain CSS tokens and small SVG charts match it exactly; a Material component library
   and a chart library would have to be fought at every step.
 
@@ -146,16 +148,18 @@ backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
 
 One view for every crew member: what an astronaut sees on board.
 
-- **Top bar:** mission day, mission clock and crew dose rate. Under it, the **crew tabs**:
-  a **Crew** tab (whole-crew overview: every body, score and key vitals) and one tab per
-  crew member with their health score.
-- **Left menu (always visible, can shrink to icons):** the body-system sections from the
-  list above. The first entry is **Overview**. At the bottom, **Talk to CHIEF** as a speech
-  bubble with the mascot.
+- **Left navigation (navy, always visible, can shrink to icons):** first the crew: a
+  **Crew overview** entry (every body, score and key vitals) and one row per crew member
+  with avatar, status ring and health score. Then the body-system sections of the selected
+  person; the first entry is **Overview**. At the bottom, **Talk to CHIEF** as the primary
+  button with the mascot.
+- **Top bar:** the selected crew member with their health score, then mission day,
+  mission clock and crew dose rate.
 - **Workspace:** sections open as tabs. Dragging a section or a tab onto a pane's edge
   splits it, so several sections can be seen at once (like editor groups in VS Code).
-- **Overview:** a human body figure (SVG) whose regions are coloured by their system's
-  status, plus the global **health score**. Clicking a region opens its section.
+- **Overview:** a human body figure (SVG) with the organs of each system; organs in
+  caution or critical take the status colour, healthy ones stay neutral. Plus the global
+  **health score**. Clicking an organ opens its section.
 - **System sections:** a dashboard full of statistics for that system: every metric from
   measurements and sensors, with period selectors (day / week / month / whole mission),
   thresholds drawn on the charts and trend indicators.

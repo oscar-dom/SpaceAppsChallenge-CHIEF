@@ -56,13 +56,13 @@ const refreshKey = computed(() => mission.health[mission.selected]?.computedAt ?
 .dash {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 4px 20px 20px;
 }
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
 }
 .empty {
   text-align: center;

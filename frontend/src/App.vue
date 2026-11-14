@@ -3,7 +3,6 @@ import { computed, onMounted, watch } from 'vue';
 import Capsule from './components/Capsule.vue';
 import { mdTime } from './lib/format';
 import ChatPanel from './layout/ChatPanel.vue';
-import CrewTabs from './layout/CrewTabs.vue';
 import NavPanel from './layout/NavPanel.vue';
 import NotificationsPanel from './layout/NotificationsPanel.vue';
 import TopBar from './layout/TopBar.vue';
@@ -60,28 +59,30 @@ watch(
   </div>
 
   <div v-else class="app">
-    <TopBar />
-    <CrewTabs />
-    <div class="main">
-      <NavPanel />
-      <Workspace />
-      <ChatPanel v-if="ui.chatOpen" />
-      <NotificationsPanel />
+    <NavPanel />
+    <div class="column">
+      <TopBar />
+      <div class="main">
+        <Workspace />
+        <ChatPanel v-if="ui.chatOpen" />
+        <NotificationsPanel />
+      </div>
+      <footer class="status">
+        <span class="mono">{{ evaluated }}</span><span>·</span>
+        <span>{{
+          chief.online ? 'CHIEF online' : 'CHIEF offline · standard recommendations'
+        }}</span><span>·</span>
+        <span
+          >{{ paneCount }} {{ paneCount === 1 ? 'pane' : 'panes' }} ·
+          {{ mission.member?.name }}</span
+        >
+        <template v-if="!mission.connected"
+          ><span>·</span><span class="warn">Live link lost, reconnecting…</span></template
+        >
+        <span class="grow" />
+        <span>Simulated data. CHIEF is a prototype, not a medical device.</span>
+      </footer>
     </div>
-    <footer class="status">
-      <span class="mono">{{ evaluated }}</span><span>·</span>
-      <span>{{
-        chief.online ? 'CHIEF online' : 'CHIEF offline · standard recommendations'
-      }}</span><span>·</span>
-      <span
-        >{{ paneCount }} {{ paneCount === 1 ? 'pane' : 'panes' }} · {{ mission.member?.name }}</span
-      >
-      <template v-if="!mission.connected"
-        ><span>·</span><span class="warn">Live link lost, reconnecting…</span></template
-      >
-      <span class="grow" />
-      <span>Simulated data. CHIEF is a prototype, not a medical device.</span>
-    </footer>
   </div>
 </template>
 
@@ -91,8 +92,13 @@ watch(
   min-width: 1280px;
   min-height: 720px;
   display: flex;
-  flex-direction: column;
   overflow: hidden;
+}
+.column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 .main {
   flex: 1;

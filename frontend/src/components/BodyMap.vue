@@ -4,8 +4,14 @@ import type { Region } from '../lib/sections';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus, statusText } from '../lib/status';
 
 /**
- * Front-view body silhouette (anatomical position) with regions tinted by the status of
- * their body system. The outline shows whole-body radiation dose.
+ * Front-view body figure with the organs of each body system.
+ *
+ * The figure is a soft mannequin (about 8 heads tall, male and female proportions), like the
+ * body views of consumer health apps: limbs are tapered round-ended shapes and the torso is one
+ * mirrored path, so the outline stays smooth at any size. Following high-performance HMI
+ * practice (ISA-101), healthy organs stay neutral and only caution and critical ones take a
+ * status colour, so a problem stands out at a glance. Critical organs pulse. The radiation
+ * system is the outline around the whole body plus a dosimeter badge.
  */
 const props = defineProps<{
   sex: 'female' | 'male';
@@ -16,42 +22,118 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ pick: [region: Region | 'body']; hover: [region: Region | null] }>();
 
-const FILL_OPACITY: Record<UiStatus, number> = {
-  nominal: 0.1,
-  caution: 0.42,
-  critical: 0.48,
-  nodata: 0.1,
-  none: 0.1,
-};
-const ANCHOR: Record<Region, [number, number]> = {
-  head: [130, 22],
-  eyes: [137, 44],
-  immune: [158, 125],
-  cardio: [146, 118],
-  nutr: [148, 176],
-  blood: [146, 207],
-  msk: [146, 300],
-  rad: [178, 112],
-};
-const REGIONS: Region[] = ['head', 'eyes', 'immune', 'cardio', 'nutr', 'blood', 'msk', 'rad'];
+type Pt = [number, number];
+/** A limb segment that narrows from `w1` at `from` to `w2` at `to`, with round ends. */
+interface Limb {
+  from: Pt;
+  to: Pt;
+  w1: number;
+  w2: number;
+}
+interface Figure {
+  head: { cy: number; rx: number; ry: number };
+  hair: string;
+  neck: { x: number; w: number };
+  torso: string;
+  /** Upper arm, forearm, hand. */
+  arm: Limb[];
+  /** Thigh, lower leg. */
+  leg: Limb[];
+  foot: { cx: number; cy: number; rx: number; ry: number };
+}
 
-// Left half outlines (x ≤ 130), mirrored in the template. Arms abducted, palms forward.
-const BODY = {
+// Left halves (x ≤ 130); the template mirrors them around x = 130.
+const FIGURES: Record<'male' | 'female', Figure> = {
   male: {
-    line: 'M130 8C119 8 112 16 112 30C112 37 112 41 113 45C112 46 111 49 112 51C113 53 115 53 116 53C117 57 119 60 121 62L121 76C116 80 105 82 95 85C86 88 79 95 78 106C76 128 67 150 61 172C55 188 49 212 44 234C38 238 32 242 30 247C29 250 32 252 35 250C38 248 40 247 41 249C38 256 37 263 37 269C37 275 42 277 45 272C48 264 52 254 56 244C61 226 68 202 74 182C80 162 88 140 94 122C96 142 98 168 100 194C101 210 98 226 97 240C93 266 95 300 101 330C98 346 95 364 98 382C101 396 107 404 110 412C108 420 102 428 104 432C108 435 120 435 125 432C126 426 124 418 123 412C123 396 123 372 122 358C121 348 123 340 123 332C123 300 127 272 130 256',
-    leg: 'M97 240C93 266 95 300 101 330C98 346 95 364 98 382C101 396 107 404 110 412C108 420 102 428 104 432C108 435 120 435 125 432C126 426 124 418 123 412C123 396 123 372 122 358C121 348 123 340 123 332C123 300 127 272 130 256L130 250C118 249 106 246 97 240Z',
-    crotch: 256,
-    top: 8,
+    head: { cy: 36, rx: 19, ry: 24 },
+    hair: 'M112 34C111 18 120 11 130 11C140 11 149 18 148 34C145 26 138 22 130 22C122 22 115 26 112 34Z',
+    neck: { x: 121, w: 18 },
+    torso:
+      'M131 74C116 74 102 76 94 80C86 84 82 92 82 102C82 112 86 120 90 128C92 150 96 172 100 196C99 212 96 226 96 240C96 254 104 264 116 268L131 270Z',
+    arm: [
+      { from: [88, 94], to: [78, 166], w1: 24, w2: 17 },
+      { from: [78, 166], to: [68, 232], w1: 17, w2: 12 },
+      { from: [68, 234], to: [64, 258], w1: 13, w2: 10 },
+    ],
+    leg: [
+      { from: [112, 252], to: [110, 340], w1: 38, w2: 22 },
+      { from: [110, 340], to: [110, 410], w1: 22, w2: 14 },
+    ],
+    foot: { cx: 106, cy: 421, rx: 12, ry: 7 },
   },
   female: {
-    line: 'M130 9C117 9 110 19 110 34C110 50 109 62 106 71C105 75 109 77 115 77L121 78C119 83 106 88 96 91C89 93 84 99 84 108C82 128 75 150 70 170C65 190 58 212 53 230C48 234 43 238 41 242C40 245 43 247 46 245C48 243 49 243 50 245C48 252 47 260 47 265C47 270 51 272 53 268C56 260 59 250 63 241C69 222 75 200 80 180C85 160 91 138 96 122C95 132 95 142 97 150C99 162 104 172 104 186C104 204 94 220 93 240C92 264 96 300 103 330C102 346 99 366 102 384C104 398 110 406 113 412C112 420 107 428 109 432C112 435 121 435 125 432C126 426 124 418 123 412C123 394 122 372 122 358C121 348 123 340 123 332C123 302 127 274 130 258',
-    leg: 'M93 240C92 264 96 300 103 330C102 346 99 366 102 384C104 398 110 406 113 412C112 420 107 428 109 432C112 435 121 435 125 432C126 426 124 418 123 412C123 394 122 372 122 358C121 348 123 340 123 332C123 302 127 274 130 258L130 252C117 251 103 248 93 240Z',
-    crotch: 258,
-    top: 9,
+    head: { cy: 37, rx: 17, ry: 22 },
+    hair: 'M110 44C106 20 118 11 130 11C142 11 154 20 150 44C151 54 150 62 146 67C142 61 141 51 143 40C139 31 135 28 130 28C125 28 121 31 117 40C119 51 118 61 114 67C110 63 109 54 110 44Z',
+    neck: { x: 122, w: 16 },
+    torso:
+      'M131 76C118 76 106 78 98 82C91 86 88 93 88 102C88 112 91 120 94 128C96 148 102 168 104 188C103 206 94 222 92 240C92 256 102 266 116 270L131 272Z',
+    arm: [
+      { from: [93, 96], to: [84, 166], w1: 21, w2: 15 },
+      { from: [84, 166], to: [76, 230], w1: 15, w2: 10 },
+      { from: [76, 232], to: [73, 254], w1: 11, w2: 8 },
+    ],
+    leg: [
+      { from: [111, 254], to: [112, 340], w1: 40, w2: 21 },
+      { from: [112, 340], to: [112, 410], w1: 21, w2: 13 },
+    ],
+    foot: { cx: 108, cy: 421, rx: 11, ry: 6 },
   },
+};
+
+/** Outline of a tapered limb segment: two sides joined by round caps. */
+function taper({ from, to, w1, w2 }: Limb): string {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len;
+  const ny = dx / len;
+  const r1 = w1 / 2;
+  const r2 = w2 / 2;
+  const f = (x: number) => x.toFixed(2);
+  const a1 = [from[0] + nx * r1, from[1] + ny * r1];
+  const a2 = [from[0] - nx * r1, from[1] - ny * r1];
+  const b1 = [to[0] + nx * r2, to[1] + ny * r2];
+  const b2 = [to[0] - nx * r2, to[1] - ny * r2];
+  return (
+    `M${f(a1[0]!)} ${f(a1[1]!)}L${f(b1[0]!)} ${f(b1[1]!)}` +
+    `A${r2} ${r2} 0 0 0 ${f(b2[0]!)} ${f(b2[1]!)}L${f(a2[0]!)} ${f(a2[1]!)}` +
+    `A${r1} ${r1} 0 0 0 ${f(a1[0]!)} ${f(a1[1]!)}Z`
+  );
+}
+
+const LUNG =
+  'M126 92C116 90 106 96 104 110C102 124 104 140 108 150C116 152 122 148 125 142C126 126 127 106 126 92Z';
+const HEART =
+  'M134 112C140 106 151 108 153 117C155 126 149 134 141 138C136 140 132 136 131 130C129 123 129 115 134 112Z';
+const STOMACH =
+  'M136 162C145 158 153 162 153 172C153 182 146 188 138 189C132 190 129 186 131 182C134 180 139 181 142 177C144 173 139 171 137 167Z';
+const KIDNEY =
+  'M116 192C111 192 108 196 108 202C108 208 111 212 116 212C118 212 119 210 118 208C117 206 117 203 118 201C119 198 119 192 116 192Z';
+const NODES: Pt[] = [
+  [122, 70],
+  [138, 70],
+  [99, 112],
+  [161, 112],
+  [116, 258],
+  [144, 258],
+];
+const BADGE: Pt = [222, 30];
+
+const ANCHOR: Record<Region, Pt> = {
+  head: [130, 30],
+  eyes: [137, 41],
+  immune: [161, 112],
+  cardio: [142, 122],
+  nutr: [146, 175],
+  blood: [148, 202],
+  msk: [110, 300],
+  rad: BADGE,
 };
 
 const MIRROR = 'translate(260 0) scale(-1 1)';
+/** Unique per instance: several body maps share the page. */
+const filterId = `bodyline-${Math.random().toString(36).slice(2, 9)}`;
+
 const root = ref<HTMLDivElement | null>(null);
 const hover = ref<Region | null>(null);
 const mouse = ref({ x: 0, y: 0 });
@@ -66,45 +148,85 @@ onMounted(() => {
 });
 onBeforeUnmount(() => observer?.disconnect());
 
-const body = computed(() => {
-  const b = BODY[props.sex];
-  return { ...b, fill: `${b.line}L131 ${b.crotch}L131 ${b.top}Z` };
+const fig = computed(() => FIGURES[props.sex]);
+const eyeY = computed(() => fig.value.head.cy + 5);
+const brain = computed(() => {
+  const { cy, rx } = fig.value.head;
+  return { cx: 130, cy: cy - 7, rx: rx - 5, ry: 10 };
 });
 
-interface RegionStyle {
+/** Bones inside each limb segment, a little shorter than the segment. */
+const limbs = computed(() => [...fig.value.arm, ...fig.value.leg].map(taper));
+const bones = computed(() =>
+  [...fig.value.arm.slice(0, 2), ...fig.value.leg].map(({ from, to }) => {
+    const k = 0.12;
+    const dx = to[0] - from[0];
+    const dy = to[1] - from[1];
+    return `M${from[0] + dx * k} ${from[1] + dy * k}L${to[0] - dx * k} ${to[1] - dy * k}`;
+  }),
+);
+const knee = computed(() => fig.value.leg[0]?.to ?? ([110, 340] as Pt));
+
+const alarm = (s: UiStatus) => s === 'caution' || s === 'critical';
+
+interface RegionLook {
   fill: string;
   stroke: string;
-  fo: number;
-  fo2: number;
-  fo3: number;
-  so: number;
-  sw: number;
-  dash: string;
+  opacity: number;
+  dash?: string;
+  pulse: boolean;
 }
 
-const r = computed(
+const look = computed(
   () =>
     Object.fromEntries(
-      REGIONS.map((k) => {
+      (Object.keys(ANCHOR) as Region[]).map((k) => {
         const s = props.st[k] ?? 'nodata';
         const on = props.highlight === k || hover.value === k;
-        const base = FILL_OPACITY[s] * (on ? 1.8 : 1);
+        const color = alarm(s) ? STATUS_COLOR[s] : 'var(--organ)';
         return [
           k,
           {
-            fill: STATUS_COLOR[s],
-            stroke: k === 'rad' && s === 'nominal' ? 'var(--body-line)' : STATUS_COLOR[s],
-            fo: base,
-            fo2: base * 0.55,
-            fo3: Math.min(1, base * 2.2),
-            so: s === 'nominal' ? (on ? 1 : 0.42) : 1,
-            sw: on ? 2.25 : k === 'rad' && s !== 'nominal' ? 1.6 : 1.1,
-            dash: s === 'nodata' ? '3 2' : 'none',
+            fill: color,
+            stroke: on ? 'var(--accent)' : alarm(s) ? STATUS_COLOR[s] : 'transparent',
+            opacity: alarm(s) ? 0.9 : s === 'nodata' ? 0.55 : 1,
+            dash: s === 'nodata' && !on ? '3 2' : undefined,
+            pulse: s === 'critical',
           },
         ];
       }),
-    ) as Record<Region, RegionStyle>,
+    ) as Record<Region, RegionLook>,
 );
+
+function style(k: Region) {
+  const v = look.value[k];
+  return {
+    fill: v.fill,
+    fillOpacity: v.opacity,
+    stroke: v.dash ? 'var(--nodata)' : v.stroke,
+    strokeWidth: 1.5,
+    strokeDasharray: v.dash,
+  };
+}
+
+function boneStyle() {
+  const v = look.value.msk;
+  return { stroke: v.fill, strokeOpacity: v.opacity, strokeDasharray: v.dash };
+}
+
+/** The body outline doubles as the radiation indicator. */
+const outline = computed(() => {
+  const s = props.st.rad ?? 'nodata';
+  const on = props.highlight === 'rad' || hover.value === 'rad';
+  if (alarm(s)) return { color: STATUS_COLOR[s], radius: on ? 3 : 2.2 };
+  return { color: on ? 'var(--accent)' : 'var(--body-line)', radius: on ? 2 : 0.9 };
+});
+const badge = computed(() => {
+  const s = props.st.rad ?? 'nodata';
+  return alarm(s)
+    ? { bg: STATUS_COLOR[s], fg: '#ffffff', ring: STATUS_COLOR[s] }
+    : { bg: 'var(--panel)', fg: 'var(--text-2)', ring: 'var(--body-line)' };
+});
 
 function enter(k: Region) {
   hover.value = k;
@@ -131,7 +253,7 @@ const tip = computed(() => {
   if (!k || !props.info[k]) return null;
   const s = props.st[k] ?? 'nodata';
   const p = hover.value ? mouse.value : pinPos(k);
-  const TW = 224;
+  const TW = 236;
   const W = size.value.w;
   let x: number;
   let y = p.y;
@@ -152,149 +274,119 @@ const tip = computed(() => {
   };
 });
 
-function style(k: Region, extra: { fill?: string; fillOpacity?: number } = {}) {
-  const v = r.value[k];
-  return {
-    fill: v.fill,
-    fillOpacity: v.fo,
-    stroke: v.stroke,
-    strokeOpacity: v.so,
-    strokeWidth: v.sw,
-    strokeDasharray: v.dash,
-    ...extra,
-  };
-}
+const hoverOn = (k: Region) => ({
+  onMouseenter: () => enter(k),
+  onMouseleave: leave,
+  onClick: (e: MouseEvent) => {
+    e.stopPropagation();
+    emit('pick', k);
+  },
+});
 </script>
 
 <template>
   <div ref="root" class="bodymap" @mousemove="move">
-    <svg viewBox="0 0 260 440" preserveAspectRatio="xMidYMid meet">
-      <g class="hit" @click="emit('pick', 'body')">
-        <path :d="body.fill" class="silhouette" />
-        <path :transform="MIRROR" :d="body.fill" class="silhouette" />
+    <svg viewBox="0 0 260 440" preserveAspectRatio="xMidYMid meet" role="img">
+      <title>Body map: organs coloured by the status of their body system</title>
+      <defs>
+        <filter :id="filterId" x="-15%" y="-10%" width="130%" height="120%">
+          <feMorphology in="SourceAlpha" operator="dilate" :radius="outline.radius" result="d" />
+          <feFlood :style="{ floodColor: outline.color }" />
+          <feComposite in2="d" operator="in" result="o" />
+          <feMerge>
+            <feMergeNode in="o" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <ellipse cx="130" cy="433" rx="56" ry="5" class="ground" />
+
+      <!-- Silhouette: one filled group, so the outline filter draws a single clean contour. -->
+      <g class="hit silhouette" :filter="`url(#${filterId})`" @click="emit('pick', 'body')">
+        <g v-for="t in ['', MIRROR]" :key="t" :transform="t || undefined">
+          <path :d="fig.torso" />
+          <path v-for="(d, i) in limbs" :key="i" :d="d" />
+          <ellipse :cx="fig.foot.cx" :cy="fig.foot.cy" :rx="fig.foot.rx" :ry="fig.foot.ry" />
+        </g>
+        <rect :x="fig.neck.x" y="52" :width="fig.neck.w" height="26" rx="7" />
+        <ellipse cx="130" :cy="fig.head.cy" :rx="fig.head.rx" :ry="fig.head.ry" />
       </g>
-      <g
-        class="hit"
-        @mouseenter="enter('rad')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'rad')"
-      >
-        <path :d="body.line" class="outline-hit" />
-        <path :transform="MIRROR" :d="body.line" class="outline-hit" />
-        <path :d="body.line" class="ns" :style="style('rad', { fill: 'none', fillOpacity: 0 })" />
-        <path
-          :transform="MIRROR"
-          :d="body.line"
-          class="ns"
-          :style="style('rad', { fill: 'none', fillOpacity: 0 })"
-        />
+      <path :d="fig.hair" class="hair" />
+
+      <!-- Musculoskeletal: the long bones and the knees. -->
+      <g class="hit" :class="{ pulse: look.msk.pulse }" v-bind="hoverOn('msk')">
+        <g v-for="t in ['', MIRROR]" :key="t" :transform="t || undefined">
+          <path v-for="(d, i) in bones" :key="i" :d="d" class="bone" :style="boneStyle()" />
+          <circle :cx="knee[0]" :cy="knee[1]" r="4.5" :style="style('msk')" />
+        </g>
       </g>
-      <g
-        class="hit"
-        :style="style('msk')"
-        @mouseenter="enter('msk')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'msk')"
-      >
-        <path :d="body.leg" class="ns" />
-        <path :transform="MIRROR" :d="body.leg" class="ns" />
-        <path
-          d="M113 258L115 322M116 338L117 404M147 258L145 322M144 338L143 404"
-          class="ns"
-          style="fill: none; stroke-width: 1.5; stroke-linecap: round"
-        />
-        <path
-          d="M111 330a4 4 0 1 0 8 0a4 4 0 1 0-8 0M141 330a4 4 0 1 0 8 0a4 4 0 1 0-8 0"
-          class="ns"
-        />
+
+      <!-- Cardiovascular: lungs and heart. -->
+      <g class="hit" :class="{ pulse: look.cardio.pulse }" v-bind="hoverOn('cardio')">
+        <path :d="LUNG" :style="style('cardio')" class="soft" />
+        <path :d="LUNG" :transform="MIRROR" :style="style('cardio')" class="soft" />
+        <path :d="HEART" :style="style('cardio')" />
       </g>
-      <g
-        class="hit"
-        :style="style('cardio', { fillOpacity: 1 })"
-        @mouseenter="enter('cardio')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'cardio')"
-      >
-        <path
-          d="M126 96C117 94 107 100 104 114C102 129 103 146 107 159C114 161 121 157 125 151C126 132 127 111 126 96Z"
-          class="ns"
-          :style="{ fillOpacity: r.cardio.fo2 }"
-        />
-        <path
-          :transform="MIRROR"
-          d="M126 96C117 94 107 100 104 114C102 129 103 146 107 159C114 161 121 157 125 151C126 132 127 111 126 96Z"
-          class="ns"
-          :style="{ fillOpacity: r.cardio.fo2 }"
-        />
-        <path
-          d="M132 108C138 102 151 104 155 113C158 122 153 131 144 136C139 138 134 134 132 128C129 121 128 112 132 108Z"
-          class="ns"
-          :style="{ fillOpacity: r.cardio.fo }"
-        />
-        <path d="M136 106C136 100 142 97 147 101" class="ns" style="fill: none" />
+
+      <!-- Nutrition: stomach. -->
+      <g class="hit" :class="{ pulse: look.nutr.pulse }" v-bind="hoverOn('nutr')">
+        <path :d="STOMACH" :style="style('nutr')" />
       </g>
-      <g
-        class="hit"
-        @mouseenter="enter('nutr')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'nutr')"
-      >
-        <path
-          d="M137 164C145 160 154 163 154 173C154 184 147 191 138 192C132 193 129 189 131 185C134 183 140 184 143 179C145 175 139 173 137 169Z"
-          class="ns"
-          :style="style('nutr')"
+
+      <!-- Blood and biochemistry: kidneys. -->
+      <g class="hit" :class="{ pulse: look.blood.pulse }" v-bind="hoverOn('blood')">
+        <path :d="KIDNEY" :style="style('blood')" />
+        <path :d="KIDNEY" :transform="MIRROR" :style="style('blood')" />
+      </g>
+
+      <!-- Immune: lymph nodes. -->
+      <g class="hit" :class="{ pulse: look.immune.pulse }" v-bind="hoverOn('immune')">
+        <circle
+          v-for="(n, i) in NODES"
+          :key="i"
+          :cx="n[0]"
+          :cy="n[1]"
+          r="3.6"
+          :style="style('immune')"
         />
       </g>
-      <g
-        class="hit"
-        :style="style('blood')"
-        @mouseenter="enter('blood')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'blood')"
-      >
-        <path
-          d="M117 197C112 197 109 201 109 207C109 213 112 217 117 217C119 217 120 215 119 213C118 211 118 208 119 206C120 203 120 197 117 197Z"
-          class="ns"
+
+      <!-- Sleep, cognition and behavioural health: the brain. -->
+      <g class="hit" :class="{ pulse: look.head.pulse }" v-bind="hoverOn('head')">
+        <ellipse
+          :cx="brain.cx"
+          :cy="brain.cy"
+          :rx="brain.rx"
+          :ry="brain.ry"
+          :style="style('head')"
         />
-        <path
-          :transform="MIRROR"
-          d="M117 197C112 197 109 201 109 207C109 213 112 217 117 217C119 217 120 215 119 213C118 211 118 208 119 206C120 203 120 197 117 197Z"
-          class="ns"
-        />
+        <path :d="`M130 ${brain.cy - brain.ry + 2}V${brain.cy + brain.ry - 2}`" class="sulcus" />
       </g>
-      <g
-        class="hit"
-        :style="style('immune', { fillOpacity: r.immune.fo3 })"
-        @mouseenter="enter('immune')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'immune')"
-      >
-        <path
-          d="M120.5 69a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M133.1 69a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M98.8 125a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M154.8 125a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M110.8 250a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M142.8 250a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0"
-          class="ns"
-        />
+
+      <!-- Vision: the eyes. -->
+      <g class="hit" :class="{ pulse: look.eyes.pulse }" v-bind="hoverOn('eyes')">
+        <ellipse cx="123" :cy="eyeY" rx="4" ry="2.6" :style="style('eyes')" />
+        <ellipse cx="137" :cy="eyeY" rx="4" ry="2.6" :style="style('eyes')" />
       </g>
-      <g
-        class="hit"
-        :style="style('head')"
-        @mouseenter="enter('head')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'head')"
-      >
-        <path d="M115 27a15 12 0 1 0 30 0a15 12 0 1 0-30 0Z" class="ns" />
-        <path d="M130 16V38" class="ns" style="fill: none" />
-      </g>
-      <g
-        class="hit"
-        :style="style('eyes', { fillOpacity: r.eyes.fo3 })"
-        @mouseenter="enter('eyes')"
-        @mouseleave="leave"
-        @click.stop="emit('pick', 'eyes')"
-      >
-        <path
-          d="M119 44a4.2 2.4 0 1 0 8.4 0a4.2 2.4 0 1 0-8.4 0ZM132.6 44a4.2 2.4 0 1 0 8.4 0a4.2 2.4 0 1 0-8.4 0Z"
-          class="ns"
+
+      <!-- Radiation: dosimeter badge (the body outline shows the same status). -->
+      <g class="hit" :class="{ pulse: look.rad.pulse }" v-bind="hoverOn('rad')">
+        <circle
+          :cx="BADGE[0]"
+          :cy="BADGE[1]"
+          r="15"
+          :style="{ fill: badge.bg, stroke: badge.ring, strokeWidth: 1.5 }"
         />
+        <g :style="{ fill: badge.fg }">
+          <circle :cx="BADGE[0]" :cy="BADGE[1]" r="2.2" />
+          <path
+            v-for="a in [-90, 30, 150]"
+            :key="a"
+            :transform="`translate(${BADGE[0]} ${BADGE[1]}) rotate(${a})`"
+            d="M4 -3.2A5 5 0 0 1 4 3.2L9 6.5A10 10 0 0 0 9 -6.5Z"
+          />
+        </g>
       </g>
     </svg>
     <div v-if="tip" class="tip" :style="tip.style">
@@ -324,33 +416,71 @@ svg {
   width: 100%;
   height: 100%;
   display: block;
+  overflow: visible;
 }
 .hit {
   cursor: pointer;
 }
+.ground {
+  fill: var(--text-1);
+  opacity: 0.06;
+}
 .silhouette {
   fill: var(--body);
+  stroke: var(--body);
 }
-.outline-hit {
+.silhouette path,
+.silhouette ellipse,
+.silhouette rect {
+  stroke: none;
+}
+.hair {
+  fill: var(--organ);
+  pointer-events: none;
+}
+.bone {
   fill: none;
-  stroke: transparent;
-  stroke-width: 10;
-  vector-effect: non-scaling-stroke;
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
-.ns {
-  vector-effect: non-scaling-stroke;
-  stroke-linejoin: round;
+.soft {
+  fill-opacity: 0.75;
+}
+.sulcus {
+  fill: none;
+  stroke: var(--body);
+  stroke-width: 1.2;
+  pointer-events: none;
+}
+.hit path,
+.hit circle,
+.hit ellipse {
+  transition:
+    fill 300ms ease,
+    stroke 150ms ease;
+}
+.pulse {
+  animation: organPulse 1.6s ease-in-out infinite;
+}
+@keyframes organPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 .tip {
   position: absolute;
   z-index: 5;
   pointer-events: none;
-  width: 224px;
-  background: var(--panel-2);
-  border: 1px solid var(--border-2);
-  border-radius: 6px;
-  padding: 8px 12px 8px 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  width: 236px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px 9px 15px;
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 .tip .bar {
@@ -358,7 +488,7 @@ svg {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 4px;
 }
 .tip-head {
   display: flex;
