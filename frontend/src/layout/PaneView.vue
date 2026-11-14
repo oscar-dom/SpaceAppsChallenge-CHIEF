@@ -227,6 +227,9 @@ function contentDrop(e: DragEvent) {
       </div>
       <span class="grow" />
       <div class="tools">
+        <button class="icon-btn small" title="Split right" @click.stop="ws.splitRight(pane.id)">
+          <Icon name="split" :size="15" />
+        </button>
         <button
           v-if="canClose"
           class="icon-btn small"
