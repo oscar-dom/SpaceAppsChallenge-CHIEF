@@ -48,16 +48,18 @@ class ChiefService:
         turns.append(Turn("user", request.message))
 
         try:
-            output = await self._llm.generate(self._system, turns, LlmChatOutput)
+            result = await self._llm.generate(self._system, turns, LlmChatOutput)
         except LlmError as exc:
-            logger.warning("Chat fell back to the rules engine: %s", exc.__cause__ or exc)
+            logger.warning("Chat fell back to the rules engine: %s", exc)
             return self._chat_fallback(request)
 
+        output = result.output
         actions = sanitize_actions(output.actions, request.formulary, self._settings.max_actions)
         return ChatResponse(
             reply=output.reply.strip(),
             actions=enforce_escalation(actions, required),
             fallback=False,
+            model=result.model,
         )
 
     async def alert_actions(self, request: AlertActionsRequest) -> AlertActionsResponse:
@@ -67,17 +69,19 @@ class ChiefService:
 
         turns = [Turn("user", f"{render_context(request)}\n\n{alert_task(alert)}")]
         try:
-            output = await self._llm.generate(self._system, turns, LlmAlertOutput)
+            result = await self._llm.generate(self._system, turns, LlmAlertOutput)
         except LlmError as exc:
-            logger.warning("Alert actions fell back to the rules engine: %s", exc.__cause__ or exc)
+            logger.warning("Alert actions fell back to the rules engine: %s", exc)
             return self._alert_fallback(alert)
 
+        output = result.output
         actions = sanitize_actions(output.actions, request.formulary, self._settings.max_actions)
         return AlertActionsResponse(
             alert_id=alert.id,
             summary=output.summary.strip(),
             actions=enforce_escalation(actions, alert.escalation),
             fallback=False,
+            model=result.model,
         )
 
     # --- Fallback: answers built only from the rules engine output -------------------

@@ -13,13 +13,15 @@ class Settings(BaseSettings):
 
     # Gemini. Without an API key the agent still runs and answers in fallback mode.
     gemini_api_key: str = ""
-    # Pro models are not available to new free-tier keys; Flash answers in about 6-8 s.
-    gemini_model: str = "gemini-3.5-flash"
+    # Models tried in order, comma-separated. Free-tier quota is per model, so when one
+    # runs out (or is overloaded) the next one answers. Tested on 2026-11-14; Pro models
+    # are not available to new free-tier keys.
+    gemini_models: str = (
+        "gemini-3.5-flash,gemini-3.6-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite"
+    )
     gemini_temperature: float = 0.4
-    # Hard limit per answer, retries included. Past it, CHIEF answers in fallback mode.
+    # Time limit for one answer across the whole chain. Past it, CHIEF falls back.
     llm_timeout_seconds: float = 30.0
-    # Attempts per request (1 = no retry). The SDK default retries for minutes.
-    llm_attempts: int = 2
 
     # Speech-to-text (faster-whisper). Model size: tiny, base, small, medium...
     whisper_model: str = "base.en"
@@ -32,8 +34,12 @@ class Settings(BaseSettings):
     max_actions: int = 5
 
     @property
+    def model_chain(self) -> list[str]:
+        return [m.strip() for m in self.gemini_models.split(",") if m.strip()]
+
+    @property
     def llm_configured(self) -> bool:
-        return bool(self.gemini_api_key)
+        return bool(self.gemini_api_key) and bool(self.model_chain)
 
     @property
     def piper_voice_file(self) -> Path:

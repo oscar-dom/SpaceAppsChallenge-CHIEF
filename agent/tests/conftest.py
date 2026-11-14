@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from chief.api import create_app
 from chief.config import Settings
-from chief.llm import LlmError, Turn
+from chief.llm import LlmError, LlmResult, Turn
 
 
 class FakeLlm:
@@ -21,7 +21,7 @@ class FakeLlm:
         self.calls.append((system, turns))
         if self.fail:
             raise LlmError("fake failure")
-        return schema.model_validate(self.output)
+        return LlmResult(output=schema.model_validate(self.output), model="fake-model")
 
 
 def make_client(llm: FakeLlm | None) -> TestClient:

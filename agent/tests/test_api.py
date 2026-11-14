@@ -34,6 +34,7 @@ def test_chat_uses_llm_and_returns_camel_case(context: dict[str, Any]) -> None:
     assert data["fallback"] is False
     assert data["reply"] == "Your vitamin D is low."
     assert data["actions"][0]["medicationId"] == "vit-d3"
+    assert data["model"] == "fake-model"
 
     system, turns = llm.calls[0]
     assert "onboard formulary" in system.lower()
@@ -61,6 +62,7 @@ def test_chat_falls_back_when_llm_fails(context: dict[str, Any]) -> None:
     assert response.status_code == 200
     assert data["fallback"] is True
     assert "71/100" in data["reply"]
+    assert data["model"] is None
     assert data["actions"][0]["description"].startswith("Take the vitamin D supplement")
 
 
