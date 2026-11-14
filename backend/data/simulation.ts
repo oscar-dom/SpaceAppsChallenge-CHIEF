@@ -78,8 +78,8 @@ export const SIMULATION: Record<string, SimParams> = {
   // Not sampled from a distribution: integrated from the dose rate, starting at the dose of previous flights.
   'cumulative-radiation-dose': { base: 0, noise: 0, precision: 2, atHour: 23 },
   'calorie-intake': { base: 2600, noise: 180, precision: 0, min: 800, atHour: 20 },
-  hydration: { base: 2200, noise: 200, precision: 0, min: 500, atHour: 20 },
-  'calcium-intake': { base: 1000, noise: 100, precision: 0, min: 200, atHour: 20 },
+  hydration: { base: 2650, noise: 200, precision: 0, min: 500, atHour: 20 },
+  'calcium-intake': { base: 1150, noise: 100, precision: 0, min: 200, atHour: 20 },
 };
 
 /** Career dose in mSv of each crew member before this mission (C001..C004). Fictional. */
