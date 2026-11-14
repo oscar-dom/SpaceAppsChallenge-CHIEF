@@ -110,7 +110,8 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
   **past mission history** so weekly and monthly charts have data from the first second.
 - **Rules engine** (`backend/src/services`): deterministic, no AI. Compares each reading
   with its threshold and returns a status, computes each body system's status and the
-  **health score** (weighted average of system statuses, weights in config), and creates
+  **health score** (weighted average of system statuses, weights in config, kept inside
+  the band of the overall status: nominal 90-100, caution 70-89, critical 0-69), and creates
   alerts. It is the source of truth for every status shown in the UI.
 - **Agent** (`agent/`): receives the context from the backend and returns CHIEF's
   answers. Endpoints: `GET /health`, `POST /chat`, `POST /alerts/actions` (recommended

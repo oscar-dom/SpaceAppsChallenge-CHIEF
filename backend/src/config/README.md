@@ -38,6 +38,7 @@ variables: PORT: ...`) instead of failing later.
 | Constant | Value | Meaning |
 | --- | --- | --- |
 | `STATUS_SCORE` | nominal 100, caution 60, critical 20 | score of one metric, averaged into the system score |
+| `SCORE_BANDS` | nominal 90-100, caution 70-89, critical 0-69 | system and health scores are scaled linearly into the band of their status |
 | `STATUS_RANK` | nominal < caution < critical | order used to pick the worst status |
 | `SYSTEM_WEIGHTS` | cardiovascular 0.2, sleep-cognition 0.15, immune 0.05, the rest 0.1 | weight of each body system in the health score. Normalized over the systems with data, so they need not add up to 1 |
 | `TREND_MIN_CHANGE` | 0.03 | a change under 3 % between the first and last third of a series is `stable` |

@@ -13,6 +13,17 @@ export const STATUS_SCORE: Record<Status, number> = {
   critical: 20,
 };
 
+/**
+ * Score band of each status. System and health scores are scaled into the band of their
+ * status, so a score never looks healthier (or worse) than the status next to it: one
+ * critical metric keeps the score under 70. The UI can colour a score with these bands.
+ */
+export const SCORE_BANDS: Record<Status, { min: number; max: number }> = {
+  nominal: { min: 90, max: 100 },
+  caution: { min: 70, max: 89 },
+  critical: { min: 0, max: 69 },
+};
+
 /** Order of severity, used to pick the worst status. */
 export const STATUS_RANK: Record<Status, number> = { nominal: 0, caution: 1, critical: 2 };
 

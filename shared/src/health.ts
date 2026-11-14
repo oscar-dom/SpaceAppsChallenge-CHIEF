@@ -6,7 +6,10 @@ import type { BodySystemId } from './systems.js';
 export interface SystemStatus {
   system: BodySystemId;
   status: Status;
-  /** 0-100, higher is healthier. */
+  /**
+   * 0-100, higher is healthier. Always inside the band of `status`: nominal 90-100,
+   * caution 70-89, critical 0-69.
+   */
   score: number;
   metrics: MetricStatus[];
 }
@@ -14,7 +17,10 @@ export interface SystemStatus {
 /** Global state of a crew member, shown on the Overview. */
 export interface HealthScore {
   crewMemberId: string;
-  /** 0-100, weighted average of the system scores. */
+  /**
+   * 0-100, weighted average of the system scores, kept inside the band of `status`
+   * (nominal 90-100, caution 70-89, critical 0-69).
+   */
   score: number;
   status: Status;
   systems: SystemStatus[];
