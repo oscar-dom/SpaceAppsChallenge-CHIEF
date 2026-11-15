@@ -49,7 +49,7 @@ cue at 0 s sets where CHIEF starts, with no glide (e.g. hidden off-right).
 ## Making the video
 
 1. **Voice-over:** load the audio file in *Voice-over*. The current one is
-   [`voiceover.mp3`](voiceover.mp3) (30.6 s), and the page's default timeline is synced to it. While it plays in `talking`, CHIEF
+   [`voiceover.mp3`](voiceover.mp3) (30.6 s; AI text-to-speech made with ElevenLabs, voice "Jessica"), and the page's default timeline is synced to it. While it plays in `talking`, CHIEF
    follows the voice.
 2. **Timeline:** write one cue per line, matched to the script:
 

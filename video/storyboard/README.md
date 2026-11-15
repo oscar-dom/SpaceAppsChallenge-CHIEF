@@ -1,7 +1,8 @@
 # Pitch video storyboard
 
 An animatic of the 30-second video for the NASA Space Apps judges, timed to the final voice-over
-([`../chief-animator/voiceover.mp3`](../chief-animator/voiceover.mp3), 30.6 s):
+([`../chief-animator/voiceover.mp3`](../chief-animator/voiceover.mp3), 30.6 s; AI text-to-speech made
+with ElevenLabs, voice "Jessica"):
 
 1. The lonely ship over a cartoon Earth ("In orbit, the nearest doctor is 400 kilometres away.").
 2. A beam of light reaches the ship as the screen turns white ("Until now!").
