@@ -280,17 +280,17 @@ The full list, with how far each source was verified, is in
 
 | Source | Used for |
 | --- | --- |
-| **NASA OSDR**, Inspiration4 (OSD-569, OSD-575) | Real preflight blood values of the crew (white blood cells, glucose) and the baselines of the simulator |
-| **NASA DONKI** (space weather) | The real proton onsets of the May 2024 solar storm, replayed on board and on the mission route |
-| **NASA-STD-3001** Vol. 1 Rev. C | Career radiation limit (600 mSv) |
-| **NASA OCHMO** technical briefs | Bone mineral density targets, radiation protection |
-| **NASA JSC-67378** (2020) | Calcium, fluid and energy intake for exploration missions |
-| **NASA HRP Spaceflight Standard Measures** | Which indicators to track: sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral |
-| **NASA Life Support Baseline Values (BVAD)**, NASA/TP-2015-218570 | Daily food (1.83 kg) and water (2.5 kg) per crew member |
-| **NASA**, ISS water recovery milestone (2023) | 98% of the water used is reclaimed |
-| **ISS Medical Kit Checklist** (NASA, FOIA) | The onboard formulary, the only medication CHIEF may suggest |
-| ISS medication and sleep studies (Wotring 2015, Barger 2014, NASA NTRS) | Which medication the crew uses most, and when |
-| Clinical guidelines (AHA, ACC/AHA, ADA, AASM, WHO…) | Thresholds where NASA sets none, each cited |
+| [**NASA OSDR**, Inspiration4 (OSD-569, OSD-575)](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) | Real preflight blood values of the crew (white blood cells, glucose) and the baselines of the simulator |
+| [**NASA DONKI**](https://api.nasa.gov/) (space weather) | The real proton onsets of the May 2024 solar storm, replayed on board and on the mission route |
+| [**NASA-STD-3001** Vol. 1 Rev. C](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf) | Career radiation limit (600 mSv) |
+| **NASA OCHMO** technical briefs: [bone loss](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-030-bone-loss.pdf), [radiation](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf) | Bone mineral density targets, radiation protection |
+| [**NASA JSC-67378**](https://ntrs.nasa.gov/citations/20205008306) (2020) | Calcium, fluid and energy intake for exploration missions |
+| [**NASA HRP Spaceflight Standard Measures**](https://ntrs.nasa.gov/citations/20180002943) | Which indicators to track: sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral |
+| [**NASA Life Support Baseline Values (BVAD)**](https://ntrs.nasa.gov/citations/20180001338), NASA/TP-2015-218570 | Daily food (1.83 kg) and water (2.5 kg) per crew member |
+| **NASA**, [ISS water recovery milestone](https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station/) (2023) | 98% of the water used is reclaimed |
+| [**ISS Medical Kit Checklist**](https://www.nasa.gov/wp-content/uploads/2015/03/medical_kit_checklist_-_full_release.pdf) (NASA, FOIA) | The onboard formulary, the only medication CHIEF may suggest |
+| ISS medication and sleep studies ([Wotring 2015](https://doi.org/10.1096/fj.14-264838), [Barger 2014](https://pmc.ncbi.nlm.nih.gov/articles/PMC4188436/), [NASA NTRS](https://ntrs.nasa.gov/citations/20110020471)) | Which medication the crew uses most, and when |
+| Clinical guidelines ([ACC/AHA](https://doi.org/10.1161/HYP.0000000000000065), [ADA](https://professional.diabetes.org/standards-of-care), [AASM](https://pmc.ncbi.nlm.nih.gov/articles/PMC4434546/), [WHO](https://www.phenxtoolkit.org/protocols/view/91102)…; all in [`docs/data-sources.md`](docs/data-sources.md)) | Thresholds where NASA sets none, each cited |
 
 **In numbers:** 25 indicators, 9 body systems, 17 thresholds with a cited source, 4 crew
 members with real preflight baselines, 10 mission stages, 11 inventory items, 3 cargo ships.

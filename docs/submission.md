@@ -121,11 +121,14 @@ No NASA logos or branding are used in generated content.
 - NASA OCHMO Bone Loss technical brief: bone mineral density targets. https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-030-bone-loss.pdf
 - NASA JSC-67378 Rev. 1, Nutritional Requirements for Exploration Missions (2020): calcium, fluid and energy intake. https://ntrs.nasa.gov/citations/20205008306
 - NASA JSC clinical decision flow for vitamin D. https://ntrs.nasa.gov/citations/20130013531
-- NASA Human Research Program Spaceflight Standard Measures: which indicators to track (sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral).
+- NASA Human Research Program Spaceflight Standard Measures: which indicators to track (sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral). https://ntrs.nasa.gov/citations/20180002943
 - NASA Life Support Baseline Values and Assumptions Document (BVAD), NASA/TP-2015-218570/REV1: daily food (1.83 kg) and potable water (2.5 kg) per crew member. https://ntrs.nasa.gov/citations/20180001338
 - NASA, ISS water recovery milestone (2023): 98% of the water used is reclaimed. https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station/
 - NASA ISS Medical Kit Checklist: the onboard formulary, the only medication CHIEF may suggest. https://www.nasa.gov/wp-content/uploads/2015/03/medical_kit_checklist_-_full_release.pdf
-- NASA Technical Reports Server: space motion sickness incidence and treatment (NTRS 20110020471), radiation exposure in the South Atlantic Anomaly (NTRS 20040152077), external thermal environment of the ISS (NTRS 20180004474).
+- NASA Technical Reports Server:
+  - Space motion sickness incidence and treatment. https://ntrs.nasa.gov/citations/20110020471
+  - Radiation exposure of the ISS in the South Atlantic Anomaly. https://ntrs.nasa.gov/citations/20040152077
+  - External thermal environment of ISS operations. https://ntrs.nasa.gov/citations/20180004474
 - NASA, International Space Station visiting vehicles: the cargo ships and their cadence. https://www.nasa.gov/international-space-station/space-station-visiting-vehicles/
 Every source, and how far each threshold was verified, is listed in docs/data-sources.md of the repository.
 ```
@@ -136,23 +139,26 @@ Every source, and how far each threshold was verified, is listed in docs/data-so
 Space Agency Partner data: none used directly. The fictional crew includes ESA astronauts.
 
 Scientific and clinical references (thresholds where NASA sets none, each cited in the app):
-- WHO Pulse Oximetry Training Manual (2011), via the PhenX protocol: blood oxygen saturation.
-- 2017 ACC/AHA Guideline for High Blood Pressure in Adults: blood pressure.
-- American Heart Association (via Mayo Clinic): resting heart rate.
-- American Diabetes Association: fasting glucose.
+- WHO Pulse Oximetry Training Manual (2011), via the PhenX protocol: blood oxygen saturation. https://www.phenxtoolkit.org/protocols/view/91102
+- 2017 ACC/AHA Guideline for High Blood Pressure in Adults: blood pressure. https://doi.org/10.1161/HYP.0000000000000065
+- American Heart Association (via Mayo Clinic): resting heart rate. https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate
+- American Diabetes Association, Standards of Care in Diabetes: fasting glucose. https://professional.diabetes.org/standards-of-care
 - AASM and Sleep Research Society consensus (2015): sleep duration. https://pmc.ncbi.nlm.nih.gov/articles/PMC4434546/
-- National Sleep Foundation sleep quality recommendations (Ohayon et al., 2017): sleep efficiency.
-- CDC/AHA statement on C-reactive protein; hypercalciuria review (PubMed 28846247): urine calcium; ophthalmology references for intraocular pressure; Frisén scale for optic disc edema (Frisén, 1982).
+- National Sleep Foundation sleep quality recommendations (Ohayon et al., 2017): sleep efficiency. https://doi.org/10.1016/j.sleh.2016.11.006
+- CDC/AHA statement on markers of inflammation (Pearson et al., 2003): C-reactive protein. https://pubmed.ncbi.nlm.nih.gov/12551878/
+- Hypercalciuria review: urine calcium. https://pubmed.ncbi.nlm.nih.gov/28846247/
+- Frisén L., Swelling of the optic nerve head: a staging scheme (1982): optic disc edema. https://doi.org/10.1136/jnnp.45.1.13
+- Standard ophthalmology reference values: intraocular pressure (normal 10 to 21 mmHg).
 - Wotring VE, Medication use by U.S. crewmembers on the ISS, FASEB J 2015. https://doi.org/10.1096/fj.14-264838
 - Barger LK et al., Sleep deficiency and hypnotic use in astronauts, Lancet Neurol 2014. https://pmc.ncbi.nlm.nih.gov/articles/PMC4188436/
 - AMS-02 collaboration, ISS thermal operations (beta angle). https://ams02.space/de/node/489
 - NOAA Space Weather Scales (solar radiation storms). https://www.spaceweather.gov/node/415
-- ISS medication list (NASA, FOIA), reproduced by WikEM.
+- ISS medication list (NASA, FOIA), reproduced by WikEM. https://wikem.org/wiki/Common_medication_list_onboard_ISS/de
 
 Images and design assets:
 - Body outlines adapted from react-native-body-highlighter 3.2.0 (MIT License). https://github.com/HichamELBSI/react-native-body-highlighter
 - Organ icons from Health Icons (public domain, CC0 1.0). https://healthicons.org
-- IBM Plex Sans and IBM Plex Mono fonts (SIL Open Font License).
+- IBM Plex Sans and IBM Plex Mono fonts (SIL Open Font License). https://github.com/IBM/plex
 - The CHIEF mascot, the interface and all other graphics are our own.
 
 Software and models (open source):
