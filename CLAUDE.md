@@ -172,8 +172,9 @@ One view for every crew member: what an astronaut sees on board.
   measurements and sensors, with period selectors (day / week / month / whole mission),
   thresholds drawn on the charts and trend indicators.
 - **Right panel (navy like the navigation, collapsible to a rail):** alerts sorted by
-  severity and a Tasks tab with the scheduled measurements. **A new alert always opens the
-  panel.** **Clicking an alert asks CHIEF for recommended actions.**
+  severity and a Tasks tab with the scheduled measurements of the coming days. **A new
+  anomaly always opens the panel** (a new task only raises the badge). **Clicking an alert
+  asks CHIEF for recommended actions.**
 - **CHIEF chat:** text and voice (push-to-talk), on a light sky-blue panel (the mascot's
   colour) so it is told apart from the data and the navy alerts. If the voice service is
   down, the browser's Web Speech API is the fallback.

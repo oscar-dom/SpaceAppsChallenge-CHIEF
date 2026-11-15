@@ -42,11 +42,12 @@ describe('ui store: a new alert', () => {
     expect(ui.notifTab).toBe('alerts');
   });
 
-  it('shows Tasks when a reminder opens a collapsed panel', () => {
+  it('only raises the badge for a reminder when the panel is collapsed', () => {
     const ui = useUiStore();
     ui.toggleNotif();
     ui.alertArrived(alert('scheduled'));
-    expect(ui.notifOpen).toBe(true);
-    expect(ui.notifTab).toBe('tasks');
+    expect(ui.notifOpen).toBe(false);
+    expect(ui.autoNotice).toBe(false);
+    expect(ui.unread).toBe(1);
   });
 });

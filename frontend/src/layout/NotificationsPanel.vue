@@ -48,7 +48,8 @@ function relative(iso?: string) {
   if (!iso || !mission.clock) return '';
   const min = Math.round((Date.parse(iso) - Date.parse(mission.clock.missionTime)) / 60000);
   if (min <= 0) return 'due now';
-  return min < 60 ? `in ${min} min` : `in ${Math.round(min / 60)} h`;
+  if (min < 60) return `in ${min} min`;
+  return min < 48 * 60 ? `in ${Math.round(min / 60)} h` : `in ${Math.round(min / 1440)} d`;
 }
 
 function toggle(id: string) {

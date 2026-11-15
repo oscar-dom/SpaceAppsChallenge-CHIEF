@@ -67,7 +67,8 @@ other formats.
   Escalation comes from the threshold; the generic advice from the thresholds table is
   stored as `recommendation` (CHIEF's fallback).
 - **Scheduled reminders**: infrequent measurements done by the crew (not sensors,
-  cadence ≥ 7 days) get a reminder 6 h before they are due (last reading + cadence).
+  cadence ≥ 7 days) get a reminder 5 mission days before they are due (last reading +
+  cadence), so the Tasks tab always shows the next check-ups of the crew.
   Measurements due at the same instant share one alert ("Scheduled check-up: 8
   measurements"). Resolved when the new readings arrive.
 - A resolved alert is returned once in `updated` with `acknowledged: true`, so the UI can
