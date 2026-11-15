@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-label="Meet CHIEF: Crew Health Interactive Evaluation Framework">
+  <!-- README banner. The mascot is the app's CHIEF (frontend/src/components/Capsule.vue,
+       viewBox 48 x 48) in the light theme, waving with happy eyes. -->
+  <rect width="1200" height="420" fill="#ffffff"/>
+
+  <!-- CHIEF, scaled 7.5x from the 48-unit model -->
+  <g transform="translate(150 30) scale(7.5)">
+    <!-- left arm, at rest -->
+    <rect x="9" y="27" width="4" height="9" rx="2" fill="#2457d6"/>
+    <!-- right arm, raised and waving (pivot at the shoulder, 37 28) -->
+    <rect x="35" y="27" width="4" height="9" rx="2" fill="#2457d6" transform="rotate(-150 37 28)"/>
+    <!-- wave marks next to the hand -->
+    <path d="M42.6 13.2a3.2 3.2 0 0 1 1.6 2.8" fill="none" stroke="#2457d6" stroke-width="0.9" stroke-linecap="round" opacity="0.55"/>
+    <path d="M44.4 11.4a5.6 5.6 0 0 1 2.4 4.8" fill="none" stroke="#2457d6" stroke-width="0.9" stroke-linecap="round" opacity="0.35"/>
+    <!-- capsule: white helmet, cobalt suit, outline and seam -->
+    <path d="M13 24V17a11 11 0 0 1 22 0v7z" fill="#ffffff"/>
+    <path d="M13 24v8a11 11 0 0 0 22 0v-8z" fill="#2457d6"/>
+    <path d="M13 17a11 11 0 0 1 22 0v15a11 11 0 0 1-22 0z" fill="none" stroke="#0b0f14" stroke-opacity="0.35" stroke-width="1"/>
+    <path d="M13 24h22" stroke="#0b0f14" stroke-opacity="0.3" stroke-width="1"/>
+    <!-- visor with happy eyes -->
+    <rect x="16.5" y="11" width="15" height="9.5" rx="4.75" fill="#0e141b"/>
+    <path d="M18.8 16.7Q20.5 13.2 22.2 16.7M25.8 16.7Q27.5 13.2 29.2 16.7" fill="none" stroke="#2457d6" stroke-width="1.25" stroke-linecap="round"/>
+    <!-- chest plate -->
+    <rect x="20" y="28" width="8" height="4.5" rx="1" fill="#0b0f14" fill-opacity="0.28"/>
+  </g>
+
+  <!-- Meet CHIEF -->
+  <text x="600" y="220" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="700" letter-spacing="-1" fill="#1b2230">Meet <tspan fill="#2457d6">CHIEF</tspan></text>
+  <text x="603" y="268" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#4f5866"><tspan fill="#2457d6" font-weight="700">C</tspan>rew <tspan fill="#2457d6" font-weight="700">H</tspan>ealth <tspan fill="#2457d6" font-weight="700">I</tspan>nteractive <tspan fill="#2457d6" font-weight="700">E</tspan>valuation <tspan fill="#2457d6" font-weight="700">F</tspan>ramework</text>
+</svg>

@@ -6,6 +6,7 @@
 | [`database-schema.md`](database-schema.md) | SQLite database: tables, constraints, commands and access functions |
 | [`simulator.md`](simulator.md) | Mission simulator: clock, value model, parameters, demo scenarios, live API |
 | [`data-sources.md`](data-sources.md) | Every data source: real NASA datasets, threshold sources and verification, formulary, simulated assumptions |
+| [`submission.md`](submission.md) | Text for every field of the Space Apps project submission form, and the checklist before submitting |
 | [`database-decisions.md`](database-decisions.md) | Why the database, simulator and data look the way they do |
 | [`design/chief-mascot/`](design/chief-mascot/README.md) | Design of the CHIEF capsule mascot |
 
