@@ -42,11 +42,14 @@ until the next cue (CHIEF also looks that way).
 
 **Positions:** `center`, `left`, `right`, `top-left`, `top-right`, `bottom-left`,
 `bottom-right`, and `off-left` / `off-right` to enter or leave the frame. CHIEF glides there,
-leaning into the movement. The size slider scales it.
+leaning into the movement. The size slider scales it. A position can also be `X,Y`: the
+pixel of the 1920 × 1080 frame where CHIEF's centre goes, to point at a spot of the app. A
+cue at 0 s sets where CHIEF starts, with no glide (e.g. hidden off-right).
 
 ## Making the video
 
-1. **Voice-over:** load the audio file in *Voice-over*. While it plays in `talking`, CHIEF
+1. **Voice-over:** load the audio file in *Voice-over*. The current one is
+   [`voiceover.mp3`](voiceover.mp3) (30.6 s), and the page's default timeline is synced to it. While it plays in `talking`, CHIEF
    follows the voice.
 2. **Timeline:** write one cue per line, matched to the script:
 
@@ -56,7 +59,7 @@ leaning into the movement. The size slider scales it.
    ```
 
    `-` keeps the current value. Subtitles only help to rehearse: they are not recorded. The
-   page comes with a 30-second example.
+   page comes with the cues for `voiceover.mp3`.
 3. **Rehearse:** *Play timeline* plays the cues (and the voice, from the start). To frame
    CHIEF over the app, pick *App screenshot…* as the preview background.
 4. **Record:** *Record WebM* plays the timeline and downloads `chief-2d-alpha.webm`
