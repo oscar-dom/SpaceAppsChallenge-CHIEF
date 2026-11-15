@@ -366,12 +366,12 @@ scripts/    one-command launcher (start.mjs) and dev helpers
 
 ## Team
 
-| Member | Built |
-| --- | --- |
-| **Óscar Domínguez Álvarez** | CHIEF: the AI agent, its context and safety rules, alert recommendations and voice. Interface improvements: the redesign, the body map, JOURNEY (mission route and inventory). The demo video |
-| **Carlos Gonzalez Marcos** | Backend API, live updates and the rules engine. The demo video |
-| **Héctor San Cecilio Martín** | Database, NASA data ingestion, thresholds, simulator and demo scenarios. The demo video |
-| **Hernán Platero Domínguez** | The interface: layout, body maps, dashboards, alerts and chat |
+| Member | Area | Technologies |
+| --- | --- | --- |
+| **Óscar Domínguez Álvarez** | AI assistant (CHIEF): LLM orchestration, clinical context, safety guardrails, speech-to-text and text-to-speech · Frontend UX: design system, body map, JOURNEY views · Demo video | Python, FastAPI, Pydantic, Google Gemini API, faster-whisper, Piper · Vue 3, TypeScript, SVG · HTML Canvas |
+| **Carlos Gonzalez Marcos** | Backend: REST API, real-time updates, rules engine (statuses, health score, alerts), agent integration · Demo video | Node.js, Express, TypeScript, Socket.IO, Zod, Vitest |
+| **Héctor San Cecilio Martín** | Data and simulation: database schema, NASA dataset ingestion, sourced thresholds, mission simulator, demo scenarios · Demo video | SQLite, Drizzle ORM, TypeScript, NASA OSDR and DONKI APIs |
+| **Hernán Platero Domínguez** | Frontend: application layout, crew navigation, dashboards and charts, alerts panel, chat | Vue 3, Vite, TypeScript, Pinia, Socket.IO client, SVG |
 
 ---
 
