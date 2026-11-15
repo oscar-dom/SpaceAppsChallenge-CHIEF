@@ -163,16 +163,18 @@ One view for every crew member: what an astronaut sees on board.
 - **System sections:** a dashboard full of statistics for that system: every metric from
   measurements and sensors, with period selectors (day / week / month / whole mission),
   thresholds drawn on the charts and trend indicators.
-- **Right panel (collapsible to a rail):** alerts sorted by severity and a Tasks tab with
-  the scheduled measurements. **A new alert always opens the panel.** **Clicking an alert
-  asks CHIEF for recommended actions.**
+- **Right panel (navy like the navigation, collapsible to a rail):** alerts sorted by
+  severity and a Tasks tab with the scheduled measurements. **A new alert always opens the
+  panel.** **Clicking an alert asks CHIEF for recommended actions.**
 - **CHIEF chat:** text and voice (push-to-talk). If the voice service is down, the
   browser's Web Speech API is the fallback.
 - **CHIEF's mascot: "Capsule"**, a medicine capsule dressed as an astronaut, with four
   animated states (`idle`, `listening`, `thinking`, `alert`). It appears on the Talk to
   CHIEF button and in the chat. SVG, colors and the suggested Vue component:
   [`docs/design/chief-mascot/`](docs/design/chief-mascot/README.md). Its accent is sky
-  blue (amber in `alert`), never green or red, which mean health statuses.
+  blue, never green or red, which mean health statuses. The app shows the same blue
+  mascot on the button and in the chat (grey when CHIEF is offline); pending alerts are
+  told by the button's text, so the amber `alert` state is not used.
 
 The UI should feel like a spacecraft system: clear, dark-friendly, with subtle animation
 for live data and alert changes.

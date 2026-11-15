@@ -2,6 +2,7 @@ import type { Alert, AlertActionsResponse, ChiefMessage, RecommendedAction } fro
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { api } from '../api/client';
+import type { CapsuleState } from '../components/Capsule.vue';
 import { firstName } from '../lib/format';
 import { useMissionStore } from './mission';
 import { useUiStore } from './ui';
@@ -60,6 +61,15 @@ export const useChiefStore = defineStore('chief', () => {
   let spokenText = '';
 
   const messages = computed(() => threads.value[mission.selected] ?? []);
+
+  /**
+   * The mascot's state, the same on the Talk to CHIEF button and in the chat: sky blue,
+   * grey only when CHIEF is offline. Pending alerts are told by the button's text, not by
+   * turning the mascot amber, so amber keeps meaning a health status.
+   */
+  const mascot = computed<CapsuleState>(() =>
+    recording.value ? 'listening' : thinking.value ? 'thinking' : online.value ? 'idle' : 'offline',
+  );
 
   function thread(crewId: string): ChatMessage[] {
     if (!threads.value[crewId]) {
@@ -225,6 +235,7 @@ export const useChiefStore = defineStore('chief', () => {
     thinking,
     online,
     recording,
+    mascot,
     recordStart,
     voiceError,
     actions,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import Capsule, { type CapsuleState } from '../components/Capsule.vue';
+import Capsule from '../components/Capsule.vue';
 import Icon from '../components/Icon.vue';
 import { firstName, initials } from '../lib/format';
 import { NAV_SECTIONS, SECTIONS, type SectionId } from '../lib/sections';
@@ -68,13 +68,6 @@ const memberAlerts = computed(
     (mission.alerts[mission.selected] ?? []).filter((a) => a.kind === 'anomaly' && !a.acknowledged)
       .length,
 );
-
-const bubbleState = computed<CapsuleState>(() => {
-  if (chief.recording) return 'listening';
-  if (chief.thinking) return 'thinking';
-  if (!chief.online) return 'offline';
-  return memberAlerts.value ? 'alert' : 'idle';
-});
 
 const bubbleText = computed(() => {
   if (!chief.online) return 'Offline · standard advice';
@@ -199,7 +192,7 @@ const railW = `${NAV_RAIL_W}px`;
         title="Talk to CHIEF"
         @click="toggleChat"
       >
-        <span class="chief-capsule"><Capsule :state="bubbleState" :size="34" /></span>
+        <span class="chief-capsule"><Capsule :state="chief.mascot" :size="34" /></span>
         <span v-if="expanded" class="row-text">
           <span class="chief-title">Talk to CHIEF</span>
           <span class="chief-sub">{{ bubbleText }}</span>
@@ -220,10 +213,10 @@ const railW = `${NAV_RAIL_W}px`;
   transition: width 180ms ease;
   overflow: hidden;
   /* Status colours read on the navy chrome in both themes. */
-  --nominal: #4cc47f;
-  --caution: #f0b04a;
-  --critical: #ff6b61;
-  --nodata: #8b97ab;
+  --nominal: var(--chrome-nominal);
+  --caution: var(--chrome-caution);
+  --critical: var(--chrome-critical);
+  --nodata: var(--chrome-nodata);
 }
 .nav.rail {
   width: v-bind(railW);
