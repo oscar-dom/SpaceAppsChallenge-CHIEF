@@ -95,6 +95,7 @@ backend/    Express API + Socket.IO              :3000
     services/     rules engine, simulator, alerts, agent client
 agent/      Python FastAPI service: CHIEF + STT + TTS   :8000
 shared/     TypeScript types shared by frontend and backend
+video/      CHIEF animator for the demo video (not part of the app)
 ```
 
 ### Data flow
