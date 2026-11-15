@@ -1,5 +1,7 @@
 <p align="center"><img src="docs/assets/meet-chief.svg" alt="Meet CHIEF: Crew Health Interactive Evaluation Framework" width="100%"></p>
 
+<p align="center"><a href="https://www.youtube.com/watch?v=UQVu2BK1jBI"><img src="https://img.shields.io/badge/%E2%96%B6%20Watch%20the%2030--second%20demo-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch the 30-second demo on YouTube"></a></p>
+
 # CHIEF · Crew Health Interactive Evaluation Framework
 
 **The health system a spacecraft could carry.**
