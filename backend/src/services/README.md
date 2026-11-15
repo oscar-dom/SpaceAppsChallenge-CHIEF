@@ -14,7 +14,10 @@ the services call the database (`src/db`) and the agent. They know nothing about
 | `health.service.ts` | `HealthService` | reads a crew member's readings and runs the rules engine on them; chart series |
 | `alerts.service.ts` | `AlertsService` | keeps the `alerts` table in line with the engine: anomalies and scheduled reminders |
 | `chief.service.ts` | `ChiefService` | builds CHIEF's context, calls the agent, answers in fallback mode when it is down |
-| `live.service.ts` | `LiveService` | the tick loop and Socket.IO |
+| `live.service.ts` | `LiveService` | the tick loop and Socket.IO; broadcasts `inventory:updated` |
+| `inventory/inventory.service.ts` | `InventoryService` | ship stock, day-by-day history and crew adjustments; `catchUp()` books each finished day's use and the resupplies |
+| `inventory/journey.service.ts` | `JourneyService` | the 10-stage route, CHIEF's position, hazards, and what the inventory did (or will do) in each stage |
+| `inventory/simulate.ts` | pure functions | deterministic daily use per item (`dailyUse`) and `catchUpInventory`, shared by the seed and the live loop |
 | [`rules/`](rules/README.md) | pure functions | **rules engine**: statuses, system scores, health score, alert diff |
 | [`agent/`](agent/README.md) | `AgentClient` | HTTP client of the Python agent |
 | [`simulator/`](simulator/README.md) | `MissionSimulator` | Héctor's simulator: moves the clock and writes readings |
@@ -90,6 +93,9 @@ Every `TICK_INTERVAL_MS` (1 s):
    member's room) and `mission:clock` (to everyone).
 2. If readings were written, every crew member is re-evaluated: `health:updated`, then
    `alert:new` / `alert:updated` for the changes of `AlertsService.sync`.
+3. `inventory.catchUp()` books the use of every mission day that has ended (at 23:00)
+   and the cargo ships that docked. Any stock change, including a crew adjustment, goes
+   to every client as `inventory:updated` with the whole stock.
 
 A failed tick is logged and the loop goes on (it calls `tick()` itself instead of
 `simulator.start()` for that reason). On connection a client receives the clock; after

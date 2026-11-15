@@ -6,6 +6,8 @@ import { AlertsService } from './alerts.service.js';
 import { ChiefService } from './chief.service.js';
 import { CrewService } from './crew.service.js';
 import { HealthService } from './health.service.js';
+import { InventoryService } from './inventory/inventory.service.js';
+import { JourneyService } from './inventory/journey.service.js';
 import { MissionClock } from './mission-clock.js';
 
 export interface Services {
@@ -14,6 +16,8 @@ export interface Services {
   health: HealthService;
   alerts: AlertsService;
   chief: ChiefService;
+  inventory: InventoryService;
+  journey: JourneyService;
 }
 
 type ServicesEnv = Pick<Env, 'AGENT_URL' | 'AGENT_TIMEOUT_MS' | 'TIME_SCALE'>;
@@ -26,5 +30,7 @@ export function createServices(db: Db, env: ServicesEnv, logger: Logger): Servic
   const alerts = new AlertsService(db, clock, health);
   const agent = new AgentClient(env.AGENT_URL, env.AGENT_TIMEOUT_MS);
   const chief = new ChiefService(clock, crew, health, alerts, agent, logger);
-  return { clock, crew, health, alerts, chief };
+  const inventory = new InventoryService(db, clock);
+  const journey = new JourneyService(db, clock, inventory);
+  return { clock, crew, health, alerts, chief, inventory, journey };
 }

@@ -12,6 +12,8 @@ import {
   ALERT_SEVERITIES,
   BODY_SYSTEMS,
   ESCALATION_LEVELS,
+  INVENTORY_CATEGORIES,
+  INVENTORY_REASONS,
   type SourceReference,
   type Threshold,
 } from '@chief/shared';
@@ -26,6 +28,8 @@ import {
  *   thresholds       -> Threshold (a threshold without a source cannot be stored)
  *   alerts           -> Alert
  *   formulary        -> Medication (the onboard formulary CHIEF may suggest from)
+ *   inventory_items  -> InventoryItem (medication, food and water the ship carries)
+ *   inventory_events -> InventoryEvent (every change in stock: stock = initial + sum of deltas)
  *
  * Dates are the simulated mission time, `YYYY-MM-DDTHH:mm:ssZ` (UTC, no milliseconds). A CHECK on
  * every date column rejects any other format, so text comparison of ranges always works.
@@ -216,5 +220,66 @@ export const formulary = sqliteTable(
       'formulary_source_required',
       sql`json_valid(${t.source}) AND length(trim(coalesce(json_extract(${t.source}, '$.document'), ''))) > 0`,
     ),
+  ],
+);
+
+/** What the ship carries. Stock is not stored: it is the initial quantity plus every event's delta. */
+export const inventoryItems = sqliteTable(
+  'inventory_items',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    category: text('category', { enum: INVENTORY_CATEGORIES }).notNull(),
+    unit: text('unit').notNull(),
+    purpose: text('purpose').notNull(),
+    initialQuantity: real('initial_quantity').notNull(),
+    expectedDailyUse: real('expected_daily_use').notNull(),
+    recoveryRate: real('recovery_rate').notNull().default(0),
+    cautionDays: real('caution_days').notNull(),
+    criticalDays: real('critical_days').notNull(),
+    source: text('source', { mode: 'json' }).$type<SourceReference>().notNull(),
+  },
+  (t) => [
+    check(
+      'inventory_items_category_valid',
+      sql`${t.category} IN (${inList(INVENTORY_CATEGORIES)})`,
+    ),
+    check('inventory_items_initial_not_negative', sql`${t.initialQuantity} >= 0`),
+    check('inventory_items_recovery_range', sql`${t.recoveryRate} >= 0 AND ${t.recoveryRate} < 1`),
+    check(
+      'inventory_items_source_required',
+      sql`json_valid(${t.source}) AND length(trim(coalesce(json_extract(${t.source}, '$.document'), ''))) > 0`,
+    ),
+  ],
+);
+
+/**
+ * Ledger of stock changes. Simulated events (daily use, water recovery, resupplies) carry a `ref`
+ * ("day-12", "dragon-1") that is unique per item and reason, so writing them twice is a no-op.
+ * Crew adjustments have no ref.
+ */
+export const inventoryEvents = sqliteTable(
+  'inventory_events',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    itemId: text('item_id')
+      .notNull()
+      .references(() => inventoryItems.id),
+    at: text('at').notNull(),
+    /** 1-based mission day of `at`. */
+    day: integer('day').notNull(),
+    delta: real('delta').notNull(),
+    reason: text('reason', { enum: INVENTORY_REASONS }).notNull(),
+    ref: text('ref'),
+    note: text('note'),
+    crewId: text('crew_id').references(() => crewMembers.id),
+  },
+  (t) => [
+    check('inventory_events_at_format', sql`${t.at} GLOB ${sql.raw(ISO_DATE_GLOB)}`),
+    check('inventory_events_reason_valid', sql`${t.reason} IN (${inList(INVENTORY_REASONS)})`),
+    check('inventory_events_day_positive', sql`${t.day} > 0`),
+    check('inventory_events_delta_not_zero', sql`${t.delta} <> 0`),
+    uniqueIndex('inventory_events_ref_uq').on(t.itemId, t.reason, t.ref),
+    index('inventory_events_item_day_idx').on(t.itemId, t.day),
   ],
 );

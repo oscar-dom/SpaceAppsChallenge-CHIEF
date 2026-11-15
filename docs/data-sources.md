@@ -17,6 +17,10 @@ Related documents: [database](database-schema.md), [simulator](simulator.md), [d
 | NASA JSC-67378 Rev. 1 (2020) | NASA requirement | Calcium and fluid intake | `thresholds.ts`, `simulation.ts` |
 | NASA JSC clinical decision flow (vitamin D) | NASA document | Vitamin D deficiency and insufficiency | `thresholds.ts` |
 | NASA ISS Medical Kit Checklist and ISS medication list (FOIA) | NASA document | Onboard formulary | `formulary.ts` |
+| NASA Life Support Baseline Values and Assumptions Document (BVAD), NASA/TP-2015-218570/REV1 | NASA document | Daily food (1.83 kg) and potable water (2.5 kg) per crew member | `inventory.ts` |
+| NASA ISS water recovery milestone (June 2023) | NASA release | 98% of the water used is reclaimed | `inventory.ts` |
+| Wotring 2015 (FASEB J), Barger et al. 2014 (Lancet Neurol), Putcha et al. (NTRS 20110020471) | Peer-reviewed / NASA studies | Which medication is used most on the ISS (sleep, pain, congestion, allergy), sleep medication, motion sickness in the first days | `inventory.ts` |
+| NTRS 20040152077, AMS-02 thermal operations, NTRS 20180004474, NASA visiting vehicles | NASA papers and pages | Journey hazards (South Atlantic Anomaly, high beta angle, EVA environment) and cargo ships | `journey.ts` |
 | HRP Spaceflight Standard Measures | NASA programme | Which indicators to track (not raw data) | `metrics.ts` |
 | Clinical guidelines (AHA, ACC/AHA, ADA, AASM/SRS, NSF, CDC/AHA, WHO, hypercalciuria review, ophthalmology reference, Frisén scale) | Public guidelines | Thresholds where NASA sets none | `thresholds.ts` |
 | NOAA Space Weather Scales | Public scale | Proposed trigger for the solar-storm alert (not implemented) | — |
@@ -121,6 +125,34 @@ Full entries, with their fallback recommendations, are in [`backend/data/thresho
 - **No dosages**: CHIEF must never suggest doses beyond the formulary, and none was found with a citable source. Add one only with a source.
 - Ibuprofen carries a note of caution for crew members with asthma.
 
+## Journey and inventory
+
+The JOURNEY section splits the 180-day mission into **10 stages of 18 days** ([`backend/data/journey.ts`](../backend/data/journey.ts)) and tracks the ship's medication, food and water ([`backend/data/inventory.ts`](../backend/data/inventory.ts)).
+
+### Use rates (from NASA documents)
+
+| Item | Daily use | Source |
+| --- | --- | --- |
+| Packaged food (ISS menu, as shipped) | **1.83 kg** per crew member | BVAD Rev. 1 (2018), [NTRS 20180001338](https://ntrs.nasa.gov/citations/20180001338), Table 4-53 (ISS food system, Perchonok et al. 2002) |
+| Potable water (drinking and food rehydration) | **2.5 kg** per crew member | BVAD Rev. 1, Table 3-33 (nominal human metabolic interface values) |
+| Water reclaimed by life support | **98 %** of the water used | NASA, [Water Recovery Milestone on the ISS](https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station/) (June 2023), Brine Processor Assembly |
+| Medication mix | Sleep, pain, congestion and allergy medication used most; sleep aids about 10 times more than on Earth | Wotring 2015, FASEB J 29:4417 ([doi:10.1096/fj.14-264838](https://doi.org/10.1096/fj.14-264838)) |
+| Sleep medication | Hypnotic use (zolpidem, zaleplon) pervasive on ISS missions | Barger et al. 2014, Lancet Neurol ([PMC4188436](https://pmc.ncbi.nlm.nih.gov/articles/PMC4188436/)) |
+| Motion sickness medication | About 40 % of crew members sick in the first flight days; promethazine the most used treatment | Putcha, Younker, Daniels, [NTRS 20110020471](https://ntrs.nasa.gov/citations/20110020471) |
+
+### Journey hazards
+
+| Hazard | Kind | When | Basis |
+| --- | --- | --- | --- |
+| South Atlantic Anomaly passes | radiation | every day | Practically all trapped-proton exposure of the ISS happens in the SAA ([NTRS 20040152077](https://ntrs.nasa.gov/citations/20040152077)) |
+| Solar particle event | radiation, critical | day 56.3 to about 60.8 | **Real** May 2024 storm (NASA DONKI), same replay as the `solar-storm` scenario |
+| High beta angle (constant sunlight) | thermal | days 48–54, 108–114, 168–174 (**simulated** timing) | The beta angle follows the ~60-day precession of the orbit; above ~70° there is no orbital night ([AMS-02 thermal operations](https://ams02.space/de/node/489)) |
+| Spacewalks (EVA) | thermal | days 80 and 135 (**simulated**) | External thermal environment ([NTRS 20180004474](https://ntrs.nasa.gov/citations/20180004474)), decompression sickness and more radiation outside |
+
+Cargo ships follow the real vehicles and cadence ([NASA visiting vehicles](https://www.nasa.gov/international-space-station/space-station-visiting-vehicles/)): **Progress** (day 40), **Cargo Dragon** (day 95) and **Cygnus** (day 145). Their dates and cargo are **simulated**.
+
+Stock is shown as days of supply at the **average net use of the last 14 days**, so a burst of use (for example C004's sleep medication in the sleep-deprivation scenario) brings an item closer to a warning.
+
 ## Indicators and metric catalog
 
 The 25 metrics in [`backend/data/metrics.ts`](../backend/data/metrics.ts) cover the 9 body systems of `shared/`. They follow the kinds of indicators NASA's Human Research Program tracks in its Spaceflight Standard Measures (sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral). Individual HRP data is restricted (NASA Life Sciences Data Archive), so it informs which indicators to show, not the values.
@@ -139,6 +171,10 @@ These values are **not** from a source; they are plausible choices, always store
 | Storm dose-rate increase | +40 / +80 µSv/h, 10 h decay | Simulated; only the timing is real (DONKI) |
 | Nutrition intake | calcium 1150 mg/day, fluid 2650 mL/day, energy 2600 kcal/day | Set inside the JSC-67378 targets so healthy crew members stay nominal |
 | Demo scenarios | see [simulator.md](simulator.md) | Synthetic cases planted so alerts fire, as `CLAUDE.md` asks |
+| Inventory at launch and cargo of each ship | food 420 kg, water 900 kg, medication sized to the mission (20–120 units) | Simulated, sized so food dips before each resupply |
+| Medication use per crew member and day | a chance per drug (e.g. melatonin 8 %, zolpidem 7 %), x3 for C004 from day 44 (sleep-deprivation scenario), x130 for promethazine in days 1–3 | Simulated, ordered like the categories NASA reports as most used |
+| Day-to-day spread of food and water use | ±6 % and ±5 % | Simulated |
+| Stock warnings | food < 21 days, water < 30, medication < 40 days of supply (critical < 10, 10 and 14) | CHIEF's own logistics thresholds, not a NASA rule |
 
 ## Looked at but not used
 

@@ -25,6 +25,7 @@ The package is consumed as TypeScript source (no build step). Vite (frontend) an
 | `metrics.ts` | `Metric`, `Measurement`, `Threshold`, `MetricStatus`, `Period` |
 | `health.ts` | `SystemStatus`, `HealthScore` |
 | `alerts.ts` | `Alert`, `AlertKind`, `AlertSeverity` |
+| `journey.ts` | JOURNEY: `Journey`, `JourneyStage`, `Hazard`, `Resupply`; ship inventory: `InventoryItem`, `InventoryStock`, `InventoryEvent`, `InventoryHistory`, `StageInventory`, `InventoryAdjustRequest` |
 | `chief.ts` | CHIEF chat and alert actions (frontend ↔ backend), `Medication`, and the backend → agent contract (`Agent*`) |
 | `api.ts` | REST routes, `ApiError`, Socket.IO events |
 

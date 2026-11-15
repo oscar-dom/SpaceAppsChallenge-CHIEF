@@ -135,7 +135,8 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
 - **Body systems (menu sections):** `overview`, `cardiovascular`, `musculoskeletal`,
   `blood-biochemistry`, `immune`, `vision` (SANS), `sleep-cognition`,
   `behavioral-health`, `radiation`, `nutrition`
-- Core entities: `CrewMember`, `Metric`, `Measurement`, `Threshold`, `SystemStatus`,
+- Core entities (JOURNEY adds `Journey`, `Hazard`, `InventoryItem`, `InventoryEvent`):
+  `CrewMember`, `Metric`, `Measurement`, `Threshold`, `SystemStatus`,
   `HealthScore`, `Alert`, `ChiefMessage`, `Medication` (onboard formulary)
 
 The agent is Python: its Pydantic models (`agent/chief/schemas.py`) mirror the
@@ -148,11 +149,17 @@ backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
 
 One view for every crew member: what an astronaut sees on board.
 
-- **Left navigation (navy, always visible, can shrink to icons):** first the crew: a
-  **Crew overview** entry (every body, score and key vitals) and one row per crew member
+- **Left navigation (navy, always visible, can shrink to icons):** first **JOURNEY**
+  (see below), then the crew: a **Crew overview** entry (every body, score and key vitals) and one row per crew member
   with avatar, status ring and health score. Then the body-system sections of the selected
   person; the first entry is **Overview**. At the bottom, **Talk to CHIEF** as the primary
   button with the mascot.
+- **JOURNEY:** two tabs. **Route**: the 180-day mission as a path of **10 stages**
+  with CHIEF as the ship moving along it (done / to go), the hazards to prepare for
+  (radiation: South Atlantic Anomaly, solar particle events; thermal: high beta angle,
+  spacewalks) and the cargo ships; clicking a stage shows what the inventory did in it
+  (a forecast for stages not reached yet). **Inventory**: medication, food and water
+  with their history; the crew adds or removes stock to keep the count right.
 - **Top bar:** the selected crew member with their health score, then mission day,
   mission clock and crew dose rate.
 - **Workspace:** sections open as tabs. Dragging a section or a tab onto a pane's edge
@@ -207,6 +214,9 @@ NASA data and standards**, and document where every value or threshold comes fro
   threshold without a source.
 - **Onboard formulary:** the medication CHIEF is allowed to suggest, based on the ISS
   medical kit.
+- **Journey and inventory:** the 10 mission stages, their hazards and cargo ships, and
+  the ship stock (medication, food, water) with use rates from NASA documents (BVAD,
+  ISS medication studies). Stock is a ledger of changes, never a stored number.
 - **Demo scenarios:** synthetic cases planted on specific crew members so that alerts fire
   and CHIEF can propose solutions. Examples: early SANS (vision changes, headaches),
   vitamin D deficiency, sleep deprivation and slower reaction time, radiation spike from
