@@ -368,6 +368,24 @@
         object-fit: cover;
         object-position: center top;
       }
+      /* Scene 5: the screen focuses on what CHIEF points at. On "I alert you" (14.85 s, 0.25 s into
+         the scene) image9 gives way to image9_2 (only the alerts sharp); on "and tell you exactly
+         what to do" (17.9 s, 3.3 s in) image9_1 (only the chat sharp) covers it. */
+      .s5 .alerts-focus,
+      .s5 .chat-focus {
+        opacity: 0;
+      }
+      .s5.active .alerts-focus {
+        animation: chatFocus 0.4s ease 0.25s both;
+      }
+      .s5.active .chat-focus {
+        animation: chatFocus 0.4s ease 3.3s both;
+      }
+      @keyframes chatFocus {
+        to {
+          opacity: 1;
+        }
+      }
       /* Scene 8: four screenshots, one per quarter of the scene. */
       .multi img {
         opacity: 0;
@@ -869,6 +887,16 @@
               src="../screenshots/image9.png"
               alt="CHIEF's answer in the chat: what to do about high intraocular pressure, with escalation"
             />
+            <img
+              class="alerts-focus"
+              src="../screenshots/image9_2.png"
+              alt="The same screen blurred except the alerts panel, to stress the alerts"
+            />
+            <img
+              class="chat-focus"
+              src="../screenshots/image9_1.png"
+              alt="The same screen with CHIEF's chat enlarged and floating, to stress the answer"
+            />
           </div>
 
           <!-- 6 · Mission route -->
@@ -1141,7 +1169,7 @@
           chief: true,
           thumb: SHOT(9),
           visual:
-            'Screenshot 9, the whole sentence: the crew overview with the alerts panel and CHIEF’s answer in the chat. CHIEF first points at the alerts (from the chat’s empty space), then glides left and points at the answer: what it means, the actions and who to call, up to the flight surgeon.',
+            'Screenshot 9, the whole sentence: the crew overview with the alerts panel and CHIEF’s answer in the chat. CHIEF first points at the alerts (from the chat’s empty space) as the shot switches to screenshot 9_2 (only the alerts sharp), then glides left and points at the answer, and the shot switches to screenshot 9_1 (only the chat sharp): what it means, the actions and who to call, up to the flight surgeon.',
           onscreen: '—',
           audio: 'Alert chime, then a soft "resolve" tone.',
           transition: 'Cross-fade from screenshot 1.',
