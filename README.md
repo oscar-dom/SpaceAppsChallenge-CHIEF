@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/assets/meet-chief.svg" alt="Meet CHIEF: the crew health assistant on board" width="100%"></p>
+
 # CHIEF: the health system a spacecraft could carry
 
 > **NASA Space Apps Challenge.** A visual tool that helps astronauts assess their own health
@@ -224,17 +226,19 @@ a day, 98% reclaimed.
 
 ## How it works
 
-```
-                 ┌──────────────────────────── one laptop, no GPU ─────────────────────────────┐
-                 │                                                                              │
-  Simulator ──▶ SQLite ──▶ Rules engine ──▶ statuses · health score · alerts                  │
-  (mission clock,          (deterministic,          │                                          │
-   600× real time)          NASA thresholds)        ├──▶ Socket.IO ──▶ Vue interface (:5173)   │
-                                                    │                                          │
-                                                    └──▶ context ──▶ CHIEF agent (:8000) ──────┼──▶ Gemini
-                                                                     Whisper (speech-to-text)  │   (only part
-                                                                     Piper (text-to-speech)    │    online)
-                 └──────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+  subgraph laptop["One laptop · no GPU · local data"]
+    direction LR
+    SIM["Simulator<br/>mission clock, 600× real time"] --> DB[("SQLite")]
+    DB --> RULES["Rules engine<br/>deterministic, NASA thresholds"]
+    RULES --> OUT["Statuses · health score · alerts"]
+    OUT -- "Socket.IO, live" --> UI["Vue interface<br/>:5173"]
+    UI -- "REST" --> API["Backend API<br/>:3000"]
+    OUT -- "crew context" --> API
+    API --> AGENT["CHIEF agent :8000<br/>Whisper speech-to-text<br/>Piper text-to-speech"]
+  end
+  AGENT -- "the only online part" --> GEMINI[("Google Gemini")]
 ```
 
 | Layer | Technology | Role |
@@ -364,9 +368,9 @@ scripts/    one-command launcher (start.mjs) and dev helpers
 
 | Member | Built |
 | --- | --- |
-| **Óscar** | CHIEF: the AI agent, its context and safety rules, alert recommendations, voice |
-| **Carlos** | Backend API, live updates and the rules engine |
-| **Héctor** | Database, NASA data ingestion, thresholds, simulator and demo scenarios |
+| **Óscar** | CHIEF: the AI agent, its context and safety rules, alert recommendations and voice. Interface improvements: the redesign, the body map, JOURNEY (mission route and inventory). The demo video |
+| **Carlos** | Backend API, live updates and the rules engine. The demo video |
+| **Héctor** | Database, NASA data ingestion, thresholds, simulator and demo scenarios. The demo video |
 | **Hernán** | The interface: layout, body maps, dashboards, alerts and chat |
 
 ---
