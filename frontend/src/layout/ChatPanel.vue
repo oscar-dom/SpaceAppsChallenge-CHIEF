@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import ActionList from '../components/ActionList.vue';
-import Capsule, { type CapsuleState } from '../components/Capsule.vue';
+import Capsule from '../components/Capsule.vue';
 import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { firstName } from '../lib/format';
@@ -26,9 +26,6 @@ const BARS = Array.from({ length: 28 }, (_, i) => ({
   delay: `${-((i * 53) % 10) / 10}s`,
 }));
 
-const mascot = computed<CapsuleState>(() =>
-  chief.recording ? 'listening' : chief.thinking ? 'thinking' : chief.online ? 'idle' : 'offline',
-);
 const statusText = computed(() =>
   chief.recording
     ? 'Listening…'
@@ -77,7 +74,7 @@ const chatW = `${CHAT_W}px`;
 <template>
   <aside class="chat">
     <div class="head">
-      <Capsule :state="mascot" :size="36" />
+      <Capsule :state="chief.mascot" :size="36" />
       <div class="who">
         <span class="name">CHIEF</span>
         <span class="muted small ellipsis">{{ statusText }}</span>

@@ -60,8 +60,13 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
     other: opening the chat collapses the navigation to its rail, and expanding the
     navigation closes the chat, so one pane always fits.
   - Panel widths live in `src/lib/shell.ts`, shared by the panels' styles and the workspace.
-- **Notifications:** alerts (anomalies) and tasks (scheduled measurements). The panel
-  collapses to a rail, but a new alert from the backend always opens it again.
+- **Notifications:** alerts (anomalies) and tasks (scheduled measurements), on the same navy
+  layer as the navigation (`.chrome-surface` in `base.css` remaps the tokens, so the alert
+  cards, chips and buttons inside follow). The panel collapses to a rail, but a new alert
+  from the backend always opens it again.
+- **CHIEF's mascot:** the same sky-blue Capsule on the Talk to CHIEF button and in the chat
+  (`chief.mascot`): listening, thinking, idle, or grey when CHIEF is offline. Pending alerts
+  are told by the button's text, not by an amber mascot, so amber keeps meaning a status.
 - **CHIEF chat:** text and push-to-talk. The recording goes to `/api/chief/stt`; if the
   voice service fails, the browser's Web Speech API transcript is used. Answers to voice
   questions are read aloud (`/api/chief/tts`, or the browser's speech synthesis). When the
@@ -83,8 +88,10 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
 ## Design rules
 
 - **Two layers.** Data sits on a warm off-white canvas with white cards: dense numbers read
-  best dark on light, and a warm neutral glares less than pure white. Navigation sits on a
-  deep navy layer, so who and where are found at a glance and never mix with the data.
+  best dark on light, and a warm neutral glares less than pure white. Navigation and
+  notifications sit on a deep navy layer that frames the workspace on both sides, so who
+  and where, and what needs attention, are found at a glance and never mix with the data.
+  On navy, text and status colours are brightened to keep AA contrast (`--chrome-*`).
 - **Colour is for state.** Green, amber and red mean **health status only**, so menus and
   buttons use a cobalt blue accent (selection, focus, primary actions, links), never green.
   Following high-performance HMI practice (ISA-101), nominal things stay neutral and only

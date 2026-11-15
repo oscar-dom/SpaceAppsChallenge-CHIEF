@@ -36,6 +36,11 @@
   --chrome-text: #eef2f8;
   --chrome-muted: #9fb0c9;
   --chrome-accent: #7cb6ff;
+  /* Status colours brightened to read (AA) on the navy chrome, in both themes. */
+  --chrome-nominal: #4cc47f;
+  --chrome-caution: #f0b04a;
+  --chrome-critical: #ff6b61;
+  --chrome-nodata: #8b97ab;
   /* Body map. */
   --body: #e6e1d8;
   --body-line: #cfc7b9;
@@ -74,6 +79,34 @@
   --body-line: #3a4766;
   --organ: #8592ad;
   --capsule-shell: #e8edf5;
+  color-scheme: dark;
+}
+
+/* A side panel on the navy chrome layer (the notifications, framing the workspace with the
+   navigation). Remaps the surface tokens, so everything inside (cards, chips, buttons)
+   follows without its own styles. Text and status colours keep AA contrast on navy. */
+.chrome-surface {
+  --bg: var(--chrome);
+  --panel: var(--chrome);
+  --panel-2: var(--chrome-2);
+  --panel-3: var(--chrome-3);
+  --border: var(--chrome-line);
+  --border-2: rgba(255, 255, 255, 0.18);
+  --text-1: var(--chrome-text);
+  --text-2: var(--chrome-muted);
+  --text-3: #93a4c0;
+  --accent: var(--chrome-accent);
+  --accent-strong: #a5ccff;
+  --accent-tint: rgba(124, 182, 255, 0.16);
+  --on-accent: #0b1220;
+  --nominal: var(--chrome-nominal);
+  --caution: var(--chrome-caution);
+  --critical: var(--chrome-critical);
+  --nodata: var(--chrome-nodata);
+  --info: var(--chrome-muted);
+  --shadow: none;
+  background: var(--chrome);
+  color: var(--text-1);
   color-scheme: dark;
 }
 

@@ -22,7 +22,7 @@ Set one state class next to `chief` on the root `<svg>`:
 | `idle` | Default, nothing happening | Floats with a gentle tilt and blinks |
 | `listening` | The crew member is talking (push-to-talk held, STT running) | A halo pulses and the right arm waves |
 | `thinking` | Waiting for the agent's answer | Eyes narrow, three dots orbit |
-| `alert` | An unacknowledged `caution`/`critical` alert exists | Pill half turns amber, shakes, warning badge |
+| `alert` | An unacknowledged `caution`/`critical` alert exists | Pill half turns amber, shakes, warning badge. Not used by the app: the button stays blue and says how many alerts are pending |
 
 `prefers-reduced-motion` turns every animation off.
 

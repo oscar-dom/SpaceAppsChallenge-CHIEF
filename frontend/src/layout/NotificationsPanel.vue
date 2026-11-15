@@ -59,7 +59,7 @@ const railW = `${NOTIF_RAIL_W}px`;
 </script>
 
 <template>
-  <aside v-if="ui.notifOpen" class="notif">
+  <aside v-if="ui.notifOpen" class="notif chrome-surface">
     <div class="tabs">
       <button
         v-for="t in [
@@ -143,7 +143,7 @@ const railW = `${NOTIF_RAIL_W}px`;
     </div>
   </aside>
 
-  <aside v-else class="rail">
+  <aside v-else class="rail chrome-surface">
     <button class="icon-btn" title="Expand notifications" @click="ui.toggleNotif()">
       <Icon name="chevsLeft" />
     </button>
