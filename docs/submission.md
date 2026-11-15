@@ -20,6 +20,15 @@ Everything on the form must be in English.
       Judging** before **Sunday 15 November, 23:59** (local time of the Local Event). It can be
       edited and resubmitted until then; the last save is judged.
 
+## Team
+
+| Member | Role |
+| --- | --- |
+| Óscar Domínguez Álvarez | CHIEF, the AI agent and voice; interface improvements (redesign, body map, JOURNEY); demo video |
+| Carlos Gonzalez Marcos | Backend API, live updates and the rules engine; demo video |
+| Héctor San Cecilio Martín | Database, NASA data ingestion, thresholds, simulator and demo scenarios; demo video |
+| Hernán Platero Domínguez | The interface: layout, body maps, dashboards, alerts and chat |
+
 ---
 
 ## Project Name

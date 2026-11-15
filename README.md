@@ -368,10 +368,10 @@ scripts/    one-command launcher (start.mjs) and dev helpers
 
 | Member | Built |
 | --- | --- |
-| **Óscar** | CHIEF: the AI agent, its context and safety rules, alert recommendations and voice. Interface improvements: the redesign, the body map, JOURNEY (mission route and inventory). The demo video |
-| **Carlos** | Backend API, live updates and the rules engine. The demo video |
-| **Héctor** | Database, NASA data ingestion, thresholds, simulator and demo scenarios. The demo video |
-| **Hernán** | The interface: layout, body maps, dashboards, alerts and chat |
+| **Óscar Domínguez Álvarez** | CHIEF: the AI agent, its context and safety rules, alert recommendations and voice. Interface improvements: the redesign, the body map, JOURNEY (mission route and inventory). The demo video |
+| **Carlos Gonzalez Marcos** | Backend API, live updates and the rules engine. The demo video |
+| **Héctor San Cecilio Martín** | Database, NASA data ingestion, thresholds, simulator and demo scenarios. The demo video |
+| **Hernán Platero Domínguez** | The interface: layout, body maps, dashboards, alerts and chat |
 
 ---
 
