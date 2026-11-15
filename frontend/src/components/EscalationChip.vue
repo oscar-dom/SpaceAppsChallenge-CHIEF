@@ -33,11 +33,4 @@ defineProps<{ level: EscalationLevel }>();
   background: var(--panel-3);
   color: var(--text-1);
 }
-/* The flight-surgeon chip is the only inverse element in the UI. */
-.inverse {
-  border-color: var(--text-1);
-  background: var(--text-1);
-  color: var(--bg);
-  font-weight: 600;
-}
 </style>

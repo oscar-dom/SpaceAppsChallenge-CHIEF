@@ -84,14 +84,14 @@ export function cutoffs(t: Threshold): Cutoffs | null {
 export interface EscalationStyle {
   label: string;
   icon: IconName;
-  variant: 'outline' | 'filled' | 'inverse';
+  variant: 'outline' | 'filled';
 }
 
-/** Escalation rises in emphasis, not hue: outline, filled, inverse. */
+/** Escalation rises in emphasis, not hue: outline, then filled. */
 export const ESCALATION: Record<EscalationLevel, EscalationStyle> = {
   'self-care': { label: 'Self-care', icon: 'user', variant: 'outline' },
   'crew-medical-officer': { label: 'Crew Medical Officer', icon: 'steth', variant: 'filled' },
-  'flight-surgeon': { label: 'Contact flight surgeon', icon: 'phone', variant: 'inverse' },
+  'flight-surgeon': { label: 'Flight surgeon', icon: 'phone', variant: 'filled' },
 };
 
 export const ACTION_CATEGORY: Record<ActionCategory, { label: string; icon: IconName }> = {
