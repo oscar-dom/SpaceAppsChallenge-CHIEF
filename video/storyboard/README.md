@@ -22,7 +22,12 @@ frame or the audio when opened from disk, serve the `video` folder (`npx serve v
 `/storyboard/`.
 
 - **Play** starts the voice-over and CHIEF's timeline together. **Voice-over** off plays it silent.
-- **Export video** records the stage with the voice-over and downloads `chief-pitch-video.webm`
+- **Music** plays a score and sound effects synthesised in the page with Web Audio (no audio
+  files, no licences), on the same clock as the scenes and about 10 dB under the voice: a lonely
+  minor drone with a heartbeat, a riser into the beam, a warm chime for "Hi", a light pulse under
+  the features (a friendly alert chime, a rising tone when CHIEF resolves it), a build through the
+  body systems and a bright chord for the payoff. The plan is in `buildScore` in `index.html`.
+- **Export video** records the stage with the voice-over and music and downloads `chief-pitch-video.webm`
   when it ends. Chrome asks what to share: pick this tab. It needs the page served (see above) for
   the voice; the video's size is the stage's size on screen, so widen the window first.
 - **Full screen** or `F` shows only the stage, clean, to screen-record it; `Space` plays, `R`

@@ -969,11 +969,15 @@
           <button id="fullscreen" title="Full screen for recording (F). Space plays, Esc exits.">
             ⛶ Full screen
           </button>
-          <button id="export" title="Record the stage with the voice-over and download it (WebM)">
+          <button
+            id="export"
+            title="Record the stage with the voice-over and music and download it (WebM)"
+          >
             ⬇ Export video
           </button>
           <label class="vo"><input type="checkbox" id="voToggle" checked /> 🔊 Voice-over</label>
           <label class="vo"><input type="checkbox" id="subsToggle" checked /> CC Subtitles</label>
+          <label class="vo"><input type="checkbox" id="musicToggle" checked /> 🎵 Music</label>
           <span class="grow"></span>
           <span class="clock" id="clock">0.0 s / 30.6 s</span>
         </div>
@@ -982,7 +986,8 @@
           Press Play: the voice-over and CHIEF's timeline start together; Pause keeps the place and
           Play goes on from there (Restart, or <kbd>R</kbd>, starts over; a scene on the timeline
           jumps to it). Voice-over off: the same 30.6 s without sound, to screen-record the stage in
-          full screen. Subtitles can be turned off for a clean recording.
+          full screen. Subtitles can be turned off for a clean recording. The music and sound
+          effects are synthesised in the page and follow the scenes (🎵 turns them off).
         </p>
       </section>
 
@@ -1653,6 +1658,289 @@
       }
       document.querySelectorAll('svg.earth').forEach((svg, k) => buildEarth(svg, k));
 
+      /* ---------- Music and sound effects ----------
+         Synthesised with Web Audio (no files, no licences), on the same clock as the scenes, so
+         Pause and Play resume it in place. The score follows the story and stays under the voice
+         (ducked while CHIEF speaks):
+         1 Alone: a low minor drone, a distant ping and a faint heartbeat (isolation, health).
+         2 Beam: a riser and a whoosh as the light travels; the chord turns hopeful.
+         3 Hi: a warm major chime, CHIEF's sound.
+         4-7 Features: a light, steady pulse (D A Bm G), a soft tick on every cut. The alert is a
+           friendly two-note chime (attention, not alarm), the music thins while CHIEF "connects
+           the dots" and a rising tone resolves it.
+         8 Body systems: the pulse builds (kick on every beat, hats, a riser).
+         9 Payoff: an impact and a wide, bright chord that rings out to the end. */
+      const musicToggle = document.getElementById('musicToggle');
+      let audioGraph = null;
+      function audioOut() {
+        if (!audioGraph) {
+          const ctx = new AudioContext();
+          const out = ctx.createGain();
+          const dest = ctx.createMediaStreamDestination(); // what Export records
+          out.connect(ctx.destination);
+          out.connect(dest);
+          audioGraph = { ctx, out, dest };
+        }
+        return audioGraph;
+      }
+      function reverbImpulse(ctx, seconds = 2.5) {
+        const len = Math.round(ctx.sampleRate * seconds);
+        const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+        for (let c = 0; c < 2; c++) {
+          const d = ir.getChannelData(c);
+          for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 3;
+        }
+        return ir;
+      }
+
+      /* Schedules the score from song second `from`; `base` is the context time of second 0.
+         Returns { stop(at) } to fade it out (on Pause). */
+      function buildScore(ctx, out, from, base) {
+        const start = base + from;
+        // Voices -> bus (dry) and send -> reverb, both into master (level, ducking, fade out).
+        const master = ctx.createGain();
+        const bus = ctx.createGain();
+        const send = ctx.createGain();
+        const verb = ctx.createConvolver();
+        const verbOut = ctx.createGain();
+        verb.buffer = reverbImpulse(ctx);
+        verbOut.gain.value = 0.5;
+        master.connect(out);
+        bus.connect(master);
+        send.connect(verb).connect(verbOut).connect(master);
+        const T = (t) => Math.max(base + t, start);
+        const M = (n) => 440 * 2 ** ((n - 69) / 12);
+        const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+        noiseBuf.getChannelData(0).forEach((_, i, d) => (d[i] = Math.random() * 2 - 1));
+
+        // One voice: source -> low-pass -> envelope -> bus (+ reverb send).
+        function voice(src, node, o) {
+          const { t, dur, gain, attack = 0.01, release = 0.3, rev = 0.3, cutoff = 12000 } = o;
+          if (t + dur <= from) return false;
+          const f = ctx.createBiquadFilter();
+          f.frequency.value = cutoff;
+          const g = ctx.createGain();
+          node.connect(f).connect(g).connect(bus);
+          if (rev) {
+            const r = ctx.createGain();
+            r.gain.value = rev;
+            g.connect(r).connect(send);
+          }
+          const a = T(t);
+          const peak = t >= from ? base + t + attack : a + 0.08; // joined late: quick fade in
+          g.gain.setValueAtTime(0, a);
+          g.gain.linearRampToValueAtTime(gain, peak);
+          g.gain.setValueAtTime(gain, Math.max(base + t + dur, peak));
+          g.gain.exponentialRampToValueAtTime(0.0001, Math.max(base + t + dur, peak) + release);
+          src.start(a);
+          src.stop(Math.max(base + t + dur, peak) + release + 0.05);
+          return true;
+        }
+        function osc(type, freq, o) {
+          const x = ctx.createOscillator();
+          x.type = type;
+          x.frequency.value = freq;
+          if (o.detune) x.detune.value = o.detune;
+          voice(x, x, o);
+          return x;
+        }
+        function noise(t, dur, gain, f0, f1, o = {}) {
+          if (t + dur <= from) return;
+          const x = ctx.createBufferSource();
+          x.buffer = noiseBuf;
+          x.loop = true;
+          const bp = ctx.createBiquadFilter();
+          bp.type = o.type || 'bandpass';
+          bp.Q.value = o.q ?? 1.2;
+          bp.frequency.setValueAtTime(f0, T(t));
+          bp.frequency.exponentialRampToValueAtTime(f1, Math.max(base + t + dur, T(t) + 0.01));
+          x.connect(bp);
+          const attack = o.attack ?? dur * 0.85;
+          voice(x, bp, {
+            t,
+            dur: dur - attack * 0.15,
+            gain,
+            attack,
+            release: o.release ?? 0.15,
+            rev: 0.4,
+          });
+        }
+        const pad = (notes, t, dur, gain, cutoff = 1800, release = 1.4) =>
+          notes.forEach((n) =>
+            [-8, 8].forEach((detune) =>
+              osc('sawtooth', M(n), {
+                t,
+                dur,
+                gain: gain / 2,
+                attack: 0.9,
+                release,
+                cutoff,
+                rev: 0.5,
+                detune,
+              }),
+            ),
+          );
+        const bass = (n, t, dur, gain) =>
+          osc('triangle', M(n), { t, dur, gain, attack: 0.02, release: 0.15, cutoff: 500, rev: 0 });
+        const pluck = (n, t, gain) =>
+          t >= from &&
+          osc('triangle', M(n), {
+            t,
+            dur: 0.04,
+            gain,
+            attack: 0.004,
+            release: 0.35,
+            cutoff: 3200,
+            rev: 0.35,
+          });
+        function bell(n, t, gain) {
+          if (t < from) return;
+          osc('sine', M(n), { t, dur: 0.02, gain, attack: 0.004, release: 1.6, rev: 0.7 });
+          osc('sine', M(n) * 2.76, {
+            t,
+            dur: 0.01,
+            gain: gain * 0.3,
+            attack: 0.004,
+            release: 0.6,
+            rev: 0.7,
+          });
+        }
+        function kick(t, gain, f0 = 120, f1 = 45, len = 0.22) {
+          if (t < from) return;
+          const x = ctx.createOscillator();
+          x.frequency.setValueAtTime(f0, base + t);
+          x.frequency.exponentialRampToValueAtTime(f1, base + t + len * 0.6);
+          voice(x, x, { t, dur: 0.02, gain, attack: 0.003, release: len, rev: 0.05 });
+        }
+        const hat = (t, gain) =>
+          t >= from &&
+          noise(t, 0.04, gain, 9000, 9000, {
+            type: 'highpass',
+            q: 0.7,
+            attack: 0.002,
+            release: 0.05,
+          });
+        function tick(t) {
+          if (t < from) return;
+          osc('sine', 2400, { t, dur: 0.01, gain: 0.05, attack: 0.002, release: 0.08, rev: 0.2 });
+          hat(t, 0.06);
+        }
+
+        // Overall level well under the voice (about 10 dB below it), ducked further while CHIEF speaks.
+        const LEVEL = 0.3;
+        const DUCK = LEVEL * 0.6;
+        const talking = (t) => SUBS.some(([a, b]) => t >= a - 0.1 && t < b + 0.15);
+        master.gain.setValueAtTime(talking(from) ? DUCK : LEVEL, start);
+        SUBS.forEach(([a, b]) => {
+          if (a - 0.1 > from) master.gain.setTargetAtTime(DUCK, base + a - 0.25, 0.08);
+          if (b + 0.15 > from) master.gain.setTargetAtTime(LEVEL, base + b + 0.15, 0.25);
+        });
+
+        const CH = {
+          Dm: [62, 65, 69],
+          Bb: [58, 62, 65],
+          D: [62, 66, 69],
+          A: [61, 64, 69],
+          Bm: [62, 66, 71],
+          G: [62, 67, 71],
+          Em: [64, 67, 71],
+        };
+        const ROOT = { Dm: 38, Bb: 34, D: 38, A: 33, Bm: 35, G: 31, Em: 40 };
+
+        // 1 · Alone
+        pad(CH.Dm, 0, 3.9, 0.016, 700, 0.6);
+        osc('sine', M(38), { t: 0, dur: 3.7, gain: 0.14, attack: 1.2, release: 0.6, rev: 0.2 });
+        [0.5, 1.5, 2.5].forEach((t) => {
+          kick(t, 0.32, 70, 38, 0.18);
+          kick(t + 0.2, 0.22, 65, 36, 0.18);
+        });
+        bell(86, 0.9, 0.03);
+        bell(81, 2.3, 0.025);
+        noise(2.3, 1.35, 0.08, 300, 4000);
+        // 2 · Beam
+        noise(3.62, 0.9, 0.3, 6000, 900, { attack: 0.3, release: 0.4 });
+        [86, 90, 93, 98].forEach((n, k) => bell(n, 3.7 + k * 0.09, 0.05));
+        pad(CH.Bb, 3.65, 1.3, 0.02, 2200, 0.5);
+        // 3 · Hi
+        [74, 78, 81, 86].forEach((n, k) => bell(n, 5.05 + k * 0.08, 0.05));
+        pad(CH.D, 5.05, 1.9, 0.022, 2400, 0.4);
+        bass(38, 5.05, 1.9, 0.14);
+
+        // 4-8 · Features: chords per section, plucks and kicks on one steady grid (126 bpm).
+        const SECTIONS = [
+          [7.0, 'D', 'full'],
+          [8.9, 'A', 'full'],
+          [10.8, 'Bm', 'full'],
+          [12.7, 'G', 'full'],
+          [14.6, 'Bm', 'thin'],
+          [16.25, 'Em', 'thin'],
+          [17.9, 'A', 'full'],
+          [19.8, 'D', 'full'],
+          [21.1, 'G', 'full'],
+          [22.4, 'A', 'full'],
+          [23.4, 'Bm', 'full'],
+          [24.35, 'G', 'build'],
+          [25.3, 'A', 'build'],
+          [26.25, 'Bm', 'build'],
+          [27.2, 'A', 'build'],
+        ];
+        const END = 28.12;
+        SECTIONS.forEach(([a, c, feel], i) => {
+          const b = SECTIONS[i + 1]?.[0] ?? END;
+          pad(CH[c], a, b - a, feel === 'thin' ? 0.016 : 0.02, feel === 'build' ? 2600 : 1600, 0.3);
+          bass(ROOT[c], a, b - a - 0.05, feel === 'thin' ? 0.07 : 0.11);
+        });
+        const STEP = 0.475 / 2;
+        for (let k = 0, t = 7.0; t < END - 0.05; k++, t = 7.0 + k * STEP) {
+          const [, c, feel] = SECTIONS.findLast(([a]) => t >= a - 0.01);
+          const n = CH[c];
+          const arp = [n[0] + 12, n[1] + 12, n[2] + 12, n[1] + 12];
+          pluck(arp[k % 4], t, (feel === 'thin' ? 0.03 : 0.055) * (k % 2 ? 0.7 : 1));
+          if (feel === 'full' && k % 4 === 0) kick(t, 0.26);
+          if (feel === 'build' && k % 2 === 0) kick(t, 0.32);
+          if (feel === 'build' && k % 2 === 1) hat(t, 0.04);
+        }
+        [7.0, 14.6, 19.8, 22.4, 24.35, 25.3, 26.25, 27.2].forEach(tick); // cuts
+        bell(88, 14.85, 0.06); // alert: friendly two-note chime
+        bell(83, 15.05, 0.06);
+        [79, 83, 86].forEach((n, k) => pluck(n + 12, 16.9 + k * 0.16, 0.04)); // connecting the dots
+        bell(81, 17.85, 0.05); // resolved
+        bell(86, 18.0, 0.06);
+        noise(19.7, 0.8, 0.1, 500, 5000, { attack: 0.35, release: 0.4 }); // off along the route
+        noise(20.3, 1.6, 0.06, 120, 260, { type: 'lowpass', attack: 0.8, release: 0.5 }); // solar storm
+        noise(26.6, 1.52, 0.1, 400, 8000); // riser into the payoff
+
+        // 9 · Payoff
+        kick(END, 0.7, 90, 30, 0.6);
+        noise(END, 1.0, 0.1, 3000, 200, { attack: 0.01, release: 0.8 });
+        pad([50, 57, 62, 66, 69, 76], END, 1.2, 0.02, 3000, 1.2);
+        bass(38, END, 1.2, 0.16);
+        [74, 78, 81, 86, 90].forEach((n, k) => bell(n, END + 0.08 + k * 0.1, 0.04));
+        bell(86, 29.5, 0.035);
+
+        return {
+          stop(at) {
+            master.gain.cancelScheduledValues(at);
+            master.gain.setValueAtTime(master.gain.value, at);
+            master.gain.setTargetAtTime(0, at, 0.03);
+            setTimeout(() => master.disconnect(), 400);
+          },
+        };
+      }
+
+      let score = null;
+      function startMusic(from) {
+        stopMusic();
+        if (!musicToggle.checked) return;
+        const { ctx, out } = audioOut();
+        ctx.resume();
+        score = buildScore(ctx, out, from, ctx.currentTime + 0.03 - from);
+      }
+      function stopMusic() {
+        score?.stop(audioGraph.ctx.currentTime);
+        score = null;
+      }
+
       /* ---------- Animatic ----------
          One clock drives the scenes: the voice-over's own time when it plays, else wall time. */
       const stage = document.getElementById('stage');
@@ -1771,10 +2059,14 @@
         stage.classList.remove('paused');
         playBtn.textContent = '❚❚ Pause';
         t0 = performance.now() - from * 1000;
-        if (voToggle.checked) {
+        if (voToggle.checked && !voFailed) {
           vo.currentTime = from;
-          vo.play().catch(() => (voFailed = true));
-        }
+          // The music starts once the voice really plays, at its exact time, to stay in sync.
+          vo.play().then(
+            () => playing && startMusic(vo.currentTime),
+            () => ((voFailed = true), playing && startMusic(now())),
+          );
+        } else startMusic(from);
         chief('play', from);
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(tick);
@@ -1789,6 +2081,7 @@
         playing = false;
         cancelAnimationFrame(raf);
         vo.pause();
+        stopMusic();
         chief('stop');
         playBtn.textContent = '▶ Play';
       }
@@ -1813,6 +2106,10 @@
       playBtn.addEventListener('click', play);
       document.getElementById('restart').addEventListener('click', restart);
       voToggle.addEventListener('change', () => {
+        stop();
+        jumped = true;
+      });
+      musicToggle.addEventListener('change', () => {
         stop();
         jumped = true;
       });
@@ -1850,7 +2147,7 @@
       // the WebM downloads when it ends. Stopping the share in Chrome's bar ends it early.
       const exportBtn = document.getElementById('export');
       let onFinish = null;
-      let voGraph = null; // an audio element can be routed through Web Audio only once
+      let voRouted = false; // an audio element can be routed through Web Audio only once
       async function exportVideo() {
         if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder)
           return alert('Export needs a recent Chrome or Edge.');
@@ -1880,17 +2177,15 @@
           }
         }
         const tracks = [video];
-        if (voToggle.checked && !voFailed) {
-          if (!voGraph) {
-            const ctx = new AudioContext();
-            const src = ctx.createMediaElementSource(vo);
-            const dest = ctx.createMediaStreamDestination();
-            src.connect(ctx.destination); // still heard while recording
-            src.connect(dest);
-            voGraph = { ctx, dest };
-          }
-          await voGraph.ctx.resume();
-          tracks.push(...voGraph.dest.stream.getAudioTracks());
+        const withVo = voToggle.checked && !voFailed;
+        if (withVo && !voRouted) {
+          // Into the same graph as the music: heard while recording and mixed into the file.
+          audioOut().ctx.createMediaElementSource(vo).connect(audioOut().out);
+          voRouted = true;
+        }
+        if (withVo || musicToggle.checked) {
+          await audioOut().ctx.resume();
+          tracks.push(...audioOut().dest.stream.getAudioTracks());
         }
         const mimeType = [
           'video/webm;codecs=vp9,opus',
