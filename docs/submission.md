@@ -26,7 +26,7 @@ Everything on the form must be in English.
 | --- | --- | --- |
 | **Óscar Domínguez Álvarez** | AI assistant (CHIEF): LLM orchestration, clinical context, safety guardrails, speech-to-text and text-to-speech · Frontend UX: design system, body map, JOURNEY views · Demo video | Python, FastAPI, Pydantic, Google Gemini API, faster-whisper, Piper · Vue 3, TypeScript, SVG · HTML Canvas |
 | **Carlos Gonzalez Marcos** | Backend: REST API, real-time updates, rules engine (statuses, health score, alerts), agent integration · Demo video | Node.js, Express, TypeScript, Socket.IO, Zod, Vitest |
-| **Héctor San Cecilio Martín** | Data and simulation: database schema, NASA dataset ingestion, sourced thresholds, mission simulator, demo scenarios · Demo video | SQLite, Drizzle ORM, TypeScript, NASA OSDR and DONKI APIs |
+| **Héctor San Cecilio Martín** | Data and simulation: database schema, NASA dataset ingestion, sourced thresholds, mission simulator, demo scenarios · Frontend UX: workspace windows, pane splitting and layout limits · Demo video | SQLite, Drizzle ORM, TypeScript, NASA OSDR and DONKI APIs · Vue 3, Pinia |
 | **Hernán Platero Domínguez** | Frontend: application layout, crew navigation, dashboards and charts, alerts panel, chat | Vue 3, Vite, TypeScript, Pinia, Socket.IO client, SVG |
 
 ---
