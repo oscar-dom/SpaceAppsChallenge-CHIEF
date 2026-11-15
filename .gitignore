@@ -96,3 +96,6 @@ __pycache__/
 agent/models/
 *.onnx
 *.onnx.json
+
+# Rendered videos (npm run video:render)
+video/renders/

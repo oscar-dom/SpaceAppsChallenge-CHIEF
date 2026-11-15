@@ -2490,6 +2490,79 @@
       }
       exportBtn.addEventListener('click', exportVideo);
 
+      /* ---------- Frame-by-frame render (npm run video:render) ----------
+         scripts/render-video.mjs opens this page in a hidden Chrome and calls these: setup()
+         freezes the page's clocks, frame(t) puts every scene, CSS animation, subtitle and CHIEF
+         exactly where they are at t seconds (however long the frame takes to draw), and audio()
+         renders the voice-over and the music offline, as a WAV. No frame is ever dropped. */
+      window.renderVideo = {
+        async setup({ subtitles = true } = {}) {
+          stop();
+          subsBox.hidden = !subtitles;
+          document.body.classList.add('recording');
+          await document.fonts.ready;
+          await Promise.all([...document.images].map((img) => img.decode().catch(() => {})));
+          chiefLayer.contentWindow.chiefRender.start();
+          current = -1;
+          this.t = -1;
+          return { duration: listTotal };
+        },
+        // CSS animations and transitions: each one is seeked to the time since it began (the
+        // frame where it first appeared), so they all follow the render clock.
+        frame(t) {
+          const i = list.findIndex((sc) => t >= sc.at && t < sc.at + sc.dur);
+          const k = i >= 0 ? i : list.length - 1;
+          if (k !== current) show(k);
+          renderSubs(t);
+          for (const a of document.getAnimations()) {
+            a.renderStart ??= t;
+            a.pause();
+            a.currentTime = (t - a.renderStart) * 1000;
+          }
+          chiefLayer.contentWindow.chiefRender.step(t);
+        },
+        async audio({ voice = true, music = true } = {}) {
+          const rate = 48000;
+          const ctx = new OfflineAudioContext(2, Math.ceil(listTotal * rate), rate);
+          if (voice) {
+            const data = await (await fetch(vo.src)).arrayBuffer();
+            const src = ctx.createBufferSource();
+            src.buffer = await ctx.decodeAudioData(data);
+            src.connect(ctx.destination);
+            src.start(0);
+          }
+          if (music) buildScore(ctx, ctx.destination, 0, 0);
+          return wavBase64(await ctx.startRendering());
+        },
+      };
+      function wavBase64(buf) {
+        const ch = buf.numberOfChannels;
+        const n = buf.length;
+        const view = new DataView(new ArrayBuffer(44 + n * ch * 2));
+        const str = (o, s) => [...s].forEach((c, i) => view.setUint8(o + i, c.charCodeAt(0)));
+        str(0, 'RIFF');
+        view.setUint32(4, 36 + n * ch * 2, true);
+        str(8, 'WAVEfmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, ch, true);
+        view.setUint32(24, buf.sampleRate, true);
+        view.setUint32(28, buf.sampleRate * ch * 2, true);
+        view.setUint16(32, ch * 2, true);
+        view.setUint16(34, 16, true);
+        str(36, 'data');
+        view.setUint32(40, n * ch * 2, true);
+        const chans = [...Array(ch)].map((_, c) => buf.getChannelData(c));
+        for (let i = 0, o = 44; i < n; i++)
+          for (let c = 0; c < ch; c++, o += 2)
+            view.setInt16(o, Math.max(-1, Math.min(1, chans[c][i])) * 0x7fff, true);
+        const bytes = new Uint8Array(view.buffer);
+        let bin = '';
+        for (let i = 0; i < bytes.length; i += 0x8000)
+          bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+        return btoa(bin);
+      }
+
       buildList();
       show(0);
     </script>
