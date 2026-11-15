@@ -280,6 +280,7 @@ Requires **Node.js ≥ 20** and **Python 3.11+** (agent).
   MSYS/Git Bash `python`.
 
 ```bash
+npm start                   # one command: install, set up the agent, fresh demo data, run (also ./start.sh, start.cmd)
 npm install                 # install every JS workspace
 npm run dev                 # start backend, frontend and agent together
 npm run lint                # ESLint on all TS code
