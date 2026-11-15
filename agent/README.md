@@ -38,8 +38,9 @@ Then:
    ```bash
    .venv/Scripts/python -m piper.download_voices en_US-ryan-medium --download-dir models/piper
    ```
-   The Whisper model (`base.en`, about 150 MB) downloads by itself on the first `/stt`
-   call.
+   The Whisper model (`base.en`, about 150 MB) downloads by itself the first time. Both
+   voice models load in a background thread when the agent starts (`VOICE_PRELOAD`), so
+   the first push-to-talk does not wait for them.
 
 Run it alone with `.venv/Scripts/python -m uvicorn main:app --reload --port 8000`, or
 together with everything else with `npm run dev` from the repository root.
@@ -86,14 +87,15 @@ answer.
 ## Model chain
 
 `GEMINI_MODELS` lists the models to try, in order. Free-tier quota is counted per model,
-so when one runs out the next one still answers. Default, tested on 2026-11-14:
+so when one runs out the next one still answers. Default order, by latency measured on
+2026-11-14 with `GEMINI_THINKING_LEVEL=low` (the model default thinks for 10-15 s):
 
-| Model | Latency | Note |
-|---|---|---|
-| `gemini-3.5-flash` | ~6-8 s | Best answers so far, first choice |
-| `gemini-3.6-flash` | ~5 s | |
-| `gemini-3.5-flash-lite` | ~2 s | Shorter answers |
-| `gemini-3.1-flash-lite` | ~2 s | |
+| Model | Latency (low) | Latency (default) | Note |
+|---|---|---|---|
+| `gemini-3.6-flash` | ~2 s | ~11 s | First choice |
+| `gemini-3.5-flash-lite` | ~1 s | ~1 s | Shorter answers |
+| `gemini-3.1-flash-lite` | ~3 s | 503 at times | |
+| `gemini-3.5-flash` | ~10-14 s | ~15 s | Last: too slow for the 15 s deadline |
 
 Not usable with a new free-tier key: `gemini-2.5-pro`, `gemini-3.1-pro-preview`,
 `gemini-2.5-flash(-lite)` (404) and `gemini-3.7/3.8-flash` (503 or minutes per answer).
@@ -105,8 +107,10 @@ How it behaves (`chief/llm.py`):
 - A failing model is skipped for a while so it does not slow down later answers:
   5 min after a 429, 1 h after a 400/403/404, 1 min after a 5xx or a timeout. Invalid
   answers do not skip the model. `/health` lists the models available right now.
-- The whole chain shares one deadline, `LLM_TIMEOUT_SECONDS` (30 s). If no model
-  answers in time, CHIEF answers in fallback mode.
+- The whole chain shares one deadline, `LLM_TIMEOUT_SECONDS` (15 s, below the
+  backend's `AGENT_TIMEOUT_MS` of 20 s), and one model gets at most
+  `LLM_ATTEMPT_SECONDS` (8 s) of it, so a slow model leaves time for the next one. If no
+  model answers in time, CHIEF answers in fallback mode.
 
 ## Guardrails (`chief/safety.py`)
 

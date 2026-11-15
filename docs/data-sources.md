@@ -17,6 +17,10 @@ Related documents: [database](database-schema.md), [simulator](simulator.md), [d
 | NASA JSC-67378 Rev. 1 (2020) | NASA requirement | Calcium and fluid intake | `thresholds.ts`, `simulation.ts` |
 | NASA JSC clinical decision flow (vitamin D) | NASA document | Vitamin D deficiency and insufficiency | `thresholds.ts` |
 | NASA ISS Medical Kit Checklist and ISS medication list (FOIA) | NASA document | Onboard formulary | `formulary.ts` |
+| NASA Life Support Baseline Values and Assumptions Document (BVAD), NASA/TP-2015-218570/REV1 | NASA document | Daily food (1.83 kg) and potable water (2.5 kg) per crew member | `inventory.ts` |
+| NASA ISS water recovery milestone (June 2023) | NASA release | 98% of the water used is reclaimed | `inventory.ts` |
+| Wotring 2015 (FASEB J), Barger et al. 2014 (Lancet Neurol), Putcha et al. (NTRS 20110020471) | Peer-reviewed / NASA studies | Which medication is used most on the ISS (sleep, pain, congestion, allergy), sleep medication, motion sickness in the first days | `inventory.ts` |
+| NTRS 20040152077, AMS-02 thermal operations, NTRS 20180004474, NASA visiting vehicles | NASA papers and pages | Journey hazards (South Atlantic Anomaly, high beta angle, EVA environment) and cargo ships | `journey.ts` |
 | HRP Spaceflight Standard Measures | NASA programme | Which indicators to track (not raw data) | `metrics.ts` |
 | Clinical guidelines (AHA, ACC/AHA, ADA, AASM/SRS, NSF, CDC/AHA, WHO, hypercalciuria review, ophthalmology reference, Frisén scale) | Public guidelines | Thresholds where NASA sets none | `thresholds.ts` |
 | NOAA Space Weather Scales | Public scale | Proposed trigger for the solar-storm alert (not implemented) | — |
@@ -85,19 +89,19 @@ Full entries, with their fallback recommendations, are in [`backend/data/thresho
 | Metric | Nominal | Caution | Critical | Source | Verification |
 | --- | --- | --- | --- | --- | --- |
 | Resting heart rate | 60–100 bpm | 50–60, 100–120 *(team band)* | < 50, ≥ 120 | AHA, quoted by [Mayo Clinic](https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate) | verified |
-| Blood oxygen saturation | ≥ 95 % | 90–95 % | < 90 % | WHO Pulse Oximetry Training Manual (2011), via the [PhenX protocol](https://www.phenxtoolkit.org/protocols/view/91102) | partially verified (90 % only in PhenX) |
+| Blood oxygen saturation | ≥ 95 % | 90–95 % | < 90 % | WHO Pulse Oximetry Training Manual (2011), quoted verbatim by the [PhenX protocol](https://www.phenxtoolkit.org/protocols/view/91102) and the WHO slide set | verified |
 | Systolic blood pressure | < 120 | 120–140 (elevated, stage 1) | ≥ 140 (stage 2) | 2017 ACC/AHA hypertension guideline | verified |
 | Diastolic blood pressure | < 80 | 80–90 (stage 1) | ≥ 90 (stage 2) | 2017 ACC/AHA hypertension guideline | verified |
-| Bone mineral density change | ≥ −5 % | −10 to −5 % | < −10 % | [NASA OCHMO Bone Loss brief](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-030-bone-loss.pdf): hip/spine ≥ 95 %, femoral neck ≥ 90 % of pre-mission | partially verified (Rev C requirement not identified) |
+| Bone mineral density change | ≥ −5 % | −10 to −5 % | < −10 % | NASA-STD-3001 Vol. 1 Rev. C, requirement **V1 4027** (Pre-mission Bone Countermeasures): hip/spine ≥ 95 %, femoral neck ≥ 90 % of pre-mission, quoted in the [NASA OCHMO Bone Loss brief](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-030-bone-loss.pdf) (OCHMO-MTB-013 Rev D) | verified |
 | Vitamin D (25-OH) | ≥ 30 ng/mL | 20–30 (insufficiency) | < 20 (deficiency) | [NASA JSC clinical decision flow](https://ntrs.nasa.gov/citations/20130013531) | verified |
 | Urine calcium | < 250 mg/day | 250–300 | ≥ 300 | [Hypercalciuria review, PubMed 28846247](https://pubmed.ncbi.nlm.nih.gov/28846247/) (> 250 women, 275–300 men); StatPearls (normal < 250) | verified |
-| Fasting glucose | 70–100 mg/dL | 100–126 (prediabetes), 54–70 (level 1 hypoglycemia) | ≥ 126, < 54 | ADA Standards of Care | partially verified (hypoglycemia levels from a secondary source) |
+| Fasting glucose | 70–100 mg/dL | 100–126 (prediabetes), 54–70 (level 1 hypoglycemia) | ≥ 126, < 54 | ADA Standards of Care (classification of hypoglycemia: level 1 < 70 and ≥ 54, level 2 < 54 mg/dL) | verified |
 | White blood cell count | 3.8–10.8 ×10³/µL | 3.0–3.8, 10.8–13 *(team band)* | < 3.0, ≥ 13 | Inspiration4 lab reference interval, [NASA OSDR OSD-569](https://osdr.nasa.gov/bio/repo/data/studies/OSD-569) | verified |
-| C-reactive protein | < 3 mg/L | 3–10 (high risk) | ≥ 10 | CDC/AHA statement, Pearson et al., Circulation 2003;107:499-511 | partially verified (> 10 mg/L from a summary) |
-| Optic disc edema grade | 0 | 1–2 *(team band)* | ≥ 3 | Frisén grading scale (1982) | to verify |
+| C-reactive protein | < 3 mg/L | 3–10 (high risk) | ≥ 10 | CDC/AHA statement, Pearson et al., Circulation 2003;107:499-511 (persistent, unexplained > 10 mg/L: look for non-cardiovascular causes) | verified (> 10 mg/L quoted by CAP and LabCorp) |
+| Optic disc edema grade | 0 | 1–2 *(team band)* | ≥ 3 | Frisén L., J Neurol Neurosurg Psychiatry 1982;45:13-18: grades 0 normal, 1 very early, 2 early, 3 moderate, 4 marked, 5 severe | verified (grades); the status mapping is a team band |
 | Intraocular pressure | 10–21 mmHg | < 10, 22–26 *(team band)* | ≥ 26 | Ophthalmology reference (normal 10–21; ocular hypertension > 21) | verified |
 | Sleep duration | ≥ 7 h | 6–7 h *(team band)* | < 6 h | [AASM/SRS consensus 2015](https://pmc.ncbi.nlm.nih.gov/articles/PMC4434546/) | verified |
-| Sleep efficiency | ≥ 85 % | 65–85 % *(team band)* | < 65 % | NSF sleep quality recommendations, Ohayon et al., Sleep Health 2017;3(1):6-19 | partially verified (85 % quoted from a citing document) |
+| Sleep efficiency | ≥ 85 % | 75–85 % (NSF "uncertain") | < 75 % | NSF sleep quality recommendations, Ohayon et al., Sleep Health 2017;3(1):6-19: adults 26–64, ≥ 85 % good quality, ≤ 74 % not good quality | verified (both cut-offs quoted by several sources) |
 | Cumulative radiation dose | < 300 mSv *(team band)* | 300–600 mSv | ≥ 600 mSv | NASA-STD-3001 Vol. 1 Rev. C, requirement V1 4030, section 4.8.2, via the [OCHMO radiation brief](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf) | verified |
 | Calcium intake | 1000–2500 mg/day | 600–1000 *(team band)* | < 600, ≥ 2500 | [NASA JSC-67378 Rev. 1](https://ntrs.nasa.gov/citations/20205008306): 1000–1200 mg/day, max 2500 | verified |
 | Fluid intake | ≥ 2100 mL/day | 1500–2100 *(team band)* | < 1500 | NASA JSC-67378 Rev. 1: 32 mL/kg/day, ≥ 2100 women, ≥ 2500 men | verified (uses the lower floor) |
@@ -121,6 +125,34 @@ Full entries, with their fallback recommendations, are in [`backend/data/thresho
 - **No dosages**: CHIEF must never suggest doses beyond the formulary, and none was found with a citable source. Add one only with a source.
 - Ibuprofen carries a note of caution for crew members with asthma.
 
+## Journey and inventory
+
+The JOURNEY section splits the 180-day mission into **10 stages of 18 days** ([`backend/data/journey.ts`](../backend/data/journey.ts)) and tracks the ship's medication, food and water ([`backend/data/inventory.ts`](../backend/data/inventory.ts)).
+
+### Use rates (from NASA documents)
+
+| Item | Daily use | Source |
+| --- | --- | --- |
+| Packaged food (ISS menu, as shipped) | **1.83 kg** per crew member | BVAD Rev. 1 (2018), [NTRS 20180001338](https://ntrs.nasa.gov/citations/20180001338), Table 4-53 (ISS food system, Perchonok et al. 2002) |
+| Potable water (drinking and food rehydration) | **2.5 kg** per crew member | BVAD Rev. 1, Table 3-33 (nominal human metabolic interface values) |
+| Water reclaimed by life support | **98 %** of the water used | NASA, [Water Recovery Milestone on the ISS](https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station/) (June 2023), Brine Processor Assembly |
+| Medication mix | Sleep, pain, congestion and allergy medication used most; sleep aids about 10 times more than on Earth | Wotring 2015, FASEB J 29:4417 ([doi:10.1096/fj.14-264838](https://doi.org/10.1096/fj.14-264838)) |
+| Sleep medication | Hypnotic use (zolpidem, zaleplon) pervasive on ISS missions | Barger et al. 2014, Lancet Neurol ([PMC4188436](https://pmc.ncbi.nlm.nih.gov/articles/PMC4188436/)) |
+| Motion sickness medication | About 40 % of crew members sick in the first flight days; promethazine the most used treatment | Putcha, Younker, Daniels, [NTRS 20110020471](https://ntrs.nasa.gov/citations/20110020471) |
+
+### Journey hazards
+
+| Hazard | Kind | When | Basis |
+| --- | --- | --- | --- |
+| South Atlantic Anomaly passes | radiation | every day | Practically all trapped-proton exposure of the ISS happens in the SAA ([NTRS 20040152077](https://ntrs.nasa.gov/citations/20040152077)) |
+| Solar particle event | radiation, critical | day 56.3 to about 60.8 | **Real** May 2024 storm (NASA DONKI), same replay as the `solar-storm` scenario |
+| High beta angle (constant sunlight) | thermal | days 48–54, 108–114, 168–174 (**simulated** timing) | The beta angle follows the ~60-day precession of the orbit; above ~70° there is no orbital night ([AMS-02 thermal operations](https://ams02.space/de/node/489)) |
+| Spacewalks (EVA) | thermal | days 80 and 135 (**simulated**) | External thermal environment ([NTRS 20180004474](https://ntrs.nasa.gov/citations/20180004474)), decompression sickness and more radiation outside |
+
+Cargo ships follow the real vehicles and cadence ([NASA visiting vehicles](https://www.nasa.gov/international-space-station/space-station-visiting-vehicles/)): **Progress** (day 40), **Cargo Dragon** (day 95) and **Cygnus** (day 145). Their dates and cargo are **simulated**.
+
+Stock is shown as days of supply at the **average net use of the last 14 days**, so a burst of use (for example C004's sleep medication in the sleep-deprivation scenario) brings an item closer to a warning.
+
 ## Indicators and metric catalog
 
 The 25 metrics in [`backend/data/metrics.ts`](../backend/data/metrics.ts) cover the 9 body systems of `shared/`. They follow the kinds of indicators NASA's Human Research Program tracks in its Spaceflight Standard Measures (sleep, cognition, immune, blood and urine chemistry, cardiovascular, behavioral). Individual HRP data is restricted (NASA Life Sciences Data Archive), so it informs which indicators to show, not the values.
@@ -132,13 +164,17 @@ These values are **not** from a source; they are plausible choices, always store
 | Assumption | Value | Basis |
 | --- | --- | --- |
 | Mission | 180 days from 2026-09-01; the seed stops at mission day 60, 12:00 UTC | `CLAUDE.md`: a 6-month ISS mission |
-| Baselines and noise of each metric | e.g. resting heart rate 62 bpm ± 2.5 | Plausible healthy adult values; blood values use the OSDR baselines above |
+| Baselines and noise of each metric | e.g. resting heart rate 70 bpm ± 2.5 | Plausible healthy adult values; blood values use the OSDR baselines above |
 | Bone loss trend | −0.035 %/day (about −1 %/month) | Within the 0.5–1.5 %/month spaceflight loss rate reported in NASA material |
 | Prior career radiation dose | C001 120, C002 280, C003 45, C004 90 mSv | Fictional; C002 is set close to the 300 mSv caution band for the demo |
 | Dose rate on board | 18 µSv/h ± 2.5 (about 0.43 mSv/day) | Plausible ISS order of magnitude |
 | Storm dose-rate increase | +40 / +80 µSv/h, 10 h decay | Simulated; only the timing is real (DONKI) |
 | Nutrition intake | calcium 1150 mg/day, fluid 2650 mL/day, energy 2600 kcal/day | Set inside the JSC-67378 targets so healthy crew members stay nominal |
 | Demo scenarios | see [simulator.md](simulator.md) | Synthetic cases planted so alerts fire, as `CLAUDE.md` asks |
+| Inventory at launch and cargo of each ship | food 420 kg, water 900 kg, medication sized to the mission (20–120 units) | Simulated, sized so food dips before each resupply |
+| Medication use per crew member and day | a chance per drug (e.g. melatonin 8 %, zolpidem 7 %), x3 for C004 from day 44 (sleep-deprivation scenario), x130 for promethazine in days 1–3 | Simulated, ordered like the categories NASA reports as most used |
+| Day-to-day spread of food and water use | ±6 % and ±5 % | Simulated |
+| Stock warnings | food < 21 days, water < 30, medication < 40 days of supply (critical < 10, 10 and 14) | CHIEF's own logistics thresholds, not a NASA rule |
 
 ## Looked at but not used
 
@@ -149,13 +185,12 @@ These values are **not** from a source; they are plausible choices, always store
 | OSDR postflight timepoints | After a 3-day flight; would fall after our simulated mission |
 | DONKI flares (`FLR`) | Endpoint returned 404 for the window |
 | DONKI June 2024 proton events | Not part of the May storm |
-| NASA-STD-3001 Rev C bone T-score requirement | Not found in the documents reached; the OCHMO brief targets are used instead |
+| NASA-STD-3001 Rev C bone T-score requirement (V1 4026) | Pre-mission selection criterion, not an in-mission limit; V1 4027 is used instead |
 | PhysioNet, ISS Live, ISS position APIs, NOAA SWPC live data | Part of an earlier design (offline-first ground link, ISS position); out of the scope set in `CLAUDE.md` |
 
 ## Open verification tasks
 
-- Check the Frisén mapping (optic disc edema) and the partially verified entries against their original documents.
-- Identify the NASA-STD-3001 Rev C requirement that holds the bone density targets.
+- Several entries are verified through documents that quote the original (WHO manual, Pearson 2003, Ohayon 2017); read the originals if access allows.
 - Agree on the space-weather rule for the solar-storm alert.
 - Refresh DONKI with a real `NASA_API_KEY` if the dataset needs to change.
 
@@ -165,4 +200,5 @@ These values are **not** from a source; they are plausible choices, always store
 | --- | --- |
 | 2026-11-14 | OSDR OSD-569 and OSD-575 file listings and CSVs downloaded; processed into `osdr-inspiration4-blood.json` |
 | 2026-11-14 | DONKI SEP and GST (2024-05-01 to 2024-06-29) downloaded with `DEMO_KEY`; processed into `donki-may-2024-storm.json` |
+| 2026-11-14 | Second pass: bone targets traced to NASA-STD-3001 V1 4027 (OCHMO-MTB-013 Rev D); WHO SpO2, ADA hypoglycemia, Pearson CRP > 10 mg/L, NSF sleep efficiency (adults) and Frisén grades confirmed. Every threshold is now `verified` |
 | 2026-11-14 | Threshold sources checked by web search: NASA OCHMO briefs, NASA-STD-3001 Rev C, JSC-67378, NASA JSC vitamin D flow, ACC/AHA 2017, ADA, AASM/SRS 2015, NSF 2017, CDC/AHA 2003, WHO pulse oximetry, hypercalciuria review, IOP references, NOAA scales, ISS medical kit |

@@ -1,0 +1,912 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "4aac15a6-1a84-49c1-881b-fb4e327898d7",
+  "prevId": "0c2eec1c-0c05-46cb-a6df-07155af30f02",
+  "tables": {
+    "alerts": {
+      "name": "alerts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "crew_id": {
+          "name": "crew_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "system": {
+          "name": "system",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "severity": {
+          "name": "severity",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "escalation": {
+          "name": "escalation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "metric_id": {
+          "name": "metric_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "due_at": {
+          "name": "due_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "acknowledged": {
+          "name": "acknowledged",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "recommendation": {
+          "name": "recommendation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "alerts_crew_idx": {
+          "name": "alerts_crew_idx",
+          "columns": [
+            "crew_id",
+            "acknowledged",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "alerts_crew_id_crew_members_id_fk": {
+          "name": "alerts_crew_id_crew_members_id_fk",
+          "tableFrom": "alerts",
+          "tableTo": "crew_members",
+          "columnsFrom": [
+            "crew_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "alerts_metric_id_metrics_id_fk": {
+          "name": "alerts_metric_id_metrics_id_fk",
+          "tableFrom": "alerts",
+          "tableTo": "metrics",
+          "columnsFrom": [
+            "metric_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "alerts_system_valid": {
+          "name": "alerts_system_valid",
+          "value": "\"alerts\".\"system\" IN ('cardiovascular', 'musculoskeletal', 'blood-biochemistry', 'immune', 'vision', 'sleep-cognition', 'behavioral-health', 'radiation', 'nutrition')"
+        },
+        "alerts_kind_valid": {
+          "name": "alerts_kind_valid",
+          "value": "\"alerts\".\"kind\" IN ('anomaly', 'scheduled')"
+        },
+        "alerts_severity_valid": {
+          "name": "alerts_severity_valid",
+          "value": "\"alerts\".\"severity\" IN ('critical', 'caution', 'info')"
+        },
+        "alerts_escalation_valid": {
+          "name": "alerts_escalation_valid",
+          "value": "\"alerts\".\"escalation\" IN ('self-care', 'crew-medical-officer', 'flight-surgeon')"
+        },
+        "alerts_created_at_format": {
+          "name": "alerts_created_at_format",
+          "value": "\"alerts\".\"created_at\" GLOB '????-??-??T??:??:??Z'"
+        },
+        "alerts_due_at_format": {
+          "name": "alerts_due_at_format",
+          "value": "\"alerts\".\"due_at\" GLOB '????-??-??T??:??:??Z'"
+        },
+        "alerts_anomaly_has_metric": {
+          "name": "alerts_anomaly_has_metric",
+          "value": "\"alerts\".\"kind\" = 'scheduled' OR \"alerts\".\"metric_id\" IS NOT NULL"
+        },
+        "alerts_scheduled_has_due": {
+          "name": "alerts_scheduled_has_due",
+          "value": "\"alerts\".\"kind\" = 'anomaly' OR \"alerts\".\"due_at\" IS NOT NULL"
+        }
+      }
+    },
+    "crew_members": {
+      "name": "crew_members",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "agency": {
+          "name": "agency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "age": {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sex": {
+          "name": "sex",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "height_cm": {
+          "name": "height_cm",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "weight_kg": {
+          "name": "weight_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "crew_members_id_format": {
+          "name": "crew_members_id_format",
+          "value": "\"crew_members\".\"id\" GLOB 'C[0-9][0-9][0-9]'"
+        },
+        "crew_members_age_positive": {
+          "name": "crew_members_age_positive",
+          "value": "\"crew_members\".\"age\" > 0"
+        },
+        "crew_members_sex_valid": {
+          "name": "crew_members_sex_valid",
+          "value": "\"crew_members\".\"sex\" IN ('female', 'male')"
+        }
+      }
+    },
+    "formulary": {
+      "name": "formulary",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "indication": {
+          "name": "indication",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dosage": {
+          "name": "dosage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "formulary_source_required": {
+          "name": "formulary_source_required",
+          "value": "json_valid(\"formulary\".\"source\") AND length(trim(coalesce(json_extract(\"formulary\".\"source\", '$.document'), ''))) > 0"
+        }
+      }
+    },
+    "inventory_events": {
+      "name": "inventory_events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "at": {
+          "name": "at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "delta": {
+          "name": "delta",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ref": {
+          "name": "ref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "crew_id": {
+          "name": "crew_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "inventory_events_ref_uq": {
+          "name": "inventory_events_ref_uq",
+          "columns": [
+            "item_id",
+            "reason",
+            "ref"
+          ],
+          "isUnique": true
+        },
+        "inventory_events_item_day_idx": {
+          "name": "inventory_events_item_day_idx",
+          "columns": [
+            "item_id",
+            "day"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "inventory_events_item_id_inventory_items_id_fk": {
+          "name": "inventory_events_item_id_inventory_items_id_fk",
+          "tableFrom": "inventory_events",
+          "tableTo": "inventory_items",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "inventory_events_crew_id_crew_members_id_fk": {
+          "name": "inventory_events_crew_id_crew_members_id_fk",
+          "tableFrom": "inventory_events",
+          "tableTo": "crew_members",
+          "columnsFrom": [
+            "crew_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "inventory_events_at_format": {
+          "name": "inventory_events_at_format",
+          "value": "\"inventory_events\".\"at\" GLOB '????-??-??T??:??:??Z'"
+        },
+        "inventory_events_reason_valid": {
+          "name": "inventory_events_reason_valid",
+          "value": "\"inventory_events\".\"reason\" IN ('consumption', 'recovery', 'resupply', 'adjustment')"
+        },
+        "inventory_events_day_positive": {
+          "name": "inventory_events_day_positive",
+          "value": "\"inventory_events\".\"day\" > 0"
+        },
+        "inventory_events_delta_not_zero": {
+          "name": "inventory_events_delta_not_zero",
+          "value": "\"inventory_events\".\"delta\" <> 0"
+        }
+      }
+    },
+    "inventory_items": {
+      "name": "inventory_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "purpose": {
+          "name": "purpose",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "initial_quantity": {
+          "name": "initial_quantity",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expected_daily_use": {
+          "name": "expected_daily_use",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "recovery_rate": {
+          "name": "recovery_rate",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "caution_days": {
+          "name": "caution_days",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "critical_days": {
+          "name": "critical_days",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "inventory_items_category_valid": {
+          "name": "inventory_items_category_valid",
+          "value": "\"inventory_items\".\"category\" IN ('medication', 'food', 'water')"
+        },
+        "inventory_items_initial_not_negative": {
+          "name": "inventory_items_initial_not_negative",
+          "value": "\"inventory_items\".\"initial_quantity\" >= 0"
+        },
+        "inventory_items_recovery_range": {
+          "name": "inventory_items_recovery_range",
+          "value": "\"inventory_items\".\"recovery_rate\" >= 0 AND \"inventory_items\".\"recovery_rate\" < 1"
+        },
+        "inventory_items_source_required": {
+          "name": "inventory_items_source_required",
+          "value": "json_valid(\"inventory_items\".\"source\") AND length(trim(coalesce(json_extract(\"inventory_items\".\"source\", '$.document'), ''))) > 0"
+        }
+      }
+    },
+    "measurements": {
+      "name": "measurements",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "crew_id": {
+          "name": "crew_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "metric_id": {
+          "name": "metric_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "taken_at": {
+          "name": "taken_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "simulated": {
+          "name": "simulated",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        }
+      },
+      "indexes": {
+        "measurements_crew_metric_time_uq": {
+          "name": "measurements_crew_metric_time_uq",
+          "columns": [
+            "crew_id",
+            "metric_id",
+            "taken_at"
+          ],
+          "isUnique": true
+        },
+        "measurements_metric_time_idx": {
+          "name": "measurements_metric_time_idx",
+          "columns": [
+            "metric_id",
+            "taken_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "measurements_crew_id_crew_members_id_fk": {
+          "name": "measurements_crew_id_crew_members_id_fk",
+          "tableFrom": "measurements",
+          "tableTo": "crew_members",
+          "columnsFrom": [
+            "crew_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "measurements_metric_id_metrics_id_fk": {
+          "name": "measurements_metric_id_metrics_id_fk",
+          "tableFrom": "measurements",
+          "tableTo": "metrics",
+          "columnsFrom": [
+            "metric_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "measurements_taken_at_format": {
+          "name": "measurements_taken_at_format",
+          "value": "\"measurements\".\"taken_at\" GLOB '????-??-??T??:??:??Z'"
+        }
+      }
+    },
+    "metrics": {
+      "name": "metrics",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "system": {
+          "name": "system",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "spaceflight_effect": {
+          "name": "spaceflight_effect",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "origin": {
+          "name": "origin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cadence_minutes": {
+          "name": "cadence_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "metrics_system_idx": {
+          "name": "metrics_system_idx",
+          "columns": [
+            "system"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "metrics_system_valid": {
+          "name": "metrics_system_valid",
+          "value": "\"metrics\".\"system\" IN ('cardiovascular', 'musculoskeletal', 'blood-biochemistry', 'immune', 'vision', 'sleep-cognition', 'behavioral-health', 'radiation', 'nutrition')"
+        },
+        "metrics_origin_valid": {
+          "name": "metrics_origin_valid",
+          "value": "\"metrics\".\"origin\" IN ('sensor', 'lab', 'manual', 'in-app-test')"
+        },
+        "metrics_cadence_positive": {
+          "name": "metrics_cadence_positive",
+          "value": "\"metrics\".\"cadence_minutes\" > 0"
+        }
+      }
+    },
+    "mission": {
+      "name": "mission",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "start_at": {
+          "name": "start_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "length_days": {
+          "name": "length_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time_scale": {
+          "name": "time_scale",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sim_time": {
+          "name": "sim_time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "mission_single_row": {
+          "name": "mission_single_row",
+          "value": "\"mission\".\"id\" = 1"
+        },
+        "mission_start_format": {
+          "name": "mission_start_format",
+          "value": "\"mission\".\"start_at\" GLOB '????-??-??T??:??:??Z'"
+        },
+        "mission_sim_time_format": {
+          "name": "mission_sim_time_format",
+          "value": "\"mission\".\"sim_time\" GLOB '????-??-??T??:??:??Z'"
+        },
+        "mission_length_positive": {
+          "name": "mission_length_positive",
+          "value": "\"mission\".\"length_days\" > 0"
+        },
+        "mission_time_scale_positive": {
+          "name": "mission_time_scale_positive",
+          "value": "\"mission\".\"time_scale\" > 0"
+        },
+        "mission_clock_not_before_start": {
+          "name": "mission_clock_not_before_start",
+          "value": "\"mission\".\"sim_time\" >= \"mission\".\"start_at\""
+        }
+      }
+    },
+    "thresholds": {
+      "name": "thresholds",
+      "columns": {
+        "metric_id": {
+          "name": "metric_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ranges": {
+          "name": "ranges",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "escalation": {
+          "name": "escalation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fallback_recommendation": {
+          "name": "fallback_recommendation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "thresholds_metric_id_metrics_id_fk": {
+          "name": "thresholds_metric_id_metrics_id_fk",
+          "tableFrom": "thresholds",
+          "tableTo": "metrics",
+          "columnsFrom": [
+            "metric_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "thresholds_ranges_array": {
+          "name": "thresholds_ranges_array",
+          "value": "json_valid(\"thresholds\".\"ranges\") AND json_type(\"thresholds\".\"ranges\") = 'array'"
+        },
+        "thresholds_escalation_object": {
+          "name": "thresholds_escalation_object",
+          "value": "json_valid(\"thresholds\".\"escalation\") AND json_type(\"thresholds\".\"escalation\") = 'object'"
+        },
+        "thresholds_source_required": {
+          "name": "thresholds_source_required",
+          "value": "json_valid(\"thresholds\".\"source\") AND length(trim(coalesce(json_extract(\"thresholds\".\"source\", '$.document'), ''))) > 0"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

@@ -60,6 +60,19 @@ class Voice:
                 self._piper = PiperVoice.load(voice_file)
             return self._piper
 
+    def warm_up(self) -> list[str]:
+        """Load both models now. Never raises: returns what could not be loaded."""
+        problems: list[str] = []
+        for name, load in (
+            ("speech-to-text", self._load_whisper),
+            ("text-to-speech", self._load_piper),
+        ):
+            try:
+                load()
+            except Exception as exc:  # noqa: BLE001 - a missing voice must not stop the agent
+                problems.append(f"{name}: {exc}")
+        return problems
+
     def transcribe(self, audio: bytes) -> tuple[str, str | None]:
         """Audio in any format FFmpeg/PyAV can decode (webm, ogg, wav...) → text."""
         model = self._load_whisper()

@@ -76,6 +76,8 @@ coverage/
 *.db-wal
 *.db-shm
 *.sqlite
+# Runtime folder of the backend: database, logs, local test output
+backend/var/
 *.sqlite3
 
 # =====================================================================

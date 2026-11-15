@@ -1,0 +1,405 @@
+/* Design tokens.
+   - Canvas: warm off-white paper. Dense numbers read best dark-on-light, and a warm
+     neutral glares less than pure white over a long shift.
+   - Chrome: the navigation (crew, sections, CHIEF) sits on a deep navy layer, so "who and
+     where" is a different plane from the data and is found at a glance.
+   - Accent: cobalt blue marks selection, focus, primary actions and links. Never green:
+     green, amber and red mean health status only (ISA-101 style: colour is for state).
+   - Status colours are tuned for AA contrast as text on the paper and on white cards. */
+:root {
+  --bg: #f3f0e9;
+  --panel: #ffffff;
+  --panel-2: #faf8f4;
+  --panel-3: #efebe3;
+  --border: #e6e1d7;
+  --border-2: #d3ccbf;
+  --text-1: #1b2230;
+  --text-2: #4f5866;
+  --text-3: #6b7380;
+  --accent: #2457d6;
+  --accent-strong: #1b45ad;
+  --accent-tint: rgba(36, 87, 214, 0.1);
+  --on-accent: #ffffff;
+  --nominal: #1e7d46;
+  --caution: #a8650a;
+  --critical: #c42f26;
+  --nodata: #7a8190;
+  --info: #5d6675;
+  --shadow: 0 1px 2px rgba(27, 34, 48, 0.06), 0 2px 8px rgba(27, 34, 48, 0.05);
+  --shadow-lg: 0 8px 28px rgba(27, 34, 48, 0.16);
+  --radius: 10px;
+  /* Navigation chrome. */
+  --chrome: #12213b;
+  --chrome-2: #1a2c4b;
+  --chrome-3: #243a5e;
+  --chrome-line: rgba(255, 255, 255, 0.09);
+  --chrome-text: #eef2f8;
+  --chrome-muted: #9fb0c9;
+  --chrome-accent: #7cb6ff;
+  /* Status colours brightened to read (AA) on the navy chrome, in both themes. */
+  --chrome-nominal: #4cc47f;
+  --chrome-caution: #f0b04a;
+  --chrome-critical: #ff6b61;
+  --chrome-nodata: #8b97ab;
+  /* Body map. */
+  --body: #e6e1d8;
+  --body-line: #cfc7b9;
+  --organ: #97a0b0;
+  --capsule-shell: #ffffff;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0e1420;
+  --panel: #151d2b;
+  --panel-2: #1a2333;
+  --panel-3: #222c3e;
+  --border: #263044;
+  --border-2: #344058;
+  --text-1: #e8edf5;
+  --text-2: #a3aec0;
+  --text-3: #8591a5;
+  --accent: #5b8cff;
+  --accent-strong: #7aa2ff;
+  --accent-tint: rgba(91, 140, 255, 0.16);
+  --on-accent: #0b1220;
+  --nominal: #46b871;
+  --caution: #e0a33a;
+  --critical: #f0625a;
+  --nodata: #7d8799;
+  --info: #94a0b3;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.5);
+  --chrome: #0a101b;
+  --chrome-2: #131c2c;
+  --chrome-3: #1d2940;
+  --body: #2a3550;
+  --body-line: #3a4766;
+  --organ: #8592ad;
+  --capsule-shell: #e8edf5;
+  color-scheme: dark;
+}
+
+/* A side panel on the navy chrome layer (the notifications, framing the workspace with the
+   navigation). Remaps the surface tokens, so everything inside (cards, chips, buttons)
+   follows without its own styles. Text and status colours keep AA contrast on navy. */
+.chrome-surface {
+  --bg: var(--chrome);
+  --panel: var(--chrome);
+  --panel-2: var(--chrome-2);
+  --panel-3: var(--chrome-3);
+  --border: var(--chrome-line);
+  --border-2: rgba(255, 255, 255, 0.18);
+  --text-1: var(--chrome-text);
+  --text-2: var(--chrome-muted);
+  --text-3: #93a4c0;
+  --accent: var(--chrome-accent);
+  --accent-strong: #a5ccff;
+  --accent-tint: rgba(124, 182, 255, 0.16);
+  --on-accent: #0b1220;
+  --nominal: var(--chrome-nominal);
+  --caution: var(--chrome-caution);
+  --critical: var(--chrome-critical);
+  --nodata: var(--chrome-nodata);
+  --info: var(--chrome-muted);
+  --shadow: none;
+  background: var(--chrome);
+  color: var(--text-1);
+  color-scheme: dark;
+}
+
+/* CHIEF's chat: a light sky-blue surface, the mascot's colour, so the conversation with the
+   assistant is its own region, apart from the data canvas (warm paper) and the alerts
+   (navy). Hue tells the regions apart; messages and inputs stay on white cards for
+   reading. Every text colour keeps AA contrast on the panel, its header and the cards. */
+.assistant-surface {
+  --panel: #e1ecfd;
+  --panel-2: #ffffff;
+  --panel-3: #d2e2fb;
+  --border: #c3d6f4;
+  --border-2: #9dbbe9;
+  --text-2: #3f4d66;
+  --text-3: #56637b;
+  --accent-tint: rgba(36, 87, 214, 0.12);
+  background: var(--panel);
+  color: var(--text-1);
+}
+:root[data-theme='dark'] .assistant-surface {
+  --panel: #14233c;
+  --panel-2: #1b2d4b;
+  --panel-3: #1b2d4b;
+  --border: #2b4166;
+  --border-2: #3a5583;
+  --text-2: #a3aec0;
+  --text-3: #9aa6ba;
+  --accent: #7aa2ff;
+  --accent-strong: #9bb9ff;
+  --accent-tint: rgba(122, 162, 255, 0.18);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+body {
+  color: var(--text-1);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border: 2px solid var(--bg);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- shared building blocks ---------------------------------------------------------- */
+
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.muted {
+  color: var(--text-2);
+}
+
+.faint {
+  color: var(--text-3);
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Slim status bar on the left edge of a card. */
+.card > .bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+}
+.icon-btn:hover:not(:disabled) {
+  background: var(--panel-3);
+  color: var(--text-1);
+}
+
+.btn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 12px;
+  font-weight: 500;
+}
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.btn.primary:hover {
+  background: var(--accent-strong);
+  color: var(--on-accent);
+}
+
+.link-btn {
+  height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+}
+.link-btn:hover {
+  background: var(--accent-tint);
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  background: var(--panel);
+  overflow: hidden;
+  flex: none;
+}
+.segmented button {
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.segmented button + button {
+  border-left: 1px solid var(--border-2);
+}
+.segmented button:hover {
+  color: var(--text-1);
+}
+.segmented button.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+@keyframes chSlide {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes chFade {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes chOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes chPanel {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes chWave {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes chDots {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}

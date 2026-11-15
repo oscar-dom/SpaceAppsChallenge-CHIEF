@@ -8,6 +8,8 @@ Reference data of the project, committed to Git and loaded into the database by 
 | `metrics.ts` | Catalog of the 25 metrics, by body system | HRP Spaceflight Standard Measures (which indicators NASA tracks) |
 | `thresholds.ts` | 17 thresholds: ranges per status, escalation and fallback advice | **No threshold without a source**; each entry says how far the source was checked (`verified`, `partially-verified`, `to-verify`) |
 | `formulary.ts` | Onboard formulary CHIEF may suggest from | NASA ISS Medical Kit Checklist. No dosages without a cited source |
+| `inventory.ts` | Ship inventory: medication, food and water, with how fast the crew uses each | Use rates from NASA BVAD and ISS medication studies; launch stock and per-dose chances are simulated |
+| `journey.ts` | The 10 stages of the mission route, the hazards along it and the cargo ships | Real phenomena with sources; timing simulated except the May 2024 solar storm (DONKI) |
 | `datasets/` + `datasets.ts` | Real NASA data: Inspiration4 blood panels (OSDR) and the May 2024 solar storm (DONKI), processed by `npm run data:fetch -w backend` | Each file keeps its source and retrieval date |
 | `simulation.ts` | Parameters of the simulated values (baseline, noise, trend) | Plausible values, not medical thresholds; blood baselines come from OSDR |
 | `scenarios.ts` | Demo scenarios planted on crew members | Change simulated readings only |

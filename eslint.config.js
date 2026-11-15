@@ -1,7 +1,8 @@
-// Root ESLint config (flat config) shared by every TypeScript workspace.
-// The frontend adds its Vue rules (eslint-plugin-vue) here when it is scaffolded.
+// Root ESLint config (flat config) shared by every TypeScript workspace, plus the Vue rules
+// of the frontend.
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
+import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -18,6 +19,15 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  ...vue.configs['flat/recommended'].map((config) => ({ ...config, files: ['frontend/**/*.vue'] })),
+  {
+    files: ['frontend/**/*.vue'],
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
+    rules: {
+      // Component names follow the design (Icon, Capsule, Workspace...).
+      'vue/multi-word-component-names': 'off',
     },
   },
   prettier,

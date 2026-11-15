@@ -1,5 +1,9 @@
 """HTTP API of the agent. Only the backend calls it."""
 
+import logging
+import threading
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import APIRouter, FastAPI, File, HTTPException, Request, Response, UploadFile
@@ -20,6 +24,8 @@ from .service import ChiefService
 from .voice import Voice, VoiceUnavailableError
 
 MAX_AUDIO_BYTES = 10 * 1024 * 1024
+
+logger = logging.getLogger("chief.voice")
 
 router = APIRouter()
 
@@ -79,13 +85,29 @@ async def text_to_speech(body: TtsRequest, request: Request) -> Response:
     return Response(content=audio, media_type="audio/wav")
 
 
+def _preload_voice(voice: Voice) -> None:
+    problems = voice.warm_up()
+    for problem in problems:
+        logger.warning("Voice not preloaded (%s); /stt or /tts will answer 503", problem)
+    if not problems:
+        logger.info("Voice models loaded")
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    # In a thread: the agent answers /health and /chat while the models load.
+    if app.state.settings.voice_preload:
+        threading.Thread(target=_preload_voice, args=(app.state.voice,), daemon=True).start()
+    yield
+
+
 def create_app(settings: Settings | None = None, llm: LlmClient | None = None) -> FastAPI:
     """Build the app. Tests pass their own settings and a fake LLM."""
     settings = settings or get_settings()
     if llm is None and settings.llm_configured:
         llm = GeminiChain(settings)
 
-    app = FastAPI(title="CHIEF agent", version="0.1.0")
+    app = FastAPI(title="CHIEF agent", version="0.1.0", lifespan=_lifespan)
     app.state.settings = settings
     app.state.llm = llm
     app.state.chief = ChiefService(settings, llm)

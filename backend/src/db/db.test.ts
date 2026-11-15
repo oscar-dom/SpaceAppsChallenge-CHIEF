@@ -354,6 +354,13 @@ describe('thresholds against the demo scenarios', () => {
     }
   });
 
+  it('keeps the caution-level cases in the caution band', () => {
+    expect(statusOf('urine-calcium', latest('C001', 'urine-calcium'))).toBe('caution');
+    expect(statusOf('optic-disc-edema-grade', latest('C002', 'optic-disc-edema-grade'))).toBe(
+      'caution',
+    );
+  });
+
   it('keeps the healthy readings of the other crew members nominal', () => {
     expect(
       statusOf('bone-mineral-density-change', latest('C003', 'bone-mineral-density-change')),

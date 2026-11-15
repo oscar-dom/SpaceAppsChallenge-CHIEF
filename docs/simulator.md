@@ -72,7 +72,7 @@ All values are simulated, not sourced (see [data sources](data-sources.md#simula
 
 | Metric | Base | Per crew | Noise (sd) | Trend / day | Other |
 | --- | --- | --- | --- | --- | --- |
-| Resting heart rate (bpm) | 62 | 0, +3, −2, +5 | 2.5 | — | daily cycle ±3, peak 15:00; min 40 |
+| Resting heart rate (bpm) | 70 | 0, +3, −2, +5 | 2.5 | — | daily cycle ±3, peak 15:00; min 40 |
 | Heart rate variability (ms) | 62 | 0, −6, +5, −3 | 6 | — | min 10 |
 | Blood oxygen saturation (%) | 97.5 | — | 0.5 | — | 85–100 |
 | Systolic BP (mmHg) | 114 | 0, +6, −4, +3 | 4 | — | |
@@ -113,10 +113,10 @@ Effect kinds (days since the mission start):
 | Scenario | Crew | Effects | Value at day 60 | Status |
 | --- | --- | --- | --- | --- |
 | `accelerated-bone-loss` | C001 Ana Ruiz | bone density −3.5 %, muscle strength −8 % (ramps from day 20) | bone density about −5.4 % | caution |
-| `kidney-stone-risk` | C001 Ana Ruiz | urine calcium +110 mg/day (ramp from day 25) | about 270 mg/day | caution |
+| `kidney-stone-risk` | C001 Ana Ruiz | urine calcium +85 mg/day (ramp from day 25) | about 275 mg/day | caution |
 | `early-sans` | C002 Leo Martín | optic disc edema +2.2 grades, eye pressure +8 mmHg (ramps from day 30) | grade 2, about 22 mmHg | caution |
 | `vitamin-d-deficiency` | C003 Sara Okafor | vitamin D −22 ng/mL (ramp from day 1) | about 16 ng/mL | critical |
-| `sleep-deprivation` | C004 Iker Vidal | sleep −2 h, efficiency −22 %, reaction time +75 ms, mood −1.2, stress +1.5 (ramps from day 44) | sleep about 5.6 h, efficiency about 67 %, reaction about 370 ms | critical (sleep), caution (efficiency) |
+| `sleep-deprivation` | C004 Iker Vidal | sleep −2 h, efficiency −22 %, reaction time +75 ms, mood −1.2, stress +1.5 (ramps from day 44) | sleep about 5.6 h, efficiency about 67 %, reaction about 370 ms | critical (sleep and efficiency) |
 | `solar-storm` | whole crew | dose rate +40 µSv/h (>10 MeV onset) or +80 µSv/h (>100 MeV), 10 h decay, at the real offsets of the May 2024 storm (NASA DONKI) | first onset at day 56.3 in the history | no dose-rate threshold: see below |
 
 C002's prior career dose (280 mSv) also puts the cumulative dose in the 300–600 mSv caution band by day 60. The tests check that every planted case leaves the nominal range and that the healthy crew members stay nominal.

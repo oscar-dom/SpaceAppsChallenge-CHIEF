@@ -12,6 +12,7 @@
     "frontend"
   ],
   "scripts": {
+    "start": "node scripts/start.mjs",
     "dev": "concurrently --kill-others-on-fail -n backend,frontend,agent -c blue,green,magenta \"npm run dev -w backend --if-present\" \"npm run dev -w frontend --if-present\" \"node scripts/dev-agent.mjs\"",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

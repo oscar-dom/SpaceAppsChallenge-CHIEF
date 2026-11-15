@@ -52,6 +52,12 @@ const STORM_EVENTS = (() => {
     .filter((event) => event.offsetDays <= 7);
 })();
 
+/** Mission day of the first proton onset in the seeded history, just before the demo day. */
+export const SOLAR_STORM_ONSET_DAY = 56.3;
+
+/** Days from the first to the last proton onset of the storm (real DONKI timing). */
+export const SOLAR_STORM_SPAN_DAYS = Math.max(0, ...STORM_EVENTS.map((e) => e.offsetDays));
+
 /** Replays the real storm with its first proton onset at `onsetDay`. */
 export function solarStormEffects(onsetDay: number): ScenarioEffect[] {
   return STORM_EVENTS.map((event) => ({
@@ -79,7 +85,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
     title: 'Rising kidney-stone risk',
     description: 'Urine calcium keeps rising, a risk factor for kidney stones.',
     crewId: 'C001',
-    effects: [{ metricId: 'urine-calcium', kind: 'ramp', amount: 110, fromDay: 25 }],
+    effects: [{ metricId: 'urine-calcium', kind: 'ramp', amount: 85, fromDay: 25 }],
   },
   {
     code: 'early-sans',
@@ -120,7 +126,7 @@ export const SCENARIOS: ScenarioDefinition[] = [
       'Replays the proton events of the May 2024 solar storm (NASA DONKI): the dose rate of the whole crew jumps and fades over hours.',
     crewId: null,
     // Planted so the last proton onset of the storm falls just before the demo day.
-    effects: solarStormEffects(56.3),
+    effects: solarStormEffects(SOLAR_STORM_ONSET_DAY),
   },
 ];
 

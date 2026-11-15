@@ -1,6 +1,7 @@
 import type { Alert } from './alerts.js';
 import type { MissionClock } from './crew.js';
 import type { HealthScore } from './health.js';
+import type { InventoryStock } from './journey.js';
 import type { Measurement } from './metrics.js';
 
 /**
@@ -10,6 +11,7 @@ import type { Measurement } from './metrics.js';
  * GET  /api/crew                                   → CrewMember[]
  * GET  /api/mission/clock                          → MissionClock
  * GET  /api/metrics                                → Metric[]
+ * GET  /api/thresholds                             → Threshold[]
  * GET  /api/crew/:crewId/health                    → HealthScore
  * GET  /api/crew/:crewId/systems/:systemId         → SystemStatus
  * GET  /api/crew/:crewId/measurements?metricId=&period=  → Measurement[]
@@ -19,6 +21,11 @@ import type { Measurement } from './metrics.js';
  * POST /api/chief/chat                             → ChiefChatResponse
  * POST /api/chief/stt   (audio)                    → { text: string }
  * POST /api/chief/tts   { text }                   → audio
+ * GET  /api/journey                               → Journey
+ * GET  /api/journey/stages/:index/inventory        → StageInventory
+ * GET  /api/inventory                              → InventoryStock[]
+ * GET  /api/inventory/:itemId/history              → InventoryHistory
+ * POST /api/inventory/:itemId/adjust               → InventoryStock
  */
 export const API_PREFIX = '/api';
 
@@ -37,6 +44,8 @@ export interface ServerToClientEvents {
   'health:updated': (health: HealthScore) => void;
   'alert:new': (alert: Alert) => void;
   'alert:updated': (alert: Alert) => void;
+  /** Stock changed (daily use, a resupply or a crew adjustment). Sent to every client. */
+  'inventory:updated': (stock: InventoryStock[]) => void;
 }
 
 /** Socket.IO events sent by the frontend. */

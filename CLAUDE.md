@@ -53,7 +53,7 @@ Full details in [`CONTRIBUTING.md`](CONTRIBUTING.md) and
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vue 3 + Vite + TypeScript, **Vuetify 3**, Pinia, Vue Router, **vue-echarts** (charts), Socket.IO client |
+| Frontend | Vue 3 + Vite + TypeScript, Pinia, Socket.IO client. Own design system (tokens in `frontend/src/styles/base.css`) and SVG charts, no component library |
 | Backend | Node.js + **Express** + TypeScript, Socket.IO, **SQLite** with **Drizzle ORM** (better-sqlite3 driver) |
 | Agent (CHIEF) | **Python + FastAPI**, a chain of Gemini Flash models via the `google-genai` SDK, **faster-whisper** (speech-to-text), **Piper** (text-to-speech) |
 | Shared contracts | `shared/` — TypeScript types used by frontend and backend |
@@ -70,6 +70,12 @@ Why these choices:
   In the story, CHIEF is the ship's assistant.
 - **Python agent:** faster-whisper and Piper are Python tools; keeping CHIEF, STT and TTS
   in one service gives the AI work a single home.
+- **No Vuetify or vue-echarts:** the interface follows a custom flight-software design
+  (status colours only for health, mono tabular numbers, threshold bands on every chart).
+  Light warm canvas with a navy navigation layer and a cobalt accent; design rules in
+  [`frontend/README.md`](frontend/README.md).
+  Plain CSS tokens and small SVG charts match it exactly; a Material component library
+  and a chart library would have to be fought at every step.
 
 ---
 
@@ -89,6 +95,7 @@ backend/    Express API + Socket.IO              :3000
     services/     rules engine, simulator, alerts, agent client
 agent/      Python FastAPI service: CHIEF + STT + TTS   :8000
 shared/     TypeScript types shared by frontend and backend
+video/      CHIEF animator for the demo video (not part of the app)
 ```
 
 ### Data flow
@@ -110,7 +117,8 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
   **past mission history** so weekly and monthly charts have data from the first second.
 - **Rules engine** (`backend/src/services`): deterministic, no AI. Compares each reading
   with its threshold and returns a status, computes each body system's status and the
-  **health score** (weighted average of system statuses, weights in config), and creates
+  **health score** (weighted average of system statuses, weights in config, kept inside
+  the band of the overall status: nominal 90-100, caution 70-89, critical 0-69), and creates
   alerts. It is the source of truth for every status shown in the UI.
 - **Agent** (`agent/`): receives the context from the backend and returns CHIEF's
   answers. Endpoints: `GET /health`, `POST /chat`, `POST /alerts/actions` (recommended
@@ -128,7 +136,8 @@ Frontend ──REST──▶ Backend ──HTTP──▶ Agent ──▶ Gemini
 - **Body systems (menu sections):** `overview`, `cardiovascular`, `musculoskeletal`,
   `blood-biochemistry`, `immune`, `vision` (SANS), `sleep-cognition`,
   `behavioral-health`, `radiation`, `nutrition`
-- Core entities: `CrewMember`, `Metric`, `Measurement`, `Threshold`, `SystemStatus`,
+- Core entities (JOURNEY adds `Journey`, `Hazard`, `InventoryItem`, `InventoryEvent`):
+  `CrewMember`, `Metric`, `Measurement`, `Threshold`, `SystemStatus`,
   `HealthScore`, `Alert`, `ChiefMessage`, `Medication` (onboard formulary)
 
 The agent is Python: its Pydantic models (`agent/chief/schemas.py`) mirror the
@@ -141,24 +150,42 @@ backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
 
 One view for every crew member: what an astronaut sees on board.
 
-- **Top bar:** **crew switcher**, a quick dropdown like Instagram's account switcher, to
-  change the active crew member. Also mission day and mission clock.
-- **Left menu (always visible):** the body-system sections from the list above. The first
-  entry is **Overview**. At the bottom, a **Talk to CHIEF** button.
-- **Overview:** a human body figure (SVG) whose regions are coloured by their system's
-  status, plus the global **health score**. Clicking a region opens its section.
+- **Left navigation (navy, always visible, can shrink to icons):** first **JOURNEY**
+  (see below), then the crew: a **Crew overview** entry (every body, score and key
+  vitals) and one row per crew member with avatar, status ring and health score. Then the body-system sections of the selected
+  person; the first entry is **Overview**. At the bottom, **Talk to CHIEF** as the primary
+  button with the mascot.
+- **JOURNEY:** two menu entries that open as workspace tabs. **Mission route**: the
+  180-day mission as a path of **10 stages** on a starry map, with CHIEF as the ship
+  moving along it (done / to go), the hazards to prepare for (radiation: South Atlantic
+  Anomaly, solar particle events; thermal: high beta angle, spacewalks) and the cargo
+  ships; clicking a stage shows what the inventory did in it (a forecast for stages not
+  reached yet). **Inventory**: medication, food and water with days of supply and their
+  history; the crew adds or removes stock to keep the count right.
+- **Top bar:** the selected crew member with their health score, then mission day,
+  mission clock and crew dose rate.
+- **Workspace:** sections open as tabs. Dragging a section or a tab onto a pane's edge
+  splits it, so several sections can be seen at once (like editor groups in VS Code).
+- **Overview:** a human body figure (SVG) with the organs of each system; organs in
+  caution or critical take the status colour, healthy ones stay neutral. Plus the global
+  **health score**. Clicking an organ opens its section.
 - **System sections:** a dashboard full of statistics for that system: every metric from
   measurements and sensors, with period selectors (day / week / month / whole mission),
   thresholds drawn on the charts and trend indicators.
-- **Right panel (always available, vertical, collapsible):** the alerts to act on or be
-  aware of, sorted by severity. **Clicking an alert asks CHIEF for recommended actions.**
-- **CHIEF chat:** text and voice (push-to-talk). If the voice service is down, the
-  browser's Web Speech API is the fallback.
+- **Right panel (navy like the navigation, collapsible to a rail):** alerts sorted by
+  severity and a Tasks tab with the scheduled measurements of the coming days. **A new
+  anomaly always opens the panel** (a new task only raises the badge). **Clicking an alert
+  asks CHIEF for recommended actions.**
+- **CHIEF chat:** text and voice (push-to-talk), on a light sky-blue panel (the mascot's
+  colour) so it is told apart from the data and the navy alerts. If the voice service is
+  down, the browser's Web Speech API is the fallback.
 - **CHIEF's mascot: "Capsule"**, a medicine capsule dressed as an astronaut, with four
   animated states (`idle`, `listening`, `thinking`, `alert`). It appears on the Talk to
   CHIEF button and in the chat. SVG, colors and the suggested Vue component:
   [`docs/design/chief-mascot/`](docs/design/chief-mascot/README.md). Its accent is sky
-  blue (amber in `alert`), never green or red, which mean health statuses.
+  blue, never green or red, which mean health statuses. The app shows the same blue
+  mascot on the button and in the chat (grey when CHIEF is offline); pending alerts are
+  told by the button's text, so the amber `alert` state is not used.
 
 The UI should feel like a spacecraft system: clear, dark-friendly, with subtle animation
 for live data and alert changes.
@@ -191,6 +218,9 @@ NASA data and standards**, and document where every value or threshold comes fro
   threshold without a source.
 - **Onboard formulary:** the medication CHIEF is allowed to suggest, based on the ISS
   medical kit.
+- **Journey and inventory:** the 10 mission stages, their hazards and cargo ships, and
+  the ship stock (medication, food, water) with use rates from NASA documents (BVAD,
+  ISS medication studies). Stock is a ledger of changes, never a stored number.
 - **Demo scenarios:** synthetic cases planted on specific crew members so that alerts fire
   and CHIEF can propose solutions. Examples: early SANS (vision changes, headaches),
   vitamin D deficiency, sleep deprivation and slower reaction time, radiation spike from
@@ -250,6 +280,7 @@ Requires **Node.js ≥ 20** and **Python 3.11+** (agent).
   MSYS/Git Bash `python`.
 
 ```bash
+npm start                   # one command: install, set up the agent, fresh demo data, run (also ./start.sh, start.cmd)
 npm install                 # install every JS workspace
 npm run dev                 # start backend, frontend and agent together
 npm run lint                # ESLint on all TS code
