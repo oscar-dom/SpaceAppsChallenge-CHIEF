@@ -483,6 +483,20 @@
       .stage {
         container-type: inline-size;
       }
+      /* Watermark for the whole video: the voice and the animation are made with AI. Small and
+         faint, bottom left, above every scene and CHIEF. */
+      .watermark {
+        position: absolute;
+        left: 1.4%;
+        bottom: 1.6%;
+        z-index: 8;
+        font: 600 1.05cqw/1 var(--sans);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        text-shadow: 0 0 0.3em rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+      }
       .subs {
         position: absolute;
         left: 50%;
@@ -918,6 +932,7 @@
             aria-hidden="true"
           ></iframe>
           <div class="subs" id="subs" aria-live="off"></div>
+          <div class="watermark" aria-hidden="true">AI-generated</div>
         </div>
 
         <div class="controls">
