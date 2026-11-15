@@ -855,21 +855,22 @@
 # Positions "X,Y" are CHIEF's centre in the 1920x1080 frame. The screenshots of
 # video/screenshots (2560x1440) fill the frame, so X,Y = screenshot pixel x 0.75.
 # Pointing arms are level with CHIEF's centre. Scenes as in video/storyboard:
-# 5.05 white · 7.0 image1 Sara's dashboards · 14.6 image2 crew overview + alerts ·
-# 17.85 image9 CHIEF's answer in the chat · 19.8 image3 mission route · 22.4 image4 inventory · 24.35 images 5-8 body systems ·
+# 5.05 white · 7.0 image1 Sara's dashboards · 14.6 image9 crew overview, alerts and
+# CHIEF's answer in the chat · 19.8 image3 mission route · 22.4 image4 inventory · 24.35 images 5-8 body systems ·
 # 28.12 back to space (CHIEF celebrates top right until the end).
+# Subtitles sit bottom centre (y 963-1031): CHIEF's centre stays at y 815 or above there.
 0     idle       off-right    none        "In orbit, the nearest doctor is four hundred kilometres away."
 4.25  idle       -            -           "Until now!"
 5.05  talking    center       wave        "Hi! I'm CHIEF."
-7.2   scanning   745,900      none        "I monitor every astronaut with real NASA data,"
+7.2   scanning   745,815      none        "I monitor every astronaut with real NASA data,"
 10.5  talking    -            point-left  "from OSDR blood panels"
 12.3  talking    -            point-right "to NASA-STD-3001 limits."
-14.85 alert      1110,640     point-right "When something drifts, I alert you,"
+14.85 alert      1490,805     point-right "When something drifts, I alert you,"
 16.9  thinking   -            none        "connect the dots,"
-17.9  talking    -            point-right "and tell you exactly what to do."
-19.9  talking    560,905      point-right "I replay real solar storms on your route,"
+17.9  talking    1110,640     point-right "and tell you exactly what to do."
+19.9  talking    560,815      point-right "I replay real solar storms on your route,"
 22.5  talking    1495,560     point-left  "track meds, food and water,"
-24.4  talking    1780,860     none        "and chart nine body systems against medical limits,"
+24.4  talking    1780,815     none        "and chart nine body systems against medical limits,"
 27.5  happy      -            nod         "every day."
 28.2  celebrate  top-right    none        "You will never be alone again!"`;
 
@@ -916,7 +917,10 @@
         if (nextCue >= cues.length && time > end && (!audio || audio.paused || audio.ended))
           stopTimeline();
       }
-      async function playTimeline() {
+      // `from` (seconds) starts the timeline there, e.g. to resume after a pause: the cues before
+      // it apply at once on the first frame. Without it (button click), it starts at 0.
+      async function playTimeline(from) {
+        const at = typeof from === 'number' ? from : 0;
         try {
           cues = parseTimeline();
         } catch (e) {
@@ -925,14 +929,14 @@
         }
         nextCue = 0;
         // A cue at 0 s sets where CHIEF starts, with no glide (e.g. hidden off-right).
-        if (cues[0]?.t === 0 && cues[0].pos !== '-') {
+        if (at === 0 && cues[0]?.t === 0 && cues[0].pos !== '-') {
           setPos(cues[0].pos);
           [cur.x, cur.y] = screenOf(target.pos);
         }
         playing = true;
-        t0 = performance.now();
+        t0 = performance.now() - at * 1000;
         if (audio) {
-          audio.currentTime = 0;
+          audio.currentTime = at;
           await actx?.resume();
           await audio.play();
         }
@@ -1020,7 +1024,7 @@
       });
       // --- embed ---------------------------------------------------------------------------------------
       // index.html?embed shows only the transparent canvas, to sit over another page (the storyboard),
-      // which starts and stops the timeline with postMessage({ chief: 'play' | 'stop' }).
+      // which starts and stops the timeline with postMessage({ chief: 'play' | 'stop', at? }).
       if (new URLSearchParams(location.search).has('embed')) {
         document.documentElement.classList.add('embed');
         document.body.classList.add('clean', 'embed');
@@ -1028,7 +1032,7 @@
         document.getElementById('subs').checked = false;
       }
       window.addEventListener('message', (e) => {
-        if (e.data?.chief === 'play') playTimeline();
+        if (e.data?.chief === 'play') playTimeline(e.data.at);
         if (e.data?.chief === 'stop') stopTimeline();
       });
       requestAnimationFrame(loop);
