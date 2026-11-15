@@ -441,6 +441,201 @@
         }
       }
 
+      /* ---------- Camera ----------
+         .cam wraps a scene's screenshots and moves like a camera. Every key pose zooms by s around
+         a focus point (px, py) that stays put on screen: translate((1-s)px%, (1-s)py%) scale(s),
+         with the origin at the top-left corner. Since s >= 1 and 0 <= p <= 100, the image always
+         covers the stage, also between poses (the condition is linear, so it holds for any mix).
+         Keyframe percentages are fractions of the scene's duration (--d), placed on the voice-over
+         words; the comment next to each pose gives its time in the video. */
+      .cam {
+        position: absolute;
+        inset: 0;
+        transform-origin: 0 0;
+        will-change: transform;
+      }
+      /* Spotlight: dims everything but an ellipse around what the voice names. It sits under
+         CHIEF and the subtitles (they are higher layers), so only the screenshot darkens. */
+      .spot {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        opacity: 0;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse var(--rx) var(--ry) at var(--x) var(--y),
+          transparent 80%,
+          rgba(4, 8, 16, 0.5) 100%
+        );
+      }
+
+      /* Scene 4 (7.0-14.6 s, image1). Two focus zones, each where CHIEF points:
+         - "from OSDR blood panels" (10.5 s, CHIEF points left): the Blood & Biochemistry and Immune
+           rows of System status, the two systems fed by the NASA OSDR Inspiration4 blood panels
+           (fasting glucose and white blood cell count, backend/data/datasets.ts).
+         - "to NASA-STD-3001 limits" (12.3 s, CHIEF points right): the two charts that draw their
+           limits as threshold lines, intraocular pressure (critical >= 26, caution >= 22) and blood
+           oxygen saturation (caution < 95). Two spotlight holes, one per chart.
+         The camera is back at 1x before the scene ends: the crossfade to scene 5 then starts from
+         the full frame and nothing jumps when the scene's animation is removed. */
+      .s4.active .cam {
+        animation: cam4 var(--d) ease-in-out both;
+      }
+      @keyframes cam4 {
+        0%,
+        43% {
+          transform: none;
+        }
+        50% {
+          /* 10.8 s · s 1.35 at (20, 83): Blood & Biochemistry and Immune rows */
+          transform: translate(-7%, -29.05%) scale(1.35);
+        }
+        69% {
+          transform: translate(-7%, -29.05%) scale(1.35);
+        }
+        76% {
+          /* 12.8 s · s 1.15 at (57, 33): intraocular pressure and blood oxygen charts */
+          transform: translate(-8.55%, -4.95%) scale(1.15);
+        }
+        92% {
+          /* 14.0 s: hold until "limits" is said */
+          transform: translate(-8.55%, -4.95%) scale(1.15);
+        }
+        100% {
+          /* 14.6 s: back to the full frame for the crossfade */
+          transform: none;
+        }
+      }
+      .s4 .spot-blood {
+        --x: 20%;
+        --y: 83%;
+        --rx: 14%;
+        --ry: 5.5%;
+      }
+      /* Two holes: each mask layer is opaque outside its ellipse and the layers intersect, so the
+         dark layer shows only outside both charts. Centres and radii are the charts' boxes after
+         the 1.15x zoom around (57, 33). */
+      .s4 .spot-limits {
+        background: rgba(4, 8, 16, 0.5);
+        -webkit-mask-image:
+          radial-gradient(ellipse 14.8% 12.8% at 36.3% 30.7%, transparent 80%, #000 100%),
+          radial-gradient(ellipse 29% 10.8% at 68.5% 35.9%, transparent 80%, #000 100%);
+        mask-image:
+          radial-gradient(ellipse 14.8% 12.8% at 36.3% 30.7%, transparent 80%, #000 100%),
+          radial-gradient(ellipse 29% 10.8% at 68.5% 35.9%, transparent 80%, #000 100%);
+        -webkit-mask-composite: source-in;
+        mask-composite: intersect;
+      }
+      .s4.active .spot-blood {
+        animation: spot4a var(--d) ease both;
+      }
+      .s4.active .spot-limits {
+        animation: spot4b var(--d) ease both;
+      }
+      @keyframes spot4a {
+        0%,
+        47% {
+          opacity: 0;
+        }
+        53%,
+        68% {
+          opacity: 1;
+        }
+        72%,
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes spot4b {
+        0%,
+        72% {
+          opacity: 0;
+        }
+        79%,
+        90% {
+          opacity: 1;
+        }
+        97%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* Scene 6 (19.8-22.4 s, image3): one focus zone, the solar storm on the route (stage 4: its
+         critical marker, the radiation zone and the label), on "I replay real solar storms"; CHIEF
+         points right at it. Back to 1x before the cut to the inventory. */
+      .s6.active .cam {
+        animation: cam6 var(--d) ease-in-out both;
+      }
+      @keyframes cam6 {
+        0% {
+          transform: none;
+        }
+        35%,
+        86% {
+          /* 20.7-22.0 s · s 1.4 at (37, 36) */
+          transform: translate(-14.8%, -14.4%) scale(1.4);
+        }
+        100% {
+          transform: none;
+        }
+      }
+      .s6 .spot {
+        --x: 37%;
+        --y: 36%;
+        --rx: 14%;
+        --ry: 18%;
+      }
+      .s6.active .spot {
+        animation: spot6 var(--d) ease both;
+      }
+      @keyframes spot6 {
+        0%,
+        20% {
+          opacity: 0;
+        }
+        40%,
+        82% {
+          opacity: 1;
+        }
+        94%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      /* Scene 1: "400 kilometres" pops as it is said (about 2 s in) and the red cross, the
+         nearest doctor, pulses. */
+      .s1.active .dist b {
+        display: inline-block;
+        animation: pop 0.6s ease 1.8s both;
+      }
+      @keyframes pop {
+        0% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        60% {
+          opacity: 1;
+          transform: scale(1.25);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .s1.active .cross {
+        border-radius: 50%;
+        animation: pulse 0.9s ease-out 1.8s 2 both;
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 107, 97, 0.7);
+        }
+        100% {
+          box-shadow: 0 0 0 22px rgba(255, 107, 97, 0);
+        }
+      }
+
       /* "9 BODY SYSTEMS" over the quick cuts, on a dark band, clear of CHIEF (bottom right). */
       .s8 .kicker {
         top: 36%;
@@ -888,10 +1083,14 @@
 
           <!-- 4 · Real NASA data -->
           <div class="scene s4 shot">
-            <img
-              src="../screenshots/image1.png"
-              alt="Sara's dashboards: body map, vision, cardiovascular and sleep, with thresholds and sources"
-            />
+            <div class="cam">
+              <img
+                src="../screenshots/image1.png"
+                alt="Sara's dashboards: body map, vision, cardiovascular and sleep, with thresholds and sources"
+              />
+            </div>
+            <div class="spot spot-blood"></div>
+            <div class="spot spot-limits"></div>
             <div class="fromwhite"></div>
           </div>
 
@@ -915,10 +1114,13 @@
 
           <!-- 6 · Mission route -->
           <div class="scene s6 shot">
-            <img
-              src="../screenshots/image3.png"
-              alt="Mission route: ten stages, hazards, solar storm and cargo ships"
-            />
+            <div class="cam">
+              <img
+                src="../screenshots/image3.png"
+                alt="Mission route: ten stages, hazards, solar storm and cargo ships"
+              />
+            </div>
+            <div class="spot"></div>
           </div>
 
           <!-- 7 · Inventory -->
