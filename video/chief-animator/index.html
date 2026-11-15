@@ -57,7 +57,7 @@
         background: #00b140;
       }
       #frame.bg-app {
-        background: #f3f0e9 center / cover no-repeat;
+        background: #f3f0e9 center / contain no-repeat;
       }
       #frame canvas {
         position: absolute;
@@ -213,7 +213,7 @@
       <h2>Position</h2>
       <div class="grid" id="positions"></div>
       <label>Size <span id="sizeVal" class="muted"></span></label>
-      <input type="range" id="size" min="0.4" max="2.2" step="0.05" value="1" />
+      <input type="range" id="size" min="0.4" max="2.2" step="0.05" value="0.75" />
 
       <h2>Colours</h2>
       <select id="theme">
@@ -341,6 +341,9 @@
         refreshButtons();
       }
       function setPos(p) {
+        // "X,Y" places CHIEF's centre at that pixel of the 1920 × 1080 frame.
+        const px = !POSITIONS[p] && p.match(/^(\d+),(\d+)$/);
+        if (px) POSITIONS[p] = [px[1] / (W / 2) - 1, 1 - px[2] / (H / 2)];
         if (POSITIONS[p]) target.pos = p;
         refreshButtons();
       }
@@ -832,20 +835,26 @@
 
       // --- timeline -------------------------------------------------------------------------------------
       const tl = document.getElementById('timeline');
-      tl.value = `# Example: replace with Héctor's script timings
-0    idle       off-right    -           ""
-0.4  happy      right        wave        ""
-1.6  talking    right        -           "Hi! I'm CHIEF, the health system of this spacecraft."
-5    scanning   top-right    -           "I watch every crew member's body, live."
-8.5  sleepy     top-right    -           "Iker barely slept last night…"
-10.5 concerned  center       -           ""
-11.5 alert      center       -           "…and his sleep is now critical."
-14.5 talking    bottom-right point-left  "I tell him what to do, and when to call the flight surgeon."
-19   thinking   bottom-left  -           "I also plan the route: radiation, heat and supplies."
-22   surprised  bottom-left  -           "Cargo ship on the way!"
-24   celebrate  center       -           "Everyone healthy, mission on track."
-27.5 happy      bottom-right wink        "CHIEF. Health, on board."
-29.5 idle       off-right    -           ""`;
+      tl.value = `# Synced to voiceover.mp3 (30.6 s) at size 0.75. Load it in Voice-over before playing.
+# Positions "X,Y" are CHIEF's centre in the 1920x1080 frame, with the app screenshot
+# fitted to the width (1920 x 956, centred). Pointing arms are level with CHIEF's centre.
+# Screenshots: 0-16.9 crew overview, 16.9-20 Sara + chat, 20-22.6 mission route,
+# 22.6-24.6 inventory, 24.6-28.5 Sara + chat (system status).
+0     idle       off-right    none        "In orbit, the nearest doctor is four hundred kilometres away."
+4.25  idle       -            -           "Until now!"
+5.25  talking    center       wave        "Hi! I'm CHIEF."
+7.2   scanning   center       -           "I monitor every astronaut with real NASA data,"
+10.5  talking    1410,894     point-left  "from OSDR blood panels to NASA-STD-3001 limits."
+14.85 alert      1275,392     point-left  "When something drifts, I alert you,"
+16.9  thinking   1203,421     none        "connect the dots,"
+18    talking    -            point-right "and tell you exactly what to do."
+20.05 talking    526,404      point-right "I replay real solar storms on your route,"
+22.65 talking    1493,280     point-left  "track meds, food and water,"
+24.6  talking    595,296      point-right "and chart nine body systems against medical limits,"
+27.5  happy      center       nod         "every day."
+28.55 celebrate  center       -           "You will never be alone again!"
+30.6  happy      center       wink        ""
+31.8  idle       off-right    -           ""`;
 
       let cues = [],
         playing = false,
@@ -898,6 +907,11 @@
           return false;
         }
         nextCue = 0;
+        // A cue at 0 s sets where CHIEF starts, with no glide (e.g. hidden off-right).
+        if (cues[0]?.t === 0 && cues[0].pos !== '-') {
+          setPos(cues[0].pos);
+          [cur.x, cur.y] = screenOf(target.pos);
+        }
         playing = true;
         t0 = performance.now();
         if (audio) {
