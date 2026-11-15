@@ -258,8 +258,8 @@
       .beam {
         position: absolute;
         left: 83%;
-        top: 15%;
-        width: 34%;
+        top: 25.8%;
+        width: 33%;
         height: 2.6%;
         border-radius: 999px;
         transform-origin: 0 50%;
@@ -270,7 +270,7 @@
           rgba(120, 200, 255, 0.4) 100%
         );
         box-shadow: 0 0 40px 12px rgba(180, 230, 255, 0.75);
-        transform: rotate(168deg) scaleX(0);
+        transform: rotate(180deg) scaleX(0);
         z-index: 5;
       }
       /* First half of the clip: the beam travels from the sun to the ship. */
@@ -279,11 +279,11 @@
       }
       @keyframes beamIn {
         0% {
-          transform: rotate(168deg) scaleX(0);
+          transform: rotate(180deg) scaleX(0);
         }
         50%,
         100% {
-          transform: rotate(168deg) scaleX(1);
+          transform: rotate(180deg) scaleX(1);
         }
       }
       /* Second half: a white disc grows from the ship until it covers the whole stage (its solid
@@ -336,8 +336,8 @@
       .s3 {
         background: #fff;
       }
-      .s3,
-      .s4 {
+      .s3.active,
+      .s4.active {
         transition: none;
       }
       .s3 .hello {
@@ -477,6 +477,39 @@
       }
       .chief-layer.on {
         opacity: 1;
+      }
+      /* Subtitles: white on a translucent black box, bottom centre, standard size (40 px on a
+         1080 p frame: 2.1 % of the stage width). Above CHIEF, which keeps clear of them. */
+      .stage {
+        container-type: inline-size;
+      }
+      .subs {
+        position: absolute;
+        left: 50%;
+        bottom: 4.5%;
+        transform: translateX(-50%);
+        width: max-content;
+        max-width: 80%;
+        z-index: 7;
+        text-align: center;
+        pointer-events: none;
+      }
+      .subs span {
+        display: inline-block;
+        padding: 0.2em 0.6em;
+        border-radius: 0.25em;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        font: 500 2.1cqw/1.3 var(--sans);
+      }
+      .subs:empty,
+      .subs[hidden] {
+        display: none;
+      }
+      /* Paused: the scene's animations freeze where they are. */
+      .stage.paused .scene,
+      .stage.paused .scene * {
+        animation-play-state: paused !important;
       }
 
       /* Scene 9: back to space, not alone any more. The ship on top, the logo centred between the
@@ -830,11 +863,11 @@
             <div class="fromwhite"></div>
           </div>
 
-          <!-- 5 · Alerts -->
+          <!-- 5 · Alerts and what to do -->
           <div class="scene s5 shot">
             <img
-              src="../screenshots/image2.png"
-              alt="Crew overview: four bodies, scores and vitals, with the alerts panel"
+              src="../screenshots/image9.png"
+              alt="CHIEF's answer in the chat: what to do about high intraocular pressure, with escalation"
             />
           </div>
 
@@ -884,6 +917,7 @@
             tabindex="-1"
             aria-hidden="true"
           ></iframe>
+          <div class="subs" id="subs" aria-live="off"></div>
         </div>
 
         <div class="controls">
@@ -893,13 +927,16 @@
             ⛶ Full screen
           </button>
           <label class="vo"><input type="checkbox" id="voToggle" checked /> 🔊 Voice-over</label>
+          <label class="vo"><input type="checkbox" id="subsToggle" checked /> CC Subtitles</label>
           <span class="grow"></span>
           <span class="clock" id="clock">0.0 s / 30.6 s</span>
         </div>
         <div class="timeline" id="timeline"><span class="playhead" id="playhead"></span></div>
         <p class="note">
-          Press Play: the voice-over and CHIEF's timeline start together. Voice-over off: the same
-          30.6 s without sound, to screen-record the stage in full screen.
+          Press Play: the voice-over and CHIEF's timeline start together; Pause keeps the place and
+          Play goes on from there (Restart, or <kbd>R</kbd>, starts over; a scene on the timeline
+          jumps to it). Voice-over off: the same 30.6 s without sound, to screen-record the stage in
+          full screen. Subtitles can be turned off for a clean recording.
         </p>
       </section>
 
@@ -928,10 +965,13 @@
           <h3>App screenshots</h3>
           <ul>
             <li>
-              <code>video/screenshots/image1.png</code> to <code>image8.png</code>, shown in that
-              order as CHIEF describes each feature.
+              <code>video/screenshots/image1.png</code> to <code>image9.png</code>, shown as CHIEF
+              describes each feature (image9 right after image1).
             </li>
-            <li>1: dashboards with thresholds and sources · 2: crew overview and alerts.</li>
+            <li>
+              1: dashboards with thresholds and sources · 9: crew overview, alerts and CHIEF’s
+              answer (image2 is not used).
+            </li>
             <li>3: mission route · 4: inventory · 5–8: body systems, quick cuts.</li>
           </ul>
         </div>
@@ -1093,19 +1133,19 @@
           why: 'Makes "we use real data" visible: thresholds and sources on every chart are the credibility a data jury scores.',
         },
         {
-          title: 'Alerts',
+          title: 'Alerts and what to do',
           start: 14.6,
           end: 19.8,
           speaker: 'chief',
           line: 'When something drifts, I alert you, connect the dots, and tell you exactly what to do.',
           chief: true,
-          thumb: SHOT(2),
+          thumb: SHOT(9),
           visual:
-            'Screenshot 2: the crew overview, four bodies with their scores, and the alerts panel with severities and escalation (contact the flight surgeon, crew medical officer).',
+            'Screenshot 9, the whole sentence: the crew overview with the alerts panel and CHIEF’s answer in the chat. CHIEF first points at the alerts (from the chat’s empty space), then glides left and points at the answer: what it means, the actions and who to call, up to the flight surgeon.',
           onscreen: '—',
           audio: 'Alert chime, then a soft "resolve" tone.',
-          transition: 'Cut.',
-          why: 'Tension (alert) and relief (what to do). The core value, so it gets a long scene.',
+          transition: 'Cross-fade from screenshot 1.',
+          why: 'Tension (alert) and relief (a clear plan with its escalation level), in one shot with no cut.',
         },
         {
           title: 'Mission route',
@@ -1169,6 +1209,21 @@
         },
       ];
       const TOTAL = SCENES[SCENES.length - 1].end;
+      /* Subtitles, timed to the voice-over's words (start, end in seconds). */
+      const SUBS = [
+        [0, 3.7, 'In orbit, the nearest doctor is 400 kilometres away.'],
+        [4.16, 5.1, 'Until now!'],
+        [5.58, 6.9, 'Hi, I’m CHIEF.'],
+        [7.28, 10.2, 'I monitor every astronaut with real NASA data,'],
+        [10.5, 14.4, 'from OSDR blood panels to NASA-STD-3001 limits.'],
+        [14.9, 16.8, 'When something drifts, I alert you,'],
+        [17.02, 19.6, 'connect the dots, and tell you exactly what to do.'],
+        [20.04, 22.3, 'I replay real solar storms on your route,'],
+        [22.56, 24.2, 'track meds, food, and water,'],
+        [24.54, 26.3, 'and chart nine body systems'],
+        [26.3, 28.12, 'against medical limits every day.'],
+        [28.12, 30.6, 'You will never be alone again!'],
+      ];
       /* ---------- Static content ---------- */
       const words = SCENES.reduce((n, s) => n + s.line.split(/\s+/).length, 0);
       document.getElementById('script').innerHTML =
@@ -1560,9 +1615,20 @@
       const playBtn = document.getElementById('play');
       const voToggle = document.getElementById('voToggle');
       const timeline = document.getElementById('timeline');
+      const subsBox = document.getElementById('subs');
+      const subsToggle = document.getElementById('subsToggle');
+      let subText = null;
+      function renderSubs(t) {
+        const cue = SUBS.find(([a, b]) => t >= a && t < b);
+        const text = cue ? cue[2] : '';
+        if (text === subText) return;
+        subText = text;
+        subsBox.innerHTML = text ? `<span>${text}</span>` : '';
+      }
+      subsToggle.addEventListener('change', () => (subsBox.hidden = !subsToggle.checked));
       const vo = new Audio('../chief-animator/voiceover.mp3');
       const chiefLayer = document.getElementById('chiefLayer');
-      const chief = (cmd) => chiefLayer.contentWindow?.postMessage({ chief: cmd }, '*');
+      const chief = (cmd, at) => chiefLayer.contentWindow?.postMessage({ chief: cmd, at }, '*');
       new ResizeObserver(() =>
         chiefLayer.style.setProperty('--k', String(stage.clientWidth / 1920)),
       ).observe(stage);
@@ -1578,6 +1644,9 @@
       let playing = false;
       let raf = null;
       let t0 = 0;
+      /* Where Play resumes (seconds), and whether the scene must restart there (after a jump). */
+      let pausedAt = 0;
+      let jumped = true;
 
       function buildList() {
         list = SCENES.map((sc, k) => ({ ...sc, n: k + 1, dur: sc.end - sc.start }));
@@ -1591,9 +1660,16 @@
           seg.style.width = `${(sc.dur / listTotal) * 100}%`;
           seg.textContent = `${sc.n}`;
           seg.title = `${sc.title} · ${sc.dur.toFixed(1)} s`;
+          // A click jumps to the start of the scene; Play then goes on from there.
           seg.addEventListener('click', () => {
             stop();
+            stage.classList.remove('paused');
             show(i);
+            pausedAt = sc.at;
+            jumped = true;
+            renderSubs(sc.at);
+            clock.textContent = `${sc.at.toFixed(1)} s / ${listTotal.toFixed(1)} s`;
+            playhead.style.left = `${(sc.at / listTotal) * 100}%`;
           });
           timeline.insertBefore(seg, playhead);
         });
@@ -1625,28 +1701,45 @@
         if (t >= listTotal || (voToggle.checked && !voFailed && vo.ended)) return finish();
         const i = list.findIndex((sc) => t >= sc.at && t < sc.at + sc.dur);
         if (i >= 0 && i !== current) show(i);
+        renderSubs(t);
         clock.textContent = `${t.toFixed(1)} s / ${listTotal.toFixed(1)} s`;
         playhead.style.left = `${Math.min(100, (t / listTotal) * 100)}%`;
         raf = requestAnimationFrame(tick);
       }
 
+      /* Play resumes where it was paused (or from a scene picked on the timeline). */
       function play() {
         if (playing) return stop();
+        const from = pausedAt < listTotal ? pausedAt : 0;
+        if (from === 0 || jumped) {
+          current = -1;
+          show(
+            Math.max(
+              0,
+              list.findIndex((sc) => from >= sc.at && from < sc.at + sc.dur),
+            ),
+          );
+        }
+        jumped = false;
         playing = true;
+        stage.classList.remove('paused');
         playBtn.textContent = '❚❚ Pause';
-        current = -1;
-        show(0);
-        t0 = performance.now();
+        t0 = performance.now() - from * 1000;
         if (voToggle.checked) {
-          vo.currentTime = 0;
+          vo.currentTime = from;
           vo.play().catch(() => (voFailed = true));
         }
-        chief('play');
+        chief('play', from);
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(tick);
       }
 
+      /* Pause: keep the position and freeze the scene. */
       function stop() {
+        if (playing) {
+          pausedAt = now();
+          stage.classList.add('paused');
+        }
         playing = false;
         cancelAnimationFrame(raf);
         vo.pause();
@@ -1654,25 +1747,35 @@
         playBtn.textContent = '▶ Play';
       }
 
+      function restart() {
+        stop();
+        pausedAt = 0;
+        jumped = true;
+        play();
+      }
+
       function finish() {
         stop();
+        pausedAt = 0;
+        jumped = true;
+        renderSubs(-1);
         clock.textContent = `${listTotal.toFixed(1)} s / ${listTotal.toFixed(1)} s`;
         playhead.style.left = '100%';
       }
 
       playBtn.addEventListener('click', play);
-      document.getElementById('restart').addEventListener('click', () => {
-        stop();
-        play();
-      });
+      document.getElementById('restart').addEventListener('click', restart);
       voToggle.addEventListener('change', () => {
         stop();
-        show(0);
+        jumped = true;
       });
 
       /* ---------- Full screen and keys (for screen recording) ---------- */
       function enterFullscreen() {
         stop();
+        stage.classList.remove('paused');
+        pausedAt = 0;
+        jumped = true;
         show(0);
         stage.requestFullscreen?.().catch(() => {});
       }
@@ -1690,8 +1793,7 @@
           if (document.fullscreenElement) document.exitFullscreen();
           else enterFullscreen();
         } else if (e.key === 'r' || e.key === 'R') {
-          stop();
-          play();
+          restart();
         }
       });
 
