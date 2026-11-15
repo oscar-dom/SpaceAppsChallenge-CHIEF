@@ -4,6 +4,7 @@ import type {
   Alert,
   ClientToServerEvents,
   HealthScore,
+  InventoryStock,
   Measurement,
   MissionClock,
   ServerToClientEvents,
@@ -99,6 +100,7 @@ describe('live loop over Socket.IO', () => {
       services.crew,
       services.health,
       services.alerts,
+      services.inventory,
       HOUR_MS,
       logger,
     );
@@ -161,5 +163,15 @@ describe('live loop over Socket.IO', () => {
     expect(for001.every((m) => m.crewMemberId === 'C001')).toBe(true);
     expect(for004.length).toBeGreaterThan(0);
     expect(for004.every((m) => m.crewMemberId === 'C004')).toBe(true);
+  });
+
+  it('sends the stock to every client when a mission day ends', async () => {
+    const c002 = await client('C002');
+    const stock = next(c002, 'inventory:updated');
+    // The clock is past 14:00 of day 60; 10 more hours pass the 23:00 booking time.
+    realMs += 10 * HOUR_MS;
+    live.tick();
+    const items = (await stock) as InventoryStock[];
+    expect(items.find((s) => s.item.id === 'food-packaged')?.quantity).toBeGreaterThan(0);
   });
 });

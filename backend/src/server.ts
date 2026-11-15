@@ -39,6 +39,7 @@ const live = new LiveService(
   services.crew,
   services.health,
   services.alerts,
+  services.inventory,
   env.TICK_INTERVAL_MS,
   logger,
 );

@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import { alertsController } from '../controllers/alerts.controller.js';
 import { chiefController } from '../controllers/chief.controller.js';
 import { crewController } from '../controllers/crew.controller.js';
+import { journeyController } from '../controllers/journey.controller.js';
 import type { Services } from '../services/index.js';
 
 /** Audio larger than this is rejected before it reaches the agent (same limit as the agent). */
@@ -13,6 +14,7 @@ export function apiRouter(services: Services): Router {
   const crew = crewController(services);
   const alerts = alertsController(services);
   const chief = chiefController(services);
+  const journey = journeyController(services);
 
   router.get('/crew', crew.list);
   router.get('/mission/clock', crew.missionClock);
@@ -25,6 +27,12 @@ export function apiRouter(services: Services): Router {
 
   router.post('/alerts/:alertId/acknowledge', alerts.acknowledge);
   router.post('/alerts/:alertId/actions', alerts.actions);
+
+  router.get('/journey', journey.route);
+  router.get('/journey/stages/:index/inventory', journey.stageInventory);
+  router.get('/inventory', journey.stocks);
+  router.get('/inventory/:itemId/history', journey.history);
+  router.post('/inventory/:itemId/adjust', journey.adjust);
 
   router.post('/chief/chat', chief.chat);
   router.post(

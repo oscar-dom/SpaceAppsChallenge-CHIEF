@@ -51,7 +51,9 @@ answers `{ "error": { "code", "message" } }`.
 Socket.IO (same port): the server emits `mission:clock` to everyone, and
 `measurement:new`, `health:updated`, `alert:new` and `alert:updated` only to the clients
 that sent `crew:select` with that crew member. A resolved alert is sent once more with
-`acknowledged: true` and then disappears from `GET .../alerts`.
+`acknowledged: true` and then disappears from `GET .../alerts`. `inventory:updated`
+(the whole ship stock) goes to every client when a mission day ends, a cargo ship docks
+or the crew corrects a count.
 
 ## Where things are
 

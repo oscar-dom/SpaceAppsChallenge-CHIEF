@@ -28,6 +28,8 @@ SQLite database of the CHIEF backend, defined with **Drizzle ORM** (better-sqlit
 | `thresholds` | `Threshold` | One row per metric: ranges per status, escalation, fallback recommendation, **source** |
 | `alerts` | `Alert` | Alerts of a crew member (`anomaly` or `scheduled`), with severity, escalation and acknowledgement |
 | `formulary` | `Medication` | The onboard formulary: the only medication CHIEF may suggest |
+| `inventory_items` | `InventoryItem` | Medication, food and water the ship carries: unit, stock at launch, expected daily use, recovery rate, warning thresholds, **source** |
+| `inventory_events` | `InventoryEvent` | Ledger of every stock change: daily `consumption`, water `recovery`, `resupply` and crew `adjustment`. **Stock = initial quantity + sum of deltas**; it is never stored |
 
 ### Conventions
 
@@ -43,7 +45,8 @@ SQLite database of the CHIEF backend, defined with **Drizzle ORM** (better-sqlit
 
 - `crew_members.id` must match `C###`; `mission` can only have one row (`id = 1`) and its clock cannot be before the start.
 - `alerts`: an `anomaly` needs a `metric_id`; a `scheduled` alert needs a `due_at`; severity, kind, system and escalation are restricted to the shared values.
-- `thresholds.source` and `formulary.source` must be valid JSON with a non-empty `document`.
+- `thresholds.source`, `formulary.source` and `inventory_items.source` must be valid JSON with a non-empty `document`.
+- `inventory_events`: `delta` cannot be 0 and `reason` is one of the shared `INVENTORY_REASONS`. Simulated events carry a `ref` (`day-12`, `dragon-1`) unique per item and reason, so booking a day twice writes nothing; crew adjustments have no `ref`.
 
 ## Mission clock
 

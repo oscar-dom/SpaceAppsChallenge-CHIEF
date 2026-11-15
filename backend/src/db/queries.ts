@@ -59,6 +59,13 @@ export function getMissionClock(db: Db): MissionClock {
   };
 }
 
+/** Mission start and length, for code that places things on the mission timeline. */
+export function getMissionSpan(db: Db): { startMs: number; lengthDays: number } {
+  const row = db.select().from(mission).where(eq(mission.id, 1)).get();
+  if (!row) throw new Error('The mission is not set up. Run `npm run db:reset -w backend`.');
+  return { startMs: Date.parse(row.startAt), lengthDays: row.lengthDays };
+}
+
 /** Moves the simulated clock. `simTime` must be `YYYY-MM-DDTHH:mm:ssZ` and not before the mission start. */
 export function setMissionTime(db: Db, simTime: string): void {
   db.update(mission).set({ simTime }).where(eq(mission.id, 1)).run();

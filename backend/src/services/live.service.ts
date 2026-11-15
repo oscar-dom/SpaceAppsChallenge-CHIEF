@@ -4,6 +4,7 @@ import type { Server, Socket } from 'socket.io';
 import type { AlertsService } from './alerts.service.js';
 import type { CrewService } from './crew.service.js';
 import type { HealthService } from './health.service.js';
+import type { InventoryService } from './inventory/inventory.service.js';
 import type { MissionClock } from './mission-clock.js';
 import type { MissionSimulator } from './simulator/live.js';
 
@@ -16,7 +17,8 @@ const room = (crewId: string) => `crew:${crewId}`;
  * The live loop. On every tick the simulator advances the mission clock and writes the due
  * readings; then the rules engine re-evaluates each crew member and the changes go to the
  * clients over Socket.IO. Each client only receives the crew member it selected
- * ('crew:select'). The loop calls `simulator.tick()` itself so a failed tick is logged
+ * ('crew:select'). The inventory books the day's use as the clock passes each day's end, and
+ * every stock change goes to all clients ('inventory:updated'). The loop calls `simulator.tick()` itself so a failed tick is logged
  * instead of crashing the process.
  */
 export class LiveService {
@@ -29,6 +31,7 @@ export class LiveService {
     private readonly crew: CrewService,
     private readonly health: HealthService,
     private readonly alerts: AlertsService,
+    private readonly inventory: InventoryService,
     private readonly intervalMs: number,
     private readonly logger: Logger,
   ) {
@@ -37,6 +40,7 @@ export class LiveService {
       this.io.to(room(m.crewMemberId)).emit('measurement:new', m);
     });
     simulator?.on('clock', (clock) => this.io.emit('mission:clock', clock));
+    inventory.on('changed', () => this.io.emit('inventory:updated', this.inventory.stocks()));
     simulator?.on('end', () => {
       this.logger.info('The mission reached its last day; live data stopped');
       this.stop();
@@ -46,6 +50,7 @@ export class LiveService {
   /** Raises the current alerts at once, then ticks (only with the simulator on). */
   start(): void {
     this.evaluateAll();
+    this.inventory.catchUp();
     if (this.simulator) this.timer = setInterval(() => this.tick(), this.intervalMs);
   }
 
@@ -58,6 +63,7 @@ export class LiveService {
     try {
       const { inserted } = this.simulator?.tick() ?? { inserted: 0 };
       if (inserted > 0) this.evaluateAll();
+      this.inventory.catchUp();
     } catch (error) {
       this.logger.error({ err: error }, 'Live tick failed');
     }

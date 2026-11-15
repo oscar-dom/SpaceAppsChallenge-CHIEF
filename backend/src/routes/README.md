@@ -22,6 +22,11 @@ a route is added there first, agreed with the team, then here.
 | POST | `/chief/chat` | `chief.chat` | `ChiefChatResponse` |
 | POST | `/chief/stt` | `chief.speechToText` | `{ text: string }` |
 | POST | `/chief/tts` | `chief.textToSpeech` | `audio/wav` bytes |
+| GET | `/journey` | `journey.route` | `Journey` (10 stages, CHIEF's position, hazards, cargo ships) |
+| GET | `/journey/stages/:index/inventory` | `journey.stageInventory` | `StageInventory` (real for past stages, a forecast for upcoming ones) |
+| GET | `/inventory` | `journey.stocks` | `InventoryStock[]` |
+| GET | `/inventory/:itemId/history` | `journey.history` | `InventoryHistory` (stock at the end of each mission day) |
+| POST | `/inventory/:itemId/adjust` | `journey.adjust` | `InventoryStock` |
 
 Outside `/api`, `app.ts` serves `GET /health` → `{ "status": "ok" }`.
 
@@ -36,6 +41,8 @@ Outside `/api`, `app.ts` serves `GET /health` → `{ "status": "ok" }`.
   (`Content-Type: audio/webm`, `audio/*`, `video/webm` or `application/octet-stream`),
   up to 10 MB. That is why this route has its own `express.raw` parser.
 - `POST /chief/tts` body: `{ text }` (≤ 2000 characters).
+- `POST /inventory/:itemId/adjust` body: `{ delta, note?, crewMemberId? }` (`InventoryAdjustRequest`): `delta` adds (positive) or removes (negative) units, never zero; `note` ≤ 200 characters. Removing more than the stock answers 400.
+- Stage `index`: 1–10.
 
 Every error answers `{ "error": { "code", "message" } }` (see `middlewares/`).
 
