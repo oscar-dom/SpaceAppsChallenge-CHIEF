@@ -713,7 +713,9 @@
       // --- loop ----------------------------------------------------------------------------------------
       let last = performance.now(),
         level = 0;
-      function loop(nowMs) {
+      // `manualStep` is set when the frame-by-frame render drives the clock (chiefRender below).
+      function loop(nowMs, manualStep) {
+        if (manual && !manualStep) return;
         const dt = Math.min(0.05, (nowMs - last) / 1000);
         last = nowMs;
         const t = nowMs / 1000;
@@ -846,7 +848,7 @@
         drawChief(t, s, lvl);
         ctx.restore();
 
-        requestAnimationFrame(loop);
+        if (!manual) requestAnimationFrame(loop);
       }
 
       // --- timeline -------------------------------------------------------------------------------------
@@ -898,6 +900,7 @@
           .sort((a, b) => a.t - b.t);
       }
       function nowT() {
+        if (manual) return manualT;
         return audio && !audio.paused ? audio.currentTime : (performance.now() - t0) / 1000;
       }
       function runTimeline() {
@@ -1035,6 +1038,32 @@
         if (e.data?.chief === 'play') playTimeline(e.data.at);
         if (e.data?.chief === 'stop') stopTimeline();
       });
+      // --- frame-by-frame render -----------------------------------------------------------------------
+      // The storyboard's video render (scripts/render-video.mjs) drives the clock: start() plays
+      // the timeline from 0 with no audio, step(t) advances the animation to t seconds in 1/60 s
+      // steps, as a 60 Hz screen would, so every render is identical.
+      let manual = false;
+      let manualT = 0;
+      window.chiefRender = {
+        start() {
+          manual = true;
+          manualT = 0;
+          last = 0;
+          cues = parseTimeline();
+          nextCue = 0;
+          if (cues[0]?.t === 0 && cues[0].pos !== '-') {
+            setPos(cues[0].pos);
+            [cur.x, cur.y] = screenOf(target.pos);
+          }
+          playing = true;
+        },
+        step(t) {
+          while (manualT + 1 / 60 <= t + 1e-6) {
+            manualT += 1 / 60;
+            loop(manualT * 1000, true);
+          }
+        },
+      };
       requestAnimationFrame(loop);
     </script>
   </body>
