@@ -71,7 +71,10 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
   voice service fails, the browser's Web Speech API transcript is used. Answers to voice
   questions are read aloud (`/api/chief/tts`, or the browser's speech synthesis). When the
   backend answers in fallback mode, the chat shows the standard recommendations of the
-  thresholds table.
+  thresholds table. The panel sits on a light sky-blue surface (`.assistant-surface` in
+  `base.css`, a blue-tinted dark variant in the dark theme), the mascot's colour, so the
+  conversation is told apart from the data canvas and the navy alerts at a glance.
+  Messages, suggestions and inputs stay on white cards; every text keeps AA contrast.
 
 ## Code
 
