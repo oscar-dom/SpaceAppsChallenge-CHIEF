@@ -25,6 +25,6 @@
   </g>
 
   <!-- Meet CHIEF -->
-  <text x="600" y="215" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="104" font-weight="700" letter-spacing="-1" fill="#1b2230">Meet <tspan fill="#2457d6">CHIEF</tspan></text>
-  <text x="604" y="275" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="30" fill="#4f5866">The crew health assistant on board</text>
+  <text x="600" y="220" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="700" letter-spacing="-1" fill="#1b2230">Meet <tspan fill="#2457d6">CHIEF</tspan></text>
+  <text x="603" y="270" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="28" fill="#4f5866">The crew health assistant on board</text>
 </svg>
