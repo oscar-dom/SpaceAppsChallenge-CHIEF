@@ -190,6 +190,22 @@
       body.clean {
         grid-template-columns: 1fr;
       }
+      /* ?embed: inside another page (the storyboard), only the transparent canvas. */
+      html.embed,
+      body.embed {
+        background: transparent;
+      }
+      body.embed #stage {
+        padding: 0;
+        height: 100vh;
+      }
+      body.embed #frame {
+        max-height: none;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        background: none;
+      }
     </style>
   </head>
   <body>
@@ -836,25 +852,26 @@
       // --- timeline -------------------------------------------------------------------------------------
       const tl = document.getElementById('timeline');
       tl.value = `# Synced to voiceover.mp3 (30.6 s) at size 0.75. Load it in Voice-over before playing.
-# Positions "X,Y" are CHIEF's centre in the 1920x1080 frame, with the app screenshot
-# fitted to the width (1920 x 956, centred). Pointing arms are level with CHIEF's centre.
-# Screenshots: 0-16.9 crew overview, 16.9-20 Sara + chat, 20-22.6 mission route,
-# 22.6-24.6 inventory, 24.6-28.5 Sara + chat (system status).
+# Positions "X,Y" are CHIEF's centre in the 1920x1080 frame. The screenshots of
+# video/screenshots (2560x1440) fill the frame, so X,Y = screenshot pixel x 0.75.
+# Pointing arms are level with CHIEF's centre. Scenes as in video/storyboard:
+# 5.05 white · 7.0 image1 Sara's dashboards · 14.6 image2 crew overview + alerts ·
+# 19.8 image3 mission route · 22.4 image4 inventory · 24.35 images 5-8 body systems ·
+# 28.12 back to space (CHIEF celebrates top right until the end).
 0     idle       off-right    none        "In orbit, the nearest doctor is four hundred kilometres away."
 4.25  idle       -            -           "Until now!"
-5.25  talking    center       wave        "Hi! I'm CHIEF."
-7.2   scanning   center       -           "I monitor every astronaut with real NASA data,"
-10.5  talking    1410,894     point-left  "from OSDR blood panels to NASA-STD-3001 limits."
-14.85 alert      1275,392     point-left  "When something drifts, I alert you,"
-16.9  thinking   1203,421     none        "connect the dots,"
+5.05  talking    center       wave        "Hi! I'm CHIEF."
+7.2   scanning   745,900      none        "I monitor every astronaut with real NASA data,"
+10.5  talking    -            point-left  "from OSDR blood panels"
+12.3  talking    -            point-right "to NASA-STD-3001 limits."
+14.85 alert      1110,640     point-right "When something drifts, I alert you,"
+16.9  thinking   -            none        "connect the dots,"
 18    talking    -            point-right "and tell you exactly what to do."
-20.05 talking    526,404      point-right "I replay real solar storms on your route,"
-22.65 talking    1493,280     point-left  "track meds, food and water,"
-24.6  talking    595,296      point-right "and chart nine body systems against medical limits,"
-27.5  happy      center       nod         "every day."
-28.55 celebrate  center       -           "You will never be alone again!"
-30.6  happy      center       wink        ""
-31.8  idle       off-right    -           ""`;
+19.9  talking    560,905      point-right "I replay real solar storms on your route,"
+22.5  talking    1495,560     point-left  "track meds, food and water,"
+24.4  talking    1780,860     none        "and chart nine body systems against medical limits,"
+27.5  happy      -            nod         "every day."
+28.2  celebrate  top-right    none        "You will never be alone again!"`;
 
       let cues = [],
         playing = false,
@@ -1000,6 +1017,19 @@
         if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('clean');
         const i = Number(e.key);
         if (i >= 1 && i <= STATES.length) setState(STATES[i - 1]);
+      });
+      // --- embed ---------------------------------------------------------------------------------------
+      // index.html?embed shows only the transparent canvas, to sit over another page (the storyboard),
+      // which starts and stops the timeline with postMessage({ chief: 'play' | 'stop' }).
+      if (new URLSearchParams(location.search).has('embed')) {
+        document.documentElement.classList.add('embed');
+        document.body.classList.add('clean', 'embed');
+        frame.className = '';
+        document.getElementById('subs').checked = false;
+      }
+      window.addEventListener('message', (e) => {
+        if (e.data?.chief === 'play') playTimeline();
+        if (e.data?.chief === 'stop') stopTimeline();
       });
       requestAnimationFrame(loop);
     </script>
