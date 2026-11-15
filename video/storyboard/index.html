@@ -789,6 +789,21 @@
       .stage::backdrop {
         background: #000;
       }
+      /* Export: the stage alone fills the window, letterboxed in black, while it records. */
+      body.recording {
+        overflow: hidden;
+      }
+      body.recording .stage {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        width: min(100vw, 177.78vh);
+        height: min(100vh, 56.25vw);
+        aspect-ratio: auto;
+        margin: auto;
+        cursor: none;
+        box-shadow: 0 0 0 100vmax #000;
+      }
 
       /* Controls */
       .controls {
@@ -1173,7 +1188,7 @@
           </button>
           <button
             id="export"
-            title="Record the stage with the voice-over and music and download it (WebM)"
+            title="Record the video with the voice-over and music and download it (MP4)"
           >
             ⬇ Export video
           </button>
@@ -2172,6 +2187,8 @@
       // If the file cannot load or play, the animatic keeps running on its own clock.
       let voFailed = false;
       vo.addEventListener('error', () => (voFailed = true));
+      vo.addEventListener('ended', () => playing && finish());
+      let endTimer = null;
 
       let list = [];
       let listTotal = 0;
@@ -2270,12 +2287,16 @@
           );
         } else startMusic(from);
         chief('play', from);
+        // The end does not wait for a frame: hidden or busy tabs draw few, and Export must stop.
+        clearTimeout(endTimer);
+        endTimer = setTimeout(() => playing && finish(), (listTotal - from) * 1000 + 300);
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(tick);
       }
 
       /* Pause: keep the position and freeze the scene. */
       function stop() {
+        clearTimeout(endTimer);
         if (playing) {
           pausedAt = now();
           stage.classList.add('paused');
@@ -2332,6 +2353,10 @@
       });
       document.addEventListener('keydown', (e) => {
         if (e.target instanceof HTMLInputElement) return;
+        if (onFinish) {
+          if (e.key === 'Escape') finish(); // ends the export early
+          return; // no other keys while recording
+        }
         if (e.code === 'Space') {
           e.preventDefault();
           play();
@@ -2343,39 +2368,54 @@
         }
       });
 
-      /* ---------- Export: record the stage with Chrome's screen capture ---------- */
-      // Chrome asks what to share (this tab is offered first). The capture is cropped to the stage
-      // (Region Capture), the voice-over is mixed in through Web Audio, the video plays from 0 and
-      // the WebM downloads when it ends. Stopping the share in Chrome's bar ends it early.
+      /* ---------- Export: record the stage with Chrome's tab capture ----------
+         One click: the stage fills the window (letterboxed in black, nothing else on screen),
+         Chrome asks to share this tab, the video plays from 0 and an MP4 (WebM on older browsers)
+         with the voice-over and the music downloads when it ends. Esc, or "Stop sharing" in
+         Chrome's bar, ends it early. The bigger the window (F11 for the whole screen), the sharper
+         the video. */
       const exportBtn = document.getElementById('export');
       let onFinish = null;
       let voRouted = false; // an audio element can be routed through Web Audio only once
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      function exportDone() {
+        document.body.classList.remove('recording');
+        exportBtn.disabled = false;
+        exportBtn.textContent = '⬇ Export video';
+      }
       async function exportVideo() {
         if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder)
           return alert('Export needs a recent Chrome or Edge.');
-        if (voToggle.checked && location.protocol === 'file:')
+        if (location.protocol === 'file:')
           return alert(
-            'To record the voice-over, serve the video folder (npx serve video) and open ' +
-              '/storyboard/ from there, or turn the voice-over off.',
+            'Open the storyboard from the local server to export it with sound: run ' +
+              '"npm run video" in the project folder (it opens the right page).',
           );
         stop();
+        stage.classList.remove('paused');
+        pausedAt = 0;
+        jumped = true;
+        show(0);
+        renderSubs(-1);
+        document.body.classList.add('recording');
         let screen;
         try {
           screen = await navigator.mediaDevices.getDisplayMedia({
-            video: { frameRate: 60 },
+            video: { frameRate: { ideal: 30, max: 30 } },
             audio: false,
-            preferCurrentTab: true,
+            preferCurrentTab: true, // Chrome only offers this tab
             selfBrowserSurface: 'include',
+            surfaceSwitching: 'exclude',
           });
         } catch {
-          return; // the share was cancelled
+          return exportDone(); // the share was cancelled
         }
         const [video] = screen.getVideoTracks();
         if (window.CropTarget && video.cropTo) {
           try {
             await video.cropTo(await CropTarget.fromElement(stage));
           } catch {
-            // Another tab or window was shared: record it uncropped.
+            // Another surface was shared: record it uncropped.
           }
         }
         const tracks = [video];
@@ -2389,39 +2429,64 @@
           await audioOut().ctx.resume();
           tracks.push(...audioOut().dest.stream.getAudioTracks());
         }
-        const mimeType = [
-          'video/webm;codecs=vp9,opus',
-          'video/webm;codecs=vp8,opus',
-          'video/webm',
-        ].find((t) => MediaRecorder.isTypeSupported(t));
-        const rec = new MediaRecorder(new MediaStream(tracks), {
-          mimeType,
-          videoBitsPerSecond: 12_000_000,
-        });
-        const chunks = [];
-        rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+        exportBtn.disabled = true;
+        exportBtn.textContent = '● Recording…';
+        // Let Chrome close its dialog, show its sharing bar and apply the crop before frame one.
+        await wait(1200);
+        const recording = await startRecorder(new MediaStream(tracks));
+        if (!recording) {
+          video.stop();
+          exportDone();
+          return alert('This browser cannot record video. Try a recent Chrome or Edge.');
+        }
+        const { rec, mimeType, chunks } = recording;
         rec.onstop = () => {
           video.stop();
           const a = document.createElement('a');
-          a.href = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' }));
-          a.download = 'chief-pitch-video.webm';
+          a.href = URL.createObjectURL(new Blob(chunks, { type: mimeType.split(';')[0] }));
+          a.download = `chief-pitch-video.${mimeType.startsWith('video/mp4') ? 'mp4' : 'webm'}`;
           a.click();
           setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
-          exportBtn.disabled = false;
-          exportBtn.textContent = '⬇ Export video';
+          exportDone();
         };
-        const end = () => {
+        onFinish = () => {
           onFinish = null;
           if (rec.state === 'recording') rec.stop();
         };
-        onFinish = end;
-        video.addEventListener('ended', end);
-        exportBtn.disabled = true;
-        exportBtn.textContent = '● Recording…';
-        // Give Chrome a moment to apply the crop and close its picker before the first frame.
-        await new Promise((r) => setTimeout(r, 600));
-        rec.start(1000);
+        // "Stop sharing" in Chrome's bar: end the video and keep what was recorded.
+        video.addEventListener('ended', () => onFinish && finish());
         restart();
+      }
+
+      /* Starts a recorder with the best format this browser really encodes: MP4 (H.264 + AAC, what
+         every editor opens), then MP4 with Opus audio, then WebM. isTypeSupported() can say yes
+         to an encoder that is missing, so a format that errors at once is skipped. */
+      const FORMATS = [
+        'video/mp4;codecs=avc1,mp4a.40.2',
+        'video/mp4;codecs=avc1,opus',
+        'video/webm;codecs=vp9,opus',
+        'video/webm',
+      ];
+      async function startRecorder(stream) {
+        for (const mimeType of FORMATS.filter((t) => MediaRecorder.isTypeSupported(t))) {
+          const chunks = [];
+          let failed = false;
+          const rec = new MediaRecorder(stream, {
+            mimeType,
+            videoBitsPerSecond: 16_000_000,
+            audioBitsPerSecond: 192_000,
+          });
+          rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+          rec.onerror = () => (failed = true);
+          try {
+            rec.start(1000);
+          } catch {
+            continue;
+          }
+          await wait(400);
+          if (!failed && rec.state === 'recording') return { rec, mimeType, chunks };
+        }
+        return null;
       }
       exportBtn.addEventListener('click', exportVideo);
 
