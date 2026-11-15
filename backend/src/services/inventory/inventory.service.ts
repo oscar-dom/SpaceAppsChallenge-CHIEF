@@ -11,6 +11,7 @@ import { RESUPPLIES } from '../../../data/journey.js';
 import type { Db } from '../../db/client.js';
 import {
   getDailyTotals,
+  getDeltaThrough,
   getInventoryItem,
   getInventoryItems,
   getNotableEvents,
@@ -181,7 +182,13 @@ export class InventoryService extends EventEmitter<InventoryEvents> {
         adjusted: round(d.adjusted),
       };
     });
-    return { item, days, events: getNotableEvents(this.db, itemId) };
+    const events = getNotableEvents(this.db, itemId).map((e) => ({
+      ...e,
+      quantityAfter: round(
+        item.initialQuantity + getDeltaThrough(this.db, itemId, e.at, Number(e.id)),
+      ),
+    }));
+    return { item, days, events };
   }
 
   /** A crew member corrects the count: adds or removes units. The stock can never go below zero. */

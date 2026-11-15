@@ -1,25 +1,47 @@
 <script setup lang="ts">
+import type { BodySystemId } from '@chief/shared';
 import { computed } from 'vue';
 import Capsule from '../components/Capsule.vue';
 import Icon from '../components/Icon.vue';
 import { firstName, initials } from '../lib/format';
-import { NAV_SECTIONS, SECTIONS, type SectionId } from '../lib/sections';
+import { isMissionSection, NAV_SECTIONS, SECTIONS, type SectionId } from '../lib/sections';
 import { NAV_RAIL_W, NAV_W } from '../lib/shell';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus } from '../lib/status';
 import { useChiefStore } from '../stores/chief';
+import { useJourneyStore } from '../stores/journey';
 import { useMissionStore } from '../stores/mission';
 import { useUiStore } from '../stores/ui';
 import { useWorkspaceStore } from '../stores/workspace';
 
 /**
- * Left navigation on the dark chrome layer, in the order a crew member thinks:
- * who (crew), what (that person's body systems), then ask CHIEF. Sections can be clicked
+ * Left navigation on the dark chrome layer, in the order a crew member thinks: where the
+ * mission is (JOURNEY: route and ship stock), who (crew), what (that person's body systems),
+ * then ask CHIEF. Sections can be clicked
  * to open or dragged into the workspace to split it.
  */
 const mission = useMissionStore();
 const ws = useWorkspaceStore();
 const ui = useUiStore();
 const chief = useChiefStore();
+const journey = useJourneyStore();
+
+const route = computed(() => ({
+  day: journey.today,
+  length: journey.lengthDays,
+  stage: journey.current?.index ?? '—',
+  pct: `${Math.min(100, (journey.day / journey.lengthDays) * 100).toFixed(1)}%`,
+  on: ws.focusedSection === 'route',
+}));
+const stock = computed(() => {
+  const flagged = journey.flagged;
+  const critical = flagged.some((s) => s.status === 'critical');
+  return {
+    items: journey.stocks.length,
+    n: flagged.length,
+    status: (critical ? 'critical' : 'caution') as UiStatus,
+    on: ws.focusedSection === 'inventory',
+  };
+});
 
 const expanded = computed(() => !ui.navCollapsed);
 const crewActive = computed(() => ws.focusedSection === 'crew');
@@ -50,7 +72,7 @@ const items = computed(() =>
     const status: UiStatus =
       id === 'overview'
         ? (mission.health[mission.selected]?.status ?? 'nodata')
-        : mission.system(mission.selected, id as Exclude<SectionId, 'crew' | 'overview'>).status;
+        : mission.system(mission.selected, id as BodySystemId).status;
     const def = SECTIONS[id];
     return {
       ...def,
@@ -77,7 +99,7 @@ const bubbleText = computed(() => {
 
 function selectPerson(id: string) {
   mission.selected = id;
-  if (ws.focusedSection === 'crew' || ws.focusedSection === null) ws.open('overview');
+  if (isMissionSection(ws.focusedSection) || ws.focusedSection === null) ws.open('overview');
 }
 
 function dragStart(e: DragEvent, sec: SectionId) {
@@ -113,7 +135,66 @@ const railW = `${NAV_RAIL_W}px`;
     </div>
 
     <div class="scroll">
+      <div v-if="expanded" class="heading">Journey</div>
+      <div v-else class="rail-heading">Journey</div>
+      <div
+        class="row journey-row"
+        :class="{ on: route.on }"
+        draggable="true"
+        role="button"
+        tabindex="0"
+        :title="`Mission route · Day ${route.day} / ${route.length} · Stage ${route.stage}`"
+        @dragstart="dragStart($event, 'route')"
+        @dragend="ws.endDrag()"
+        @click="ws.open('route')"
+        @keydown.enter="ws.open('route')"
+      >
+        <span class="journey-icon accent"><Icon name="route" :size="18" /></span>
+        <span v-if="expanded" class="row-text">
+          <span class="row-title">Mission route</span>
+          <span class="row-sub mono"
+            >Day {{ route.day }}/{{ route.length }} · Stage {{ route.stage }}</span
+          >
+          <span class="route-bar"><span :style="{ width: route.pct }" /></span>
+        </span>
+        <template v-else>
+          <span class="rail-route mono">D{{ route.day }}·S{{ route.stage }}</span>
+          <span class="route-bar rail-bar"><span :style="{ width: route.pct }" /></span>
+        </template>
+      </div>
+      <div
+        class="row journey-row"
+        :class="{ on: stock.on }"
+        draggable="true"
+        role="button"
+        tabindex="0"
+        :title="`Inventory · food, water, medication${stock.n ? ` · ${stock.n} ${STATUS_LABEL[stock.status].toLowerCase()}` : ''}`"
+        @dragstart="dragStart($event, 'inventory')"
+        @dragend="ws.endDrag()"
+        @click="ws.open('inventory')"
+        @keydown.enter="ws.open('inventory')"
+      >
+        <span class="journey-icon"><Icon name="inventory" :size="18" /></span>
+        <span v-if="expanded" class="row-text">
+          <span class="row-title">Inventory</span>
+          <span class="row-sub">{{ stock.items }} items · food, water, meds</span>
+        </span>
+        <span
+          v-if="expanded && stock.n"
+          class="flag"
+          :style="{ background: STATUS_COLOR[stock.status] }"
+          >{{ stock.n }} {{ STATUS_LABEL[stock.status] }}</span
+        >
+        <span
+          v-else-if="stock.n"
+          class="rail-count mono"
+          :style="{ background: STATUS_COLOR[stock.status] }"
+          >{{ stock.n }}</span
+        >
+      </div>
+
       <div v-if="expanded" class="heading">Crew</div>
+      <div v-else class="divider" />
       <button
         class="row crew-row"
         :class="{ on: crewActive }"
@@ -353,6 +434,82 @@ const railW = `${NAV_RAIL_W}px`;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.rail-heading {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--chrome-muted);
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.journey-row {
+  color: var(--chrome-text);
+}
+.rail .journey-row {
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0 7px;
+}
+.journey-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chrome-2);
+  border: 1px solid var(--chrome-line);
+  color: var(--chrome-muted);
+}
+.journey-icon.accent {
+  color: var(--chrome-accent);
+}
+.rail .journey-icon {
+  width: 32px;
+  height: 32px;
+}
+.journey-row .row-sub.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.route-bar {
+  display: block;
+  height: 3px;
+  margin-top: 5px;
+  border-radius: 2px;
+  background: var(--chrome-line);
+  overflow: hidden;
+}
+.route-bar span {
+  display: block;
+  height: 100%;
+  background: var(--chrome-accent);
+}
+.rail-route {
+  font-size: 10px;
+  line-height: 1;
+}
+.rail-bar {
+  width: 36px;
+  margin-top: 0;
+}
+.rail-count {
+  position: absolute;
+  top: 4px;
+  left: calc(50% + 8px);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  color: #10192b;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .crew-icon {
   width: 40px;

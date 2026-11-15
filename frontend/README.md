@@ -24,8 +24,11 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
 ```
 ┌ NavPanel ──┬ TopBar: selected person + score · mission day · clock · dose · layouts ─┐
 │ (navy)     ├────────────────────────────────────────────────────────┬──────┬──────────┤
-│ Crew       │ Workspace: panes of tabs, split by drag and drop      │ Chat │ Alerts   │
-│  overview  │ (Crew overview · Overview · one dashboard per system) │      │ / Tasks  │
+│ Journey    │ Workspace: panes of tabs, split by drag and drop      │ Chat │ Alerts   │
+│  route     │ (Mission route · Inventory · Crew overview ·          │      │ / Tasks  │
+│  inventory │  Overview · one dashboard per system)                 │      │          │
+│ Crew       │                                                       │      │          │
+│  overview  │                                                       │      │          │
 │  4 people  │                                                       │      │ (rail    │
 │ Health     │                                                       │      │ when     │
 │  systems   │                                                       │      │ closed)  │
@@ -33,7 +36,9 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
 └ CHIEF ─────┴──────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Navigation (NavPanel):** who, then what: the crew overview and one row per person
+- **Navigation (NavPanel):** where the mission is, who, then what: **JOURNEY** (Mission
+  route with day, stage and progress; Inventory with a badge when items run low), then
+  the crew overview and one row per person
   (avatar with a status ring, role, score), then the health systems of the selected person
   (systems in caution or critical get a status label), then **Talk to CHIEF** as the
   primary button. It shrinks to an icon rail.
@@ -60,6 +65,20 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
     other: opening the chat collapses the navigation to its rail, and expanding the
     navigation closes the chat, so one pane always fits.
   - Panel widths live in `src/lib/shell.ts`, shared by the panels' styles and the workspace.
+- **JOURNEY · Mission route** (`views/JourneyRoute.vue`): mission day, current stage,
+  next hazard and next resupply; the route map (10 stages on a wave, CHIEF's capsule at
+  the live mission time, hazard zones: radiation hatched, thermal solid, coloured by
+  severity, critical pulsing while ahead or active; cargo ships; the daily South Atlantic
+  Anomaly as a dotted line). Hovering a marker shows its effect, what to do and the source;
+  clicking pins it. Below: the current stage and what is coming up, or, after clicking a
+  stage, its inventory table (recorded, in progress with a forecast end, or a hatched
+  forecast for stages not reached).
+- **JOURNEY · Inventory** (`views/JourneyInventory.vue`): cards by category (medication
+  grouped by use) with stock, days left at the burn rate of the last 14 days, a sparkline
+  and the next cargo. Selecting an item shows its stock over the mission (stage bands,
+  cargo ships, forecast, adjustments), the water balance for water, and the **Adjust
+  count** form (remove or add, note, who; it previews the result and refuses going below
+  zero). Stock changes arrive live (`inventory:updated`).
 - **Notifications:** alerts (anomalies) and tasks (scheduled measurements), on the same navy
   layer as the navigation (`.chrome-surface` in `base.css` remaps the tokens, so the alert
   cards, chips and buttons inside follow). The panel collapses to a rail, but a new alert
@@ -81,11 +100,11 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
 | Folder | Contents |
 | --- | --- |
 | `src/api/` | REST client for the backend |
-| `src/stores/` | `mission` (data and live sockets), `workspace` (layout), `ui` (panels), `chief` (chat, alert actions, voice) |
+| `src/stores/` | `mission` (data and live sockets), `journey` (route, ship stock, histories, adjustments), `workspace` (layout), `ui` (panels), `chief` (chat, alert actions, voice) |
 | `src/layout/` | App shell: navigation, top bar, workspace and panes, chat, notifications |
-| `src/views/` | Crew overview, crew member overview, system dashboard |
+| `src/views/` | Mission route and inventory (JOURNEY), crew overview, crew member overview, system dashboard |
 | `src/components/` | Body map, Capsule mascot, metric card and chart, alert card, chips |
-| `src/lib/` | Pure helpers: statuses and thresholds, sections, layout tree, formatting, icons |
+| `src/lib/` | Pure helpers: statuses and thresholds, sections, layout tree, route geometry and stock forecasts (`journey.ts`), formatting, icons |
 | `src/styles/base.css` | Design tokens (light by default, dark) and shared classes |
 
 ## Design rules

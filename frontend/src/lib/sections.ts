@@ -1,8 +1,18 @@
 import { BODY_SYSTEMS, type BodySystemId } from '@chief/shared';
 import type { IconName } from './icons';
 
-/** A workspace section: the crew overview, a crew member's overview, or a body system. */
-export type SectionId = 'crew' | 'overview' | BodySystemId;
+/**
+ * A workspace section: the crew overview, the JOURNEY views (mission route and ship
+ * inventory), a crew member's overview, or a body system.
+ */
+export type SectionId = 'crew' | 'route' | 'inventory' | 'overview' | BodySystemId;
+
+/** Sections about the whole mission, not one crew member. */
+export type MissionSectionId = 'crew' | 'route' | 'inventory';
+export const MISSION_SECTIONS: MissionSectionId[] = ['crew', 'route', 'inventory'];
+export function isMissionSection(s: SectionId | null): s is MissionSectionId {
+  return s !== null && (MISSION_SECTIONS as SectionId[]).includes(s);
+}
 
 export interface SectionDef {
   id: SectionId;
@@ -12,6 +22,8 @@ export interface SectionDef {
 
 export const SECTIONS: Record<SectionId, SectionDef> = {
   crew: { id: 'crew', name: 'Crew overview', icon: 'crew' },
+  route: { id: 'route', name: 'Mission route', icon: 'route' },
+  inventory: { id: 'inventory', name: 'Inventory', icon: 'inventory' },
   overview: { id: 'overview', name: 'Overview', icon: 'overview' },
   ...(Object.fromEntries(
     BODY_SYSTEMS.map((s) => [s.id, { id: s.id, name: s.label, icon: s.id as IconName }]),

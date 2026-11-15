@@ -4,6 +4,7 @@ import type {
   ClientToServerEvents,
   CrewMember,
   HealthScore,
+  InventoryStock,
   Metric,
   MetricStatus,
   MissionClock,
@@ -58,6 +59,8 @@ export const useMissionStore = defineStore('mission', () => {
 
   /** Called with every alert the backend raises while the app is open. */
   let onNewAlert: (alert: Alert) => void = () => {};
+  /** Called with the whole ship stock whenever it changes (JOURNEY). */
+  let onInventory: (stock: InventoryStock[]) => void = () => {};
   /** While the backend is unreachable (e.g. still starting with `npm run dev`), retry. */
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
   const refetchTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -166,7 +169,10 @@ export const useMissionStore = defineStore('mission', () => {
       socket.on('disconnect', () => {
         if (i === 0) connected.value = false;
       });
-      if (i === 0) socket.on('mission:clock', (value) => (clock.value = value));
+      if (i === 0) {
+        socket.on('mission:clock', (value) => (clock.value = value));
+        socket.on('inventory:updated', (stock) => onInventory(stock));
+      }
       socket.on('health:updated', setHealth);
       socket.on('alert:new', (a) => {
         upsertAlert(a);
@@ -181,8 +187,12 @@ export const useMissionStore = defineStore('mission', () => {
     });
   }
 
-  async function init(handlers: { onNewAlert: (a: Alert) => void }) {
+  async function init(handlers: {
+    onNewAlert: (a: Alert) => void;
+    onInventory?: (stock: InventoryStock[]) => void;
+  }) {
     onNewAlert = handlers.onNewAlert;
+    onInventory = handlers.onInventory ?? onInventory;
     clearTimeout(retryTimer);
     try {
       const [c, m, t, k] = await Promise.all([

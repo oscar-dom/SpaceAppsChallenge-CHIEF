@@ -208,7 +208,9 @@ describe('REST', () => {
     expect(removed.quantity).toBe(before + 7);
 
     const events = services.inventory.history('ibuprofen-400').events;
-    expect(events.filter((e) => e.reason === 'adjustment')).toEqual([
+    const adjustments = events.filter((e) => e.reason === 'adjustment');
+    expect(adjustments.map((e) => e.quantityAfter)).toEqual([before + 10, before + 7]);
+    expect(adjustments).toEqual([
       expect.objectContaining({
         delta: 10,
         note: 'Found a spare pack',
