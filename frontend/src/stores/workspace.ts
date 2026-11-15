@@ -2,29 +2,61 @@ import type { Period } from '@chief/shared';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import {
+  accept,
   allPanes,
+  applyDrop,
+  type Area,
+  balance,
   clone,
+  type DragInfo,
   findPane,
+  fitLayout,
+  fits,
   type LayoutNode,
   mkPane,
   mkSplit,
   mkTab,
   nodeAt,
-  type Pane,
+  paneOf,
   removePane,
   splitPane,
+  takeTab,
   type Zone,
 } from '../lib/layout';
 import type { SectionId } from '../lib/sections';
 
-/** What is being dragged: a section from the left panel or a tab from a pane. */
-export type DragInfo =
-  | { kind: 'section'; sec: SectionId }
-  | { kind: 'tab'; sec: SectionId; paneId: string; tabId: string };
+export type { DragInfo };
+
+export type PresetId = 'single' | 'two' | 'grid' | 'reset';
+
+/** The demo layouts of the Layouts menu. */
+function presetTree(name: PresetId): LayoutNode {
+  if (name === 'single') return mkPane(['crew', 'overview', 'cardiovascular'], 1);
+  if (name === 'two')
+    return mkSplit('row', [mkPane(['overview', 'cardiovascular'], 1), mkPane(['sleep-cognition'])]);
+  if (name === 'grid')
+    return mkSplit('col', [
+      mkSplit('row', [mkPane(['overview']), mkPane(['vision'])]),
+      mkSplit('row', [mkPane(['radiation']), mkPane(['immune'])]),
+    ]);
+  return mkPane(['crew', 'overview'], 0);
+}
 
 export const useWorkspaceStore = defineStore('workspace', () => {
-  const layout = ref<LayoutNode>(mkPane(['crew', 'overview'], 0));
+  const layout = ref<LayoutNode>(presetTree('reset'));
   const focus = ref<string>(allPanes(layout.value)[0]?.id ?? '');
+  /**
+   * Room for panes, measured by the workspace (null until it is mounted). Every layout
+   * change is checked against it, so panes never shrink below the minimum size and never
+   * spill out of the workspace.
+   */
+  const area = ref<Area | null>(null);
+  /**
+   * The layout as the user left it before a smaller workspace forced panes to merge (the chat
+   * opened, the window shrank). It comes back when there is room again, unless the user
+   * changed the layout in between.
+   */
+  let stash: { tree: LayoutNode; focus: string } | null = null;
   const drag = ref<DragInfo | null>(null);
   /** Drop zone under the pointer while dragging over a pane's content. */
   const dropZone = ref<{ paneId: string; zone: Zone } | null>(null);
@@ -40,10 +72,38 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     return p?.tabs.find((t) => t.id === p.active)?.sec ?? null;
   });
 
-  function set(tree: LayoutNode, nextFocus?: string) {
-    layout.value = tree;
-    const ids = allPanes(tree).map((p) => p.id);
+  /** The layout a split or a drop would produce, or null when it does not fit. */
+  function candidate(tree: LayoutNode): LayoutNode | null {
+    return area.value ? accept(tree, area.value) : tree;
+  }
+
+  function show(tree: LayoutNode, nextFocus?: string) {
+    layout.value = area.value ? fitLayout(tree, area.value) : tree;
+    const ids = allPanes(layout.value).map((p) => p.id);
     focus.value = nextFocus && ids.includes(nextFocus) ? nextFocus : (ids[0] ?? '');
+  }
+
+  /** A layout change made by the user. */
+  function set(tree: LayoutNode, nextFocus?: string) {
+    stash = null;
+    show(tree, nextFocus);
+  }
+
+  /**
+   * New room for panes: a layout that no longer fits is balanced, then merged, and the
+   * user's layout comes back once it fits again.
+   */
+  function setArea(next: Area) {
+    const cur = area.value;
+    if (cur && Math.abs(cur.w - next.w) < 1 && Math.abs(cur.h - next.h) < 1) return;
+    area.value = next;
+    if (stash && fits(stash.tree, next)) {
+      show(stash.tree, stash.focus);
+      stash = null;
+    } else if (!fits(layout.value, next)) {
+      stash ??= { tree: layout.value, focus: focus.value };
+      show(layout.value, focus.value);
+    }
   }
 
   /** Opens a section in the focused pane, or activates it if it is already there. */
@@ -65,21 +125,16 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     const tree = clone(layout.value);
     const p = findPane(tree, paneId);
     if (p) p.active = tabId;
-    set(tree, paneId);
+    // Switching tabs does not change the layout, so a stashed layout can still come back.
+    show(tree, paneId);
   }
 
   function setPeriod(paneId: string, tabId: string, period: Period) {
     const tree = clone(layout.value);
     const t = findPane(tree, paneId)?.tabs.find((x) => x.id === tabId);
     if (t) t.period = period;
+    stash = null;
     layout.value = tree;
-  }
-
-  function takeTab(p: Pane, tabId: string) {
-    const i = p.tabs.findIndex((t) => t.id === tabId);
-    const [tab] = p.tabs.splice(i, 1);
-    if (p.active === tabId) p.active = p.tabs[Math.max(0, i - 1)]?.id ?? null;
-    return tab;
   }
 
   function closeTab(paneId: string, tabId: string) {
@@ -95,58 +150,43 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     set(removePane(clone(layout.value), paneId) ?? mkPane(['crew']));
   }
 
-  /** Opens the active tab of a pane again in a new pane to its right. */
-  function splitRight(paneId: string) {
+  /** Layout after opening the active tab of a pane again in a new pane to its right. */
+  function splitRightTree(paneId: string): { tree: LayoutNode; focus: string } | null {
     const p = findPane(layout.value, paneId);
     const active = p?.tabs.find((t) => t.id === p.active);
-    if (!active) return;
-    const t = mkTab(active.sec, active.period);
-    const np: Pane = { type: 'pane', id: `${paneId}-r${Date.now()}`, tabs: [t], active: t.id };
-    set(splitPane(clone(layout.value), paneId, 'right', np), np.id);
+    if (!active) return null;
+    const np = paneOf(mkTab(active.sec, active.period));
+    const tree = candidate(splitPane(clone(layout.value), paneId, 'right', np));
+    return tree ? { tree, focus: np.id } : null;
+  }
+
+  function canSplitRight(paneId: string): boolean {
+    return splitRightTree(paneId) !== null;
+  }
+
+  function splitRight(paneId: string) {
+    const next = splitRightTree(paneId);
+    if (next) set(next.tree, next.focus);
+  }
+
+  /** Layout after dropping what is being dragged, or null when it changes nothing or does not fit. */
+  function dropTree(paneId: string, zone: Zone, index?: number) {
+    if (!drag.value) return null;
+    const next = applyDrop(layout.value, drag.value, paneId, zone, index);
+    const tree = next && candidate(next.tree);
+    return next && tree ? { tree, focus: next.focus } : null;
+  }
+
+  /** Whether dropping what is being dragged on this zone of a pane is allowed. */
+  function canDrop(paneId: string, zone: Zone): boolean {
+    return zone === 'center' || dropTree(paneId, zone) !== null;
   }
 
   /** Drops what is being dragged on a pane: into it (center) or as a new split beside it. */
   function drop(paneId: string, zone: Zone, index?: number) {
-    const d = drag.value;
+    const next = dropTree(paneId, zone, index);
     endDrag();
-    if (!d) return;
-    let tree: LayoutNode = clone(layout.value);
-    let tab;
-    if (d.kind === 'tab') {
-      const src = findPane(tree, d.paneId);
-      if (!src) return;
-      if (zone !== 'center' && d.paneId === paneId && src.tabs.length === 1) return;
-      let at = index;
-      if (at !== undefined && d.paneId === paneId) {
-        const from = src.tabs.findIndex((t) => t.id === d.tabId);
-        if (from < at) at--;
-      }
-      index = at;
-      tab = takeTab(src, d.tabId);
-    } else tab = mkTab(d.sec);
-    if (!tab) return;
-    let nextFocus = paneId;
-    if (zone === 'center') {
-      const target = findPane(tree, paneId);
-      if (!target) return;
-      const existing = target.tabs.find((t) => t.sec === tab.sec);
-      if (existing && d.kind === 'section') target.active = existing.id;
-      else {
-        if (existing) target.tabs.splice(target.tabs.indexOf(existing), 1);
-        const at = index === undefined ? target.tabs.length : Math.min(index, target.tabs.length);
-        target.tabs.splice(at, 0, tab);
-        target.active = tab.id;
-      }
-    } else {
-      const np: Pane = { type: 'pane', id: `p-${tab.id}`, tabs: [tab], active: tab.id };
-      tree = splitPane(tree, paneId, zone, np);
-      nextFocus = np.id;
-    }
-    if (d.kind === 'tab') {
-      const src = findPane(tree, d.paneId);
-      if (src && !src.tabs.length) tree = removePane(tree, d.paneId) ?? mkPane(['crew']);
-    }
-    set(tree, nextFocus);
+    if (next) set(next.tree, next.focus);
   }
 
   function startDrag(info: DragInfo) {
@@ -173,42 +213,42 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     const a = Math.max(min, Math.min(total - min, (sizes0[i] ?? 0) + delta));
     n.sizes[i] = a;
     n.sizes[i + 1] = total - a;
+    stash = null;
     layout.value = tree;
   }
 
-  /** Demo layouts from the Scenarios menu. */
-  function preset(name: 'single' | 'two' | 'grid' | 'reset') {
-    if (name === 'single') set(mkPane(['crew', 'overview', 'cardiovascular'], 1));
-    else if (name === 'two')
-      set(mkSplit('row', [mkPane(['overview', 'cardiovascular'], 1), mkPane(['sleep-cognition'])]));
-    else if (name === 'grid')
-      set(
-        mkSplit('col', [
-          mkSplit('row', [mkPane(['overview']), mkPane(['vision'])]),
-          mkSplit('row', [mkPane(['radiation']), mkPane(['immune'])]),
-        ]),
-      );
-    else set(mkPane(['crew', 'overview'], 0));
+  /** A demo layout fits when its panes keep the minimum size in the current workspace. */
+  function presetFits(name: PresetId): boolean {
+    return !area.value || fits(balance(presetTree(name)), area.value);
+  }
+
+  function preset(name: PresetId) {
+    set(presetTree(name));
   }
 
   return {
     layout,
     focus,
+    area,
     drag,
     dropZone,
     dropTab,
     panes,
     focusedSection,
+    setArea,
     open,
     activate,
     setPeriod,
     closeTab,
     closePane,
+    canSplitRight,
     splitRight,
+    canDrop,
     drop,
     startDrag,
     endDrag,
     resize,
+    presetFits,
     preset,
   };
 });

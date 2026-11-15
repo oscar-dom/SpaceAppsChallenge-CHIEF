@@ -43,10 +43,23 @@ The dev server proxies `/api` and `/socket.io` to `http://localhost:3000`. Copy
   section to open it in the focused pane; drag a section or a tab onto a pane edge to split
   it, onto its centre or tab bar to move it there. The **Split right** button in a pane's
   header opens its active tab again in a new pane to the right. Dividers resize the panes.
-  A pane never gets smaller than 380 × 280 px: a drag split is only offered when both
-  halves keep that size, there are at most 4 panes, dividers stop at the minimum, and when
-  the window is too small for the layout the workspace scrolls instead of squeezing the
-  panes. The Split right button does not check the pane limit or the minimum width.
+  Pane rules, the same for every way of changing the layout (Split right, drag and drop,
+  demo layouts):
+  - At most **4 panes**, and none smaller than **380 × 280 px**. A split that would break
+    either rule is not offered: the Split right button is disabled with the reason, a drag
+    onto that edge opens the section in the pane instead, and a demo layout that does not
+    fit is greyed out. Dividers stop at the minimum size.
+  - The room for panes is measured from the workspace, always keeping the full width of the
+    notifications panel free (even when collapsed to its rail), so a new alert that forces
+    it open never squeezes or moves the panes.
+  - When the workspace gets smaller (chat opened, navigation expanded, window resized) the
+    layout is balanced and, if it still does not fit, the last panes are merged into the
+    previous ones; no tab is lost. When the room comes back, the previous layout returns,
+    unless the user changed it in between. Panes never overflow behind a side panel.
+  - On narrow windows (below 1428 px) the chat and the expanded navigation exclude each
+    other: opening the chat collapses the navigation to its rail, and expanding the
+    navigation closes the chat, so one pane always fits.
+  - Panel widths live in `src/lib/shell.ts`, shared by the panels' styles and the workspace.
 - **Notifications:** alerts (anomalies) and tasks (scheduled measurements). The panel
   collapses to a rail, but a new alert from the backend always opens it again.
 - **CHIEF chat:** text and push-to-talk. The recording goes to `/api/chief/stt`; if the

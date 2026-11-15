@@ -199,7 +199,7 @@ a {
   background: transparent;
   color: var(--text-2);
 }
-.icon-btn:hover {
+.icon-btn:hover:not(:disabled) {
   background: var(--panel-3);
   color: var(--text-1);
 }

@@ -5,6 +5,7 @@ import Capsule, { type CapsuleState } from '../components/Capsule.vue';
 import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { firstName } from '../lib/format';
+import { CHAT_W } from '../lib/shell';
 import { useChiefStore } from '../stores/chief';
 import { useMissionStore } from '../stores/mission';
 import { useUiStore } from '../stores/ui';
@@ -70,6 +71,7 @@ function send(text = input.value) {
   input.value = '';
   void chief.ask(t);
 }
+const chatW = `${CHAT_W}px`;
 </script>
 
 <template>
@@ -190,7 +192,7 @@ function send(text = input.value) {
 
 <style scoped>
 .chat {
-  width: 420px;
+  width: v-bind(chatW);
   flex: none;
   display: flex;
   flex-direction: column;

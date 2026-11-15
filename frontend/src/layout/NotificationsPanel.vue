@@ -4,6 +4,7 @@ import AlertCard from '../components/AlertCard.vue';
 import Icon from '../components/Icon.vue';
 import { firstName, hhmm, missionDayOf } from '../lib/format';
 import { SECTIONS } from '../lib/sections';
+import { NOTIF_RAIL_W, NOTIF_W } from '../lib/shell';
 import { STATUS_COLOR } from '../lib/status';
 import { useMissionStore } from '../stores/mission';
 import { useUiStore } from '../stores/ui';
@@ -53,6 +54,8 @@ function relative(iso?: string) {
 function toggle(id: string) {
   expanded.value = expanded.value === id ? null : id;
 }
+const notifW = `${NOTIF_W}px`;
+const railW = `${NOTIF_RAIL_W}px`;
 </script>
 
 <template>
@@ -159,7 +162,7 @@ function toggle(id: string) {
 
 <style scoped>
 .notif {
-  width: 360px;
+  width: v-bind(notifW);
   flex: none;
   display: flex;
   flex-direction: column;
@@ -335,7 +338,7 @@ function toggle(id: string) {
   white-space: nowrap;
 }
 .rail {
-  width: 44px;
+  width: v-bind(railW);
   flex: none;
   display: flex;
   flex-direction: column;
