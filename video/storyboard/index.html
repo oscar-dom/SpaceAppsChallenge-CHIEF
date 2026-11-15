@@ -368,7 +368,7 @@
         object-fit: cover;
         object-position: center top;
       }
-      /* Scene 8: four screenshots, one per quarter of the scene. */
+      /* Scene 9: four screenshots, one per quarter of the scene. */
       .multi img {
         opacity: 0;
       }
@@ -424,11 +424,11 @@
       }
 
       /* "9 BODY SYSTEMS" over the quick cuts, on a dark band, clear of CHIEF (bottom right). */
-      .s8 .kicker {
+      .s9 .kicker {
         top: 36%;
         z-index: 2;
       }
-      .s8 .kicker span {
+      .s9 .kicker span {
         display: inline-block;
         padding: 0.2em 0.8em;
         border-radius: 14px;
@@ -438,7 +438,7 @@
         letter-spacing: 0.08em;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
       }
-      .s8.active .kicker {
+      .s9.active .kicker {
         animation: slam var(--d) ease both;
       }
       @keyframes slam {
@@ -479,12 +479,12 @@
         opacity: 1;
       }
 
-      /* Scene 9: back to space, not alone any more. The ship on top, the logo centred between the
+      /* Scene 10: back to space, not alone any more. The ship on top, the logo centred between the
          ship and the Earth; CHIEF (the animator) celebrates top right. */
-      .s9 .ship {
+      .s10 .ship {
         top: 13%;
       }
-      .s9.active .ship {
+      .s10.active .ship {
         animation: settle var(--d) ease-out both;
       }
       @keyframes settle {
@@ -495,7 +495,7 @@
           transform: translate(-50%, -30%) scale(0.85);
         }
       }
-      .s9 .logo {
+      .s10 .logo {
         position: absolute;
         left: 0;
         right: 0;
@@ -503,7 +503,7 @@
         text-align: center;
         opacity: 0;
       }
-      .s9.active .logo {
+      .s10.active .logo {
         animation: fadeUp 0.8s ease calc(var(--d) * 0.25) both;
       }
       .logo b {
@@ -838,24 +838,32 @@
             />
           </div>
 
-          <!-- 6 · Mission route -->
+          <!-- 6 · What to do -->
           <div class="scene s6 shot">
+            <img
+              src="../screenshots/image9.png"
+              alt="CHIEF's answer in the chat: what to do about high intraocular pressure, with escalation"
+            />
+          </div>
+
+          <!-- 7 · Mission route -->
+          <div class="scene s7 shot">
             <img
               src="../screenshots/image3.png"
               alt="Mission route: ten stages, hazards, solar storm and cargo ships"
             />
           </div>
 
-          <!-- 7 · Inventory -->
-          <div class="scene s7 shot">
+          <!-- 8 · Inventory -->
+          <div class="scene s8 shot">
             <img
               src="../screenshots/image4.png"
               alt="Inventory: food, water and onboard medication with days left"
             />
           </div>
 
-          <!-- 8 · Nine body systems -->
-          <div class="scene s8 multi">
+          <!-- 9 · Nine body systems -->
+          <div class="scene s9 multi">
             <img src="../screenshots/image5.png" alt="Leo: radiation, sleep and nutrition" />
             <img src="../screenshots/image6.png" alt="Iker: cardiovascular over the mission" />
             <img src="../screenshots/image7.png" alt="Iker: behavioral health" />
@@ -863,8 +871,8 @@
             <div class="kicker"><span>9 BODY SYSTEMS</span></div>
           </div>
 
-          <!-- 9 · Payoff -->
-          <div class="scene s9">
+          <!-- 10 · Payoff -->
+          <div class="scene s10">
             <div class="stars"></div>
             <svg class="earth" aria-hidden="true"></svg>
             <svg class="ship lit glow" viewBox="0 0 240 120" aria-hidden="true">
@@ -928,10 +936,13 @@
           <h3>App screenshots</h3>
           <ul>
             <li>
-              <code>video/screenshots/image1.png</code> to <code>image8.png</code>, shown in that
-              order as CHIEF describes each feature.
+              <code>video/screenshots/image1.png</code> to <code>image9.png</code>, shown as CHIEF
+              describes each feature (image9 right after image2).
             </li>
-            <li>1: dashboards with thresholds and sources · 2: crew overview and alerts.</li>
+            <li>
+              1: dashboards with thresholds and sources · 2: crew overview and alerts · 9: CHIEF’s
+              answer (what to do).
+            </li>
             <li>3: mission route · 4: inventory · 5–8: body systems, quick cuts.</li>
           </ul>
         </div>
@@ -1095,17 +1106,32 @@
         {
           title: 'Alerts',
           start: 14.6,
-          end: 19.8,
+          end: 17.85,
           speaker: 'chief',
-          line: 'When something drifts, I alert you, connect the dots, and tell you exactly what to do.',
+          line: 'When something drifts, I alert you, connect the dots,',
           chief: true,
           thumb: SHOT(2),
           visual:
             'Screenshot 2: the crew overview, four bodies with their scores, and the alerts panel with severities and escalation (contact the flight surgeon, crew medical officer).',
           onscreen: '—',
-          audio: 'Alert chime, then a soft "resolve" tone.',
+          audio: 'Alert chime.',
           transition: 'Cut.',
           why: 'Tension (alert) and relief (what to do). The core value, so it gets a long scene.',
+        },
+        {
+          title: 'What to do',
+          start: 17.85,
+          end: 19.8,
+          speaker: 'chief',
+          line: 'and tell you exactly what to do.',
+          chief: true,
+          thumb: SHOT(9),
+          visual:
+            'Screenshot 9: CHIEF’s answer in the chat for a critical alert (high intraocular pressure): what it means, the actions (follow-up, task, avoid) and who to call, from self-care to the flight surgeon.',
+          onscreen: '—',
+          audio: 'A soft "resolve" tone.',
+          transition: 'Cut in the pause after "connect the dots".',
+          why: 'The payoff of the alert: not just a warning, a clear plan with its escalation level.',
         },
         {
           title: 'Mission route',
