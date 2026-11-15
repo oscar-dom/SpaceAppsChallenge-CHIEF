@@ -1,6 +1,8 @@
-<p align="center"><img src="docs/assets/meet-chief.svg" alt="Meet CHIEF: the crew health assistant on board" width="100%"></p>
+<p align="center"><img src="docs/assets/meet-chief.svg" alt="Meet CHIEF: Crew Health Interactive Evaluation Framework" width="100%"></p>
 
-# CHIEF: the health system a spacecraft could carry
+# CHIEF · Crew Health Interactive Evaluation Framework
+
+**The health system a spacecraft could carry.**
 
 > **NASA Space Apps Challenge.** A visual tool that helps astronauts assess their own health
 > during a mission and tells them what to do about it.

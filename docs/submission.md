@@ -34,13 +34,13 @@ Everything on the form must be in English.
 ## Project Name
 
 ```
-CHIEF: the health system a spacecraft could carry
+CHIEF: Crew Health Interactive Evaluation Framework
 ```
 
 ## High-Level Project Summary
 
 ```
-CHIEF is a crew health system for a six-month ISS mission, built as if it were part of the spacecraft. The station "measures" 25 physical and psychological indicators of each astronaut across 9 body systems; a deterministic rules engine compares every reading with a threshold taken from NASA standards (NASA-STD-3001, JSC-67378, OCHMO) or cited clinical guidelines, and turns them into a status, a health score and alerts. CHIEF, an AI assistant the crew can talk to by text or voice, explains in plain words what is wrong and what to do: tasks to avoid, nutrition, medication from the onboard kit only, and when to call the flight surgeon. A mission route view plans ahead: the radiation and thermal hazards of the coming weeks, including a replay of the real May 2024 solar storm from NASA DONKI, and the food, water and medication left on board.
+CHIEF (Crew Health Interactive Evaluation Framework) is a crew health system for a six-month ISS mission, built as if it were part of the spacecraft. The station "measures" 25 physical and psychological indicators of each astronaut across 9 body systems; a deterministic rules engine compares every reading with a threshold taken from NASA standards (NASA-STD-3001, JSC-67378, OCHMO) or cited clinical guidelines, and turns them into a status, a health score and alerts. CHIEF, an AI assistant the crew can talk to by text or voice, explains in plain words what is wrong and what to do: tasks to avoid, nutrition, medication from the onboard kit only, and when to call the flight surgeon. A mission route view plans ahead: the radiation and thermal hazards of the coming weeks, including a replay of the real May 2024 solar storm from NASA DONKI, and the food, water and medication left on board.
 
 It answers the challenge directly: astronauts see their own health at a glance and get guidance on treatment and improvement. It matters because, as missions go farther from Earth, crews can no longer rely on instant help from the ground. CHIEF gives them autonomy, while the AI never decides a status and every recommendation is grounded in NASA science.
 ```
