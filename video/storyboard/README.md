@@ -21,6 +21,9 @@ frame or the audio when opened from disk, serve the `video` folder (`npx serve v
 `/storyboard/`.
 
 - **Play** starts the voice-over and CHIEF's timeline together. **Voice-over** off plays it silent.
+- **Export video** records the stage with the voice-over and downloads `chief-pitch-video.webm`
+  when it ends. Chrome asks what to share: pick this tab. It needs the page served (see above) for
+  the voice; the video's size is the stage's size on screen, so widen the window first.
 - **Full screen** or `F` shows only the stage, clean, to screen-record it; `Space` plays, `R`
   restarts, `Esc` exits.
 
