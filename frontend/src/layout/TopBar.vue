@@ -4,6 +4,8 @@ import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { clockText, initials, roleLine } from '../lib/format';
 import { STATUS_COLOR, type UiStatus } from '../lib/status';
+import { isMissionSection } from '../lib/sections';
+import { useJourneyStore } from '../stores/journey';
 import { useMissionStore } from '../stores/mission';
 import { useUiStore } from '../stores/ui';
 import { useWorkspaceStore } from '../stores/workspace';
@@ -16,9 +18,10 @@ const mission = useMissionStore();
 const ws = useWorkspaceStore();
 const ui = useUiStore();
 const menuOpen = ref(false);
+const journey = useJourneyStore();
 
 const context = computed(() => {
-  if (ws.focusedSection === 'crew' || !mission.member) return null;
+  if (isMissionSection(ws.focusedSection) || !mission.member) return null;
   const m = mission.member;
   const h = mission.health[m.id];
   const status: UiStatus = h?.status ?? 'nodata';
@@ -33,6 +36,24 @@ const context = computed(() => {
 });
 
 const day = computed(() => mission.clock?.missionDay ?? 0);
+
+/** Header for the views about the whole mission (crew overview, route, inventory). */
+const missionHeader = computed(() => {
+  if (ws.focusedSection === 'route')
+    return {
+      title: 'Mission route',
+      sub: `ISS Expedition · Day ${day.value} of ${journey.lengthDays} · Stage ${journey.current?.index ?? '—'}`,
+    };
+  if (ws.focusedSection === 'inventory')
+    return {
+      title: 'Inventory',
+      sub: `${journey.stocks.length} items · ${journey.flagged.length ? `${journey.flagged.length} to watch` : 'all nominal'}`,
+    };
+  return {
+    title: 'Crew overview',
+    sub: `${mission.crew.length} crew members · ISS expedition`,
+  };
+});
 const length = computed(() => mission.clock?.missionLengthDays ?? 180);
 const progress = computed(() => `${Math.min(100, (day.value / length.value) * 100).toFixed(1)}%`);
 
@@ -73,8 +94,8 @@ function pick(id: (typeof LAYOUTS)[number]['id']) {
         </div>
       </template>
       <div v-else class="who">
-        <span class="who-name">Crew overview</span>
-        <span class="muted who-role">{{ mission.crew.length }} crew members · ISS expedition</span>
+        <span class="who-name">{{ missionHeader.title }}</span>
+        <span class="muted who-role">{{ missionHeader.sub }}</span>
       </div>
     </div>
     <div class="telemetry">

@@ -6,10 +6,15 @@ import type {
   ChiefChatResponse,
   CrewMember,
   HealthScore,
+  InventoryAdjustRequest,
+  InventoryHistory,
+  InventoryStock,
+  Journey,
   Measurement,
   Metric,
   MissionClock,
   Period,
+  StageInventory,
   Threshold,
 } from '@chief/shared';
 import { API_PREFIX } from '@chief/shared';
@@ -50,6 +55,12 @@ export const api = {
   acknowledge: (alertId: string) => post<Alert>(`/alerts/${alertId}/acknowledge`),
   alertActions: (alertId: string) => post<AlertActionsResponse>(`/alerts/${alertId}/actions`),
   chat: (body: ChiefChatRequest) => post<ChiefChatResponse>('/chief/chat', body),
+  journey: () => request<Journey>('/journey'),
+  stageInventory: (index: number) => request<StageInventory>(`/journey/stages/${index}/inventory`),
+  inventory: () => request<InventoryStock[]>('/inventory'),
+  inventoryHistory: (itemId: string) => request<InventoryHistory>(`/inventory/${itemId}/history`),
+  adjustInventory: (itemId: string, body: InventoryAdjustRequest) =>
+    post<InventoryStock>(`/inventory/${itemId}/adjust`, body),
 
   /** Speech to text through the backend (faster-whisper in the agent). */
   async stt(audio: Blob): Promise<string> {

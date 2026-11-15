@@ -1,5 +1,5 @@
 import type { InventoryEvent, InventoryItem, InventoryReason } from '@chief/shared';
-import { and, asc, eq, gte, inArray, lt, lte, max, sum } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, lt, lte, max, or, sum } from 'drizzle-orm';
 import type { Db } from './client.js';
 import { inventoryEvents, inventoryItems } from './schema.js';
 
@@ -101,6 +101,24 @@ export function getNotableEvents(db: Db, itemId: string): InventoryEvent[] {
     .orderBy(asc(inventoryEvents.at), asc(inventoryEvents.id))
     .all()
     .map(toEvent);
+}
+
+/** Sum of every delta of an item up to and including one event (ledger order: time, then id). */
+export function getDeltaThrough(db: Db, itemId: string, at: string, id: number): number {
+  const row = db
+    .select({ total: sum(inventoryEvents.delta) })
+    .from(inventoryEvents)
+    .where(
+      and(
+        eq(inventoryEvents.itemId, itemId),
+        or(
+          lt(inventoryEvents.at, at),
+          and(eq(inventoryEvents.at, at), lte(inventoryEvents.id, id)),
+        ),
+      ),
+    )
+    .get();
+  return Number(row?.total ?? 0);
 }
 
 /** Writes events; simulated ones already in the ledger (same item, reason and ref) are skipped. */

@@ -163,11 +163,16 @@ export interface InventoryDay {
   adjusted: number;
 }
 
+/** A resupply or crew adjustment with the stock right after it. */
+export interface InventoryLogEntry extends InventoryEvent {
+  quantityAfter: number;
+}
+
 export interface InventoryHistory {
   item: InventoryItem;
   days: InventoryDay[];
-  /** Resupplies and crew adjustments (daily consumption is summed up in `days`). */
-  events: InventoryEvent[];
+  /** Resupplies and crew adjustments, oldest first (daily use is summed up in `days`). */
+  events: InventoryLogEntry[];
 }
 
 /** What one item did during one stage (GET /api/journey/stages/:index/inventory). */

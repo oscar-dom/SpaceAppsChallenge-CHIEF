@@ -150,16 +150,17 @@ backend → agent types in `shared/src/chief.ts` (`AgentChatRequest`,
 One view for every crew member: what an astronaut sees on board.
 
 - **Left navigation (navy, always visible, can shrink to icons):** first **JOURNEY**
-  (see below), then the crew: a **Crew overview** entry (every body, score and key vitals) and one row per crew member
-  with avatar, status ring and health score. Then the body-system sections of the selected
+  (see below), then the crew: a **Crew overview** entry (every body, score and key
+  vitals) and one row per crew member with avatar, status ring and health score. Then the body-system sections of the selected
   person; the first entry is **Overview**. At the bottom, **Talk to CHIEF** as the primary
   button with the mascot.
-- **JOURNEY:** two tabs. **Route**: the 180-day mission as a path of **10 stages**
-  with CHIEF as the ship moving along it (done / to go), the hazards to prepare for
-  (radiation: South Atlantic Anomaly, solar particle events; thermal: high beta angle,
-  spacewalks) and the cargo ships; clicking a stage shows what the inventory did in it
-  (a forecast for stages not reached yet). **Inventory**: medication, food and water
-  with their history; the crew adds or removes stock to keep the count right.
+- **JOURNEY:** two menu entries that open as workspace tabs. **Mission route**: the
+  180-day mission as a path of **10 stages** on a starry map, with CHIEF as the ship
+  moving along it (done / to go), the hazards to prepare for (radiation: South Atlantic
+  Anomaly, solar particle events; thermal: high beta angle, spacewalks) and the cargo
+  ships; clicking a stage shows what the inventory did in it (a forecast for stages not
+  reached yet). **Inventory**: medication, food and water with days of supply and their
+  history; the crew adds or removes stock to keep the count right.
 - **Top bar:** the selected crew member with their health score, then mission day,
   mission clock and crew dose rate.
 - **Workspace:** sections open as tabs. Dragging a section or a tab onto a pane's edge

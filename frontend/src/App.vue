@@ -9,6 +9,7 @@ import NotificationsPanel from './layout/NotificationsPanel.vue';
 import TopBar from './layout/TopBar.vue';
 import Workspace from './layout/Workspace.vue';
 import { useChiefStore } from './stores/chief';
+import { useJourneyStore } from './stores/journey';
 import { useMissionStore } from './stores/mission';
 import { useUiStore } from './stores/ui';
 import { useWorkspaceStore } from './stores/workspace';
@@ -17,9 +18,19 @@ const mission = useMissionStore();
 const ui = useUiStore();
 const ws = useWorkspaceStore();
 const chief = useChiefStore();
+const journey = useJourneyStore();
 
+const handlers = { onNewAlert: ui.alertArrived, onInventory: journey.stockUpdated };
 ui.applyTheme();
-onMounted(() => mission.init({ onNewAlert: ui.alertArrived }));
+onMounted(() => mission.init(handlers));
+// JOURNEY data loads once the mission is reachable (it retries with the mission on failure).
+watch(
+  () => mission.loaded,
+  (ok) => {
+    if (ok) void journey.load();
+  },
+  { immediate: true },
+);
 
 const evaluated = computed(() => {
   const h = mission.health[mission.selected];
@@ -55,7 +66,7 @@ watch(
         >{{ mission.loadError }}. Start the backend with <code>npm run dev</code>; retrying every
         few seconds.</span
       >
-      <button class="btn" @click="mission.init({ onNewAlert: ui.alertArrived })">Retry</button>
+      <button class="btn" @click="mission.init(handlers)">Retry</button>
     </template>
     <span v-else class="muted">Connecting to the ship's health system…</span>
   </div>

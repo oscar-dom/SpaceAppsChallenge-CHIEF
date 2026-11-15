@@ -5,11 +5,14 @@ import Icon from '../components/Icon.vue';
 import StatusChip from '../components/StatusChip.vue';
 import { hhmm, roleLine } from '../lib/format';
 import { MAX_PANES, type Pane, zoneAt, type Zone } from '../lib/layout';
-import { SECTIONS, SYSTEM_IDS, type SectionId } from '../lib/sections';
+import { isMissionSection, SECTIONS, SYSTEM_IDS, type SectionId } from '../lib/sections';
 import { STATUS_COLOR, STATUS_LABEL, type UiStatus } from '../lib/status';
+import { useJourneyStore } from '../stores/journey';
 import { useMissionStore } from '../stores/mission';
 import { useWorkspaceStore } from '../stores/workspace';
 import CrewOverview from '../views/CrewOverview.vue';
+import JourneyInventory from '../views/JourneyInventory.vue';
+import JourneyRoute from '../views/JourneyRoute.vue';
 import MemberOverview from '../views/MemberOverview.vue';
 import SystemDashboard from '../views/SystemDashboard.vue';
 
@@ -17,6 +20,7 @@ import SystemDashboard from '../views/SystemDashboard.vue';
 const props = defineProps<{ pane: Pane; canClose: boolean }>();
 const ws = useWorkspaceStore();
 const mission = useMissionStore();
+const journey = useJourneyStore();
 
 const PERIOD_LABEL: Record<Period, string> = {
   day: 'Day',
@@ -51,7 +55,11 @@ const activeTab = computed(() => props.pane.tabs.find((t) => t.id === props.pane
 const sec = computed<SectionId | null>(() => activeTab.value?.sec ?? null);
 
 function statusOf(s: SectionId): UiStatus | null {
-  if (s === 'crew') return null;
+  if (s === 'crew' || s === 'route') return null;
+  if (s === 'inventory') {
+    const flagged = journey.flagged.map((x) => x.status);
+    return flagged.includes('critical') ? 'critical' : flagged.length ? 'caution' : null;
+  }
   if (s === 'overview') return mission.health[mission.selected]?.status ?? 'nodata';
   return mission.system(mission.selected, s).status;
 }
@@ -65,7 +73,9 @@ const tabs = computed(() =>
       def: SECTIONS[t.sec],
       dot: st ? STATUS_COLOR[st] : null,
       on: t.id === props.pane.active,
-      title: SECTIONS[t.sec].name + (t.sec === 'crew' ? '' : ` · ${mission.member?.name ?? ''}`),
+      title: isMissionSection(t.sec)
+        ? SECTIONS[t.sec].name
+        : `${SECTIONS[t.sec].name} · ${mission.member?.name ?? ''}`,
     };
   }),
 );
@@ -84,6 +94,24 @@ const header = computed(() => {
   const updated = mission.health[mission.selected]?.computedAt;
   const upd = updated ? `Updated ${hhmm(updated)} UTC` : '';
   if (!s || !m) return null;
+  if (s === 'route')
+    return {
+      title: 'Mission route',
+      sub: `ISS Expedition · ${journey.lengthDays}-day mission · ${mission.crew.length} crew`,
+      summary: [],
+      periods: false,
+      updated: upd,
+    };
+  if (s === 'inventory') {
+    const flagged = journey.flagged;
+    return {
+      title: 'Inventory',
+      sub: 'Ship stock · food, water and medication · kept by the crew',
+      summary: summarize(flagged.map((x) => x.status)),
+      periods: false,
+      updated: upd,
+    };
+  }
   if (s === 'crew')
     return {
       title: 'Crew overview',
@@ -287,6 +315,8 @@ function contentDrop(e: DragEvent) {
       </div>
       <div class="content">
         <CrewOverview v-if="sec === 'crew'" />
+        <JourneyRoute v-else-if="sec === 'route'" />
+        <JourneyInventory v-else-if="sec === 'inventory'" />
         <MemberOverview v-else-if="sec === 'overview'" />
         <SystemDashboard
           v-else-if="sec && activeTab"
