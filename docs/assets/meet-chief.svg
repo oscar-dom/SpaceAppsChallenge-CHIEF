@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-label="Meet CHIEF: the app's mascot waving hello">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-label="Meet CHIEF: Crew Health Interactive Evaluation Framework">
   <!-- README banner. The mascot is the app's CHIEF (frontend/src/components/Capsule.vue,
        viewBox 48 x 48) in the light theme, waving with happy eyes. -->
   <rect width="1200" height="420" fill="#ffffff"/>
@@ -26,5 +26,5 @@
 
   <!-- Meet CHIEF -->
   <text x="600" y="220" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="84" font-weight="700" letter-spacing="-1" fill="#1b2230">Meet <tspan fill="#2457d6">CHIEF</tspan></text>
-  <text x="603" y="270" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="28" fill="#4f5866">The crew health assistant on board</text>
+  <text x="603" y="268" font-family="'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#4f5866"><tspan fill="#2457d6" font-weight="700">C</tspan>rew <tspan fill="#2457d6" font-weight="700">H</tspan>ealth <tspan fill="#2457d6" font-weight="700">I</tspan>nteractive <tspan fill="#2457d6" font-weight="700">E</tspan>valuation <tspan fill="#2457d6" font-weight="700">F</tspan>ramework</text>
 </svg>
