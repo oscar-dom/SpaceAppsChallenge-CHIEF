@@ -969,6 +969,9 @@
           <button id="fullscreen" title="Full screen for recording (F). Space plays, Esc exits.">
             ⛶ Full screen
           </button>
+          <button id="export" title="Record the stage with the voice-over and download it (WebM)">
+            ⬇ Export video
+          </button>
           <label class="vo"><input type="checkbox" id="voToggle" checked /> 🔊 Voice-over</label>
           <label class="vo"><input type="checkbox" id="subsToggle" checked /> CC Subtitles</label>
           <span class="grow"></span>
@@ -1799,6 +1802,7 @@
 
       function finish() {
         stop();
+        onFinish?.();
         pausedAt = 0;
         jumped = true;
         renderSubs(-1);
@@ -1839,6 +1843,90 @@
           restart();
         }
       });
+
+      /* ---------- Export: record the stage with Chrome's screen capture ---------- */
+      // Chrome asks what to share (this tab is offered first). The capture is cropped to the stage
+      // (Region Capture), the voice-over is mixed in through Web Audio, the video plays from 0 and
+      // the WebM downloads when it ends. Stopping the share in Chrome's bar ends it early.
+      const exportBtn = document.getElementById('export');
+      let onFinish = null;
+      let voGraph = null; // an audio element can be routed through Web Audio only once
+      async function exportVideo() {
+        if (!navigator.mediaDevices?.getDisplayMedia || !window.MediaRecorder)
+          return alert('Export needs a recent Chrome or Edge.');
+        if (voToggle.checked && location.protocol === 'file:')
+          return alert(
+            'To record the voice-over, serve the video folder (npx serve video) and open ' +
+              '/storyboard/ from there, or turn the voice-over off.',
+          );
+        stop();
+        let screen;
+        try {
+          screen = await navigator.mediaDevices.getDisplayMedia({
+            video: { frameRate: 60 },
+            audio: false,
+            preferCurrentTab: true,
+            selfBrowserSurface: 'include',
+          });
+        } catch {
+          return; // the share was cancelled
+        }
+        const [video] = screen.getVideoTracks();
+        if (window.CropTarget && video.cropTo) {
+          try {
+            await video.cropTo(await CropTarget.fromElement(stage));
+          } catch {
+            // Another tab or window was shared: record it uncropped.
+          }
+        }
+        const tracks = [video];
+        if (voToggle.checked && !voFailed) {
+          if (!voGraph) {
+            const ctx = new AudioContext();
+            const src = ctx.createMediaElementSource(vo);
+            const dest = ctx.createMediaStreamDestination();
+            src.connect(ctx.destination); // still heard while recording
+            src.connect(dest);
+            voGraph = { ctx, dest };
+          }
+          await voGraph.ctx.resume();
+          tracks.push(...voGraph.dest.stream.getAudioTracks());
+        }
+        const mimeType = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+        ].find((t) => MediaRecorder.isTypeSupported(t));
+        const rec = new MediaRecorder(new MediaStream(tracks), {
+          mimeType,
+          videoBitsPerSecond: 12_000_000,
+        });
+        const chunks = [];
+        rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+        rec.onstop = () => {
+          video.stop();
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' }));
+          a.download = 'chief-pitch-video.webm';
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+          exportBtn.disabled = false;
+          exportBtn.textContent = '⬇ Export video';
+        };
+        const end = () => {
+          onFinish = null;
+          if (rec.state === 'recording') rec.stop();
+        };
+        onFinish = end;
+        video.addEventListener('ended', end);
+        exportBtn.disabled = true;
+        exportBtn.textContent = '● Recording…';
+        // Give Chrome a moment to apply the crop and close its picker before the first frame.
+        await new Promise((r) => setTimeout(r, 600));
+        rec.start(1000);
+        restart();
+      }
+      exportBtn.addEventListener('click', exportVideo);
 
       buildList();
       show(0);
