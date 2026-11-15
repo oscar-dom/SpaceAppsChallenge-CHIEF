@@ -9,7 +9,7 @@ Everything on the form must be in English.
 
 - [ ] **Make the repository public** (it is private now): the judges must open every link with
       no login, permission or registration. Check the history has no secrets before.
-- [ ] **Upload the demo video** (30 s or less, English, AI watermark visible) to YouTube,
+- [x] **Upload the demo video** (30 s or less, English, AI watermark visible) to YouTube,
       Google Drive or similar, set it to public, and paste the link below.
 - [ ] **Release `develop` to `main`**, so the repository's default branch shows the final work.
 - [ ] Open both links in a private window to check they work.
@@ -48,7 +48,7 @@ It answers the challenge directly: astronauts see their own health at a glance a
 ## Link to Project Demo
 
 ```
-<public link to the 30-second video: YouTube / Google Drive>
+https://www.youtube.com/watch?v=UQVu2BK1jBI
 ```
 
 The video is built in [`video/storyboard/`](../video/storyboard/) (export: *Export video*); it
