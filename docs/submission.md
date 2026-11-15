@@ -108,7 +108,7 @@ TOOLS
 Yes.
 - In the product: CHIEF, the in-app assistant, uses a large language model (Google Gemini) to explain the rules engine's results and suggest actions, within safety limits (it never decides statuses, it only suggests medication from the onboard formulary). Speech recognition (Whisper) and speech synthesis (Piper) are machine-learning models running locally. The project text and the README state this.
 - In development: we used AI assistants to speed up writing code, tests and documentation, and to explore interface designs. The idea, the approach to the challenge, the architecture, the safety rules and the choice of NASA sources are the team's; every change was reviewed by the team.
-- In the demo video: the voice-over and the mascot's animation are AI-generated; the video carries a visible "AI-generated" watermark.
+- In the demo video: the voice-over is AI text-to-speech made with ElevenLabs (voice "Jessica"), and the mascot's animation is computer-generated; the video carries a visible "AI-generated" watermark and the voice is credited in the video description and in this text.
 No NASA logos or branding are used in generated content.
 ```
 
@@ -160,6 +160,9 @@ Images and design assets:
 - Organ icons from Health Icons (public domain, CC0 1.0). https://healthicons.org
 - IBM Plex Sans and IBM Plex Mono fonts (SIL Open Font License). https://github.com/IBM/plex
 - The CHIEF mascot, the interface and all other graphics are our own.
+
+Tools:
+- ElevenLabs text-to-speech, voice "Jessica": the voice-over of the demo video (AI-generated). https://elevenlabs.io
 
 Software and models (open source):
 Vue 3, Vite, Pinia, TypeScript, Node.js, Express, Socket.IO, SQLite, better-sqlite3, Drizzle ORM, Zod, Pino, Vitest, Python, FastAPI, Pydantic, Uvicorn, google-genai (Google Gemini API), faster-whisper (OpenAI Whisper model), Piper text-to-speech with the en_US-ryan-medium voice, ESLint, Prettier, Ruff, GitHub Actions.
