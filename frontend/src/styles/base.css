@@ -110,6 +110,35 @@
   color-scheme: dark;
 }
 
+/* CHIEF's chat: a light sky-blue surface, the mascot's colour, so the conversation with the
+   assistant is its own region, apart from the data canvas (warm paper) and the alerts
+   (navy). Hue tells the regions apart; messages and inputs stay on white cards for
+   reading. Every text colour keeps AA contrast on the panel, its header and the cards. */
+.assistant-surface {
+  --panel: #e1ecfd;
+  --panel-2: #ffffff;
+  --panel-3: #d2e2fb;
+  --border: #c3d6f4;
+  --border-2: #9dbbe9;
+  --text-2: #3f4d66;
+  --text-3: #56637b;
+  --accent-tint: rgba(36, 87, 214, 0.12);
+  background: var(--panel);
+  color: var(--text-1);
+}
+:root[data-theme='dark'] .assistant-surface {
+  --panel: #14233c;
+  --panel-2: #1b2d4b;
+  --panel-3: #1b2d4b;
+  --border: #2b4166;
+  --border-2: #3a5583;
+  --text-2: #a3aec0;
+  --text-3: #9aa6ba;
+  --accent: #7aa2ff;
+  --accent-strong: #9bb9ff;
+  --accent-tint: rgba(122, 162, 255, 0.18);
+}
+
 *,
 *::before,
 *::after {

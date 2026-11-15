@@ -166,8 +166,9 @@ One view for every crew member: what an astronaut sees on board.
 - **Right panel (navy like the navigation, collapsible to a rail):** alerts sorted by
   severity and a Tasks tab with the scheduled measurements. **A new alert always opens the
   panel.** **Clicking an alert asks CHIEF for recommended actions.**
-- **CHIEF chat:** text and voice (push-to-talk). If the voice service is down, the
-  browser's Web Speech API is the fallback.
+- **CHIEF chat:** text and voice (push-to-talk), on a light sky-blue panel (the mascot's
+  colour) so it is told apart from the data and the navy alerts. If the voice service is
+  down, the browser's Web Speech API is the fallback.
 - **CHIEF's mascot: "Capsule"**, a medicine capsule dressed as an astronaut, with four
   animated states (`idle`, `listening`, `thinking`, `alert`). It appears on the Talk to
   CHIEF button and in the chat. SVG, colors and the suggested Vue component:

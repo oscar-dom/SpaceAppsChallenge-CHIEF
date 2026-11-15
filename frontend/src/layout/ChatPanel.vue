@@ -72,7 +72,7 @@ const chatW = `${CHAT_W}px`;
 </script>
 
 <template>
-  <aside class="chat">
+  <aside class="chat assistant-surface">
     <div class="head">
       <Capsule :state="chief.mascot" :size="36" />
       <div class="who">
@@ -206,6 +206,8 @@ const chatW = `${CHAT_W}px`;
   gap: 12px;
   padding: 0 10px 0 16px;
   border-bottom: 1px solid var(--border);
+  /* A deeper band names the region: this is CHIEF talking. */
+  background: var(--panel-3);
 }
 .who {
   flex: 1;
@@ -335,7 +337,8 @@ const chatW = `${CHAT_W}px`;
   padding: 0 10px;
   border: 1px solid var(--border-2);
   border-radius: 14px;
-  background: transparent;
+  /* Filled like the cards, so the suggestions read as buttons on the blue panel. */
+  background: var(--panel-2);
   font-size: 12px;
   white-space: nowrap;
 }
