@@ -161,9 +161,23 @@ Images and design assets:
 - IBM Plex Sans and IBM Plex Mono fonts (SIL Open Font License). https://github.com/IBM/plex
 - The CHIEF mascot, the interface and all other graphics are our own.
 
-Tools:
-- ElevenLabs text-to-speech, voice "Jessica": the voice-over of the demo video (AI-generated). https://elevenlabs.io
+AI tools and models:
+- Google Gemini API (in the product: CHIEF's answers). https://ai.google.dev
+- OpenAI Whisper speech recognition model, run locally with faster-whisper (in the product: speech-to-text). https://github.com/openai/whisper · https://github.com/SYSTRAN/faster-whisper
+- Piper text-to-speech, voice en_US-ryan-medium (in the product: CHIEF's voice, run locally). https://github.com/OHF-Voice/piper1-gpl · https://huggingface.co/rhasspy/piper-voices
+- ElevenLabs text-to-speech, voice "Jessica" (the voice-over of the demo video). https://elevenlabs.io
+- Claude Code (AI coding assistant: development, tests and documentation). https://www.anthropic.com/claude-code
+- Claude Design (AI design tool: interface design exploration). https://claude.com/product/claude-design
 
-Software and models (open source):
-Vue 3, Vite, Pinia, TypeScript, Node.js, Express, Socket.IO, SQLite, better-sqlite3, Drizzle ORM, Zod, Pino, Vitest, Python, FastAPI, Pydantic, Uvicorn, google-genai (Google Gemini API), faster-whisper (OpenAI Whisper model), Piper text-to-speech with the en_US-ryan-medium voice, ESLint, Prettier, Ruff, GitHub Actions.
+Open-source software, frontend:
+- Vue 3 https://vuejs.org · Vite https://vite.dev · Pinia https://pinia.vuejs.org · Socket.IO client https://socket.io · Vue language tools (vue-tsc) https://github.com/vuejs/language-tools · Vitest https://vitest.dev
+
+Open-source software, backend:
+- Node.js https://nodejs.org · Express https://expressjs.com · Socket.IO https://socket.io · SQLite https://sqlite.org · better-sqlite3 https://github.com/WiseLibs/better-sqlite3 · Drizzle ORM https://orm.drizzle.team · Zod https://zod.dev · Helmet https://helmetjs.github.io · cors https://github.com/expressjs/cors · dotenv https://github.com/motdotla/dotenv · Pino https://getpino.io · tsx https://tsx.is · Supertest https://github.com/ladjs/supertest · Vitest https://vitest.dev
+
+Open-source software, AI agent:
+- Python https://www.python.org · FastAPI https://fastapi.tiangolo.com · Uvicorn https://www.uvicorn.dev · Pydantic https://docs.pydantic.dev · python-multipart https://github.com/Kludex/python-multipart · Google Gen AI SDK (google-genai) https://github.com/googleapis/python-genai · PyAV https://pyav.org · faster-whisper https://github.com/SYSTRAN/faster-whisper · Piper https://github.com/OHF-Voice/piper1-gpl · pytest https://pytest.org · HTTPX https://www.python-httpx.org · Ruff https://docs.astral.sh/ruff
+
+Open-source tooling:
+- TypeScript https://www.typescriptlang.org · ESLint https://eslint.org · typescript-eslint https://typescript-eslint.io · Prettier https://prettier.io · concurrently https://github.com/open-cli-tools/concurrently · GitHub Actions https://github.com/features/actions
 ```
